@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "border-delicate": "#EFE6DE",
+          "error-container": "#ffdad6",
+          "tertiary-fixed-dim": "#e9c176",
+          "accent-gold": "#D4AF37",
+          "surface-container-highest": "#e4e2e1",
+          "primary-container": "#5c1d24",
+          "on-secondary-fixed": "#350f11",
+          "surface-bright": "#fcf9f8",
+          "error": "#ba1a1a",
+          "background": "#fcf9f8",
+          "secondary-container": "#fdb8b8",
+          "on-secondary-fixed-variant": "#6a393a",
+          "surface-container": "#f0eded",
+          "on-primary-fixed-variant": "#753137",
+          "on-secondary": "#ffffff",
+          "inverse-on-surface": "#f3f0f0",
+          "on-tertiary-fixed": "#261900",
+          "surface-dim": "#dcd9d9",
+          "inverse-primary": "#ffb3b6",
+          "outline-variant": "#d9c1c1",
+          "burgundy-light": "#78242E",
+          "surface-container-low": "#f6f3f2",
+          "canvas-cream": "#FAF8F5",
+          "on-primary": "#ffffff",
+          "on-tertiary-fixed-variant": "#5d4201",
+          "on-tertiary-container": "#ba9650",
+          "on-tertiary": "#ffffff",
+          "blush-hover": "#F2C4CE",
+          "surface-tint": "#93474d",
+          "secondary-fixed": "#ffdad9",
+          "surface-container-high": "#eae7e7",
+          "blush-surface": "#F8E7E7",
+          "on-surface-variant": "#534343",
+          "on-error": "#ffffff",
+          "on-secondary-container": "#794647",
+          "primary-fixed": "#ffdada",
+          "on-background": "#1b1c1c",
+          "tertiary-container": "#442f00",
+          "on-primary-fixed": "#3d050e",
+          "on-primary-container": "#db8287",
+          "tertiary": "#291b00",
+          "on-error-container": "#93000a",
+          "outline": "#867273",
+          "surface-variant": "#e4e2e1",
+          "secondary": "#855050",
+          "tertiary-fixed": "#ffdea5",
+          "secondary-fixed-dim": "#fab5b5",
+          "canvas-pure": "#FFFDFB",
+          "inverse-surface": "#303030",
+          "on-surface": "#1b1c1c",
+          "surface": "#fcf9f8",
+          "surface-container-lowest": "#ffffff",
+          "primary": "#400710",
+          "primary-fixed-dim": "#ffb3b6"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "margin-mobile": "1.25rem",
+          "space-sm": "0.75rem",
+          "gutter": "1.5rem",
+          "space-xl": "3.5rem",
+          "space-lg": "2rem",
+          "space-md": "1.25rem",
+          "margin": "3rem",
+          "gutter-mobile": "1rem",
+          "space-xs": "0.375rem"
+        },
+        "fontFamily": {
+          "headline-sm": [
+            "Playfair Display"
+          ],
+          "body-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "display-mobile": [
+            "Playfair Display"
+          ],
+          "headline-lg-mobile": [
+            "Playfair Display"
+          ],
+          "display": [
+            "Playfair Display"
+          ],
+          "label-sm": [
+            "Plus Jakarta Sans"
+          ],
+          "label-md": [
+            "Plus Jakarta Sans"
+          ],
+          "label-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-md": [
+            "Playfair Display"
+          ],
+          "title-md": [
+            "Plus Jakarta Sans"
+          ],
+          "title-lg": [
+            "Plus Jakarta Sans"
+          ],
+          "headline-lg": [
+            "Playfair Display"
+          ],
+          "body-md": [
+            "Plus Jakarta Sans"
+          ],
+          "body-sm": [
+            "Plus Jakarta Sans"
+          ]
+        },
+        "fontSize": {
+          "headline-sm": [
+            "22px",
+            {
+              "lineHeight": "30px",
+              "letterSpacing": "0em",
+              "fontWeight": "600"
+            }
+          ],
+          "body-lg": [
+            "17px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "0.01em",
+              "fontWeight": "400"
+            }
+          ],
+          "display-mobile": [
+            "38px",
+            {
+              "lineHeight": "46px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-lg-mobile": [
+            "28px",
+            {
+              "lineHeight": "36px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "500"
+            }
+          ],
+          "display": [
+            "56px",
+            {
+              "lineHeight": "68px",
+              "letterSpacing": "-0.02em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-sm": [
+            "11px",
+            {
+              "lineHeight": "14px",
+              "letterSpacing": "0.1em",
+              "fontWeight": "700"
+            }
+          ],
+          "label-md": [
+            "12px",
+            {
+              "lineHeight": "16px",
+              "letterSpacing": "0.08em",
+              "fontWeight": "600"
+            }
+          ],
+          "label-lg": [
+            "14px",
+            {
+              "lineHeight": "20px",
+              "letterSpacing": "0.04em",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-md": [
+            "28px",
+            {
+              "lineHeight": "36px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "500"
+            }
+          ],
+          "title-md": [
+            "18px",
+            {
+              "lineHeight": "26px",
+              "letterSpacing": "0em",
+              "fontWeight": "500"
+            }
+          ],
+          "title-lg": [
+            "20px",
+            {
+              "lineHeight": "28px",
+              "letterSpacing": "-0.01em",
+              "fontWeight": "600"
+            }
+          ],
+          "headline-lg": [
+            "40px",
+            {
+              "lineHeight": "50px",
+              "letterSpacing": "-0.015em",
+              "fontWeight": "500"
+            }
+          ],
+          "body-md": [
+            "15px",
+            {
+              "lineHeight": "24px",
+              "letterSpacing": "0.005em",
+              "fontWeight": "400"
+            }
+          ],
+          "body-sm": [
+            "13px",
+            {
+              "lineHeight": "20px",
+              "letterSpacing": "0.01em",
+              "fontWeight": "400"
+            }
+          ]
+        }
+      },
+    },
+  }</script></head><body class="bg-canvas-cream font-body-md text-on-surface antialiased"><div class="fixed top-0 left-0 right-0 z-50"><div class="w-full bg-blush-surface text-on-secondary-container px-4 py-2 shadow-[0_1px_4px_rgba(92,29,36,0.04)]"><div class="max-w-[1320px] mx-auto flex items-center justify-between font-label-md text-label-md"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-accent-gold">auto_awesome</span><span>✨ Yeni Çıkan E-Kitaplarda %50 Lansman İndirimi! Kod: <strong class="text-primary-container font-semibold tracking-wider">DISIL50</strong></span></div><div class="flex items-center gap-6"><a class="flex items-center gap-1.5 text-on-secondary-container hover:text-primary-container transition-colors" href="#"><span class="material-symbols-outlined text-[15px]">chat</span><span>WhatsApp Danışma Hattı</span></a><span class="text-outline-variant">|</span><span class="text-on-surface-variant font-body-sm text-body-sm">Hafta İçi 09:30 - 18:30</span></div></div></div><header class="w-full bg-canvas-pure/90 backdrop-blur-md shadow-[0_4px_24px_rgba(92,29,36,0.04)]"><div class="h-20 max-w-[1320px] mx-auto px-6 flex items-center justify-between gap-6"><div class="flex items-center gap-4 flex-shrink-0"><img alt="Sümeyra Aydın Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WmgOiNUjaiKAyx9E7v0c1TiacEOf9Ez9UIoiWtd_wu5jvZxJQkt8tgqP_1af1X7-Dq0EwBfRcJN1dVN4feUAM4OLHX21QPzTrembPsErT974fcokn2vtB79K9-ykrYd6AqJJDHa0STeq52b_josAFx-YABLqEprjUcJFEgNZ7WPTHG_XrOPUggI1lMcTBFl29nh55qk4MnTXdlVybvkd-PPE97N01i9a5AgA7WLKsp_pYadDtSCgI8oJ4"/><a class="flex flex-col" data-path="anasayfa" href="#"><span class="font-headline-sm text-headline-sm text-primary tracking-tight font-semibold">Sümeyra Aydın</span><span class="font-label-sm text-label-sm tracking-[0.18em] uppercase text-secondary font-medium">Akademi &amp; Danışmanlık</span></a></div><nav class="hidden xl:flex items-center gap-5" data-active-classes="text-primary-container font-semibold after:scale-x-100"><a aria-current="page" class="transition-colors py-1 text-primary-container font-semibold after:scale-x-100" data-path="anasayfa" href="#">Anasayfa</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="hakkimda" href="#">Hakkımda</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="egitimler" href="#">Eğitimler</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1 inline-flex items-center gap-1" data-path="e-kitaplar" href="#">E-Kitaplar<span class="material-symbols-outlined text-[16px]">expand_more</span></a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="atolyeler" href="#">Atölyeler</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1 inline-flex items-center gap-1" data-path="1e1-seanslar" href="#">1e1 Seanslar<span class="material-symbols-outlined text-[16px]">expand_more</span></a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="soru-danismanligi" href="#">Soru Danışmanlığı</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="danisan-gorusleri" href="#">Danışan Görüşleri</a><a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary-container transition-colors py-1" data-path="iletisim" href="#">İletişim</a></nav><div class="flex items-center gap-4 flex-shrink-0"><button class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary-container hover:bg-blush-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">search</span></button><button class="relative w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary-container hover:bg-blush-surface transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">shopping_bag</span><span class="absolute -top-1 -right-1 bg-accent-gold text-tertiary font-label-sm text-label-sm font-bold w-4 h-4 rounded-full flex items-center justify-center ring-2 ring-canvas-pure">2</span></button><a class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-[0_8px_20px_-4px_rgba(92,29,36,0.35)] hover:bg-burgundy-light hover:text-on-primary transition-all" data-path="randevu-al" href="#">Randevu Al</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header></div><main class="w-full pt-28 bg-canvas-cream"><div class="flex flex-col w-full">
+<!-- Subtle Ambient Glow Orbs behind section -->
+<div class="relative w-full overflow-hidden">
+<div class="absolute -top-32 -left-20 w-96 h-96 bg-secondary-container/25 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-80 -right-24 w-[500px] h-[500px] bg-blush-hover/20 rounded-full blur-3xl pointer-events-none"></div>
+<!-- MAIN CONTAINER -->
+<div class="max-w-[1320px] mx-auto px-6 py-6 md:py-10">
+<!-- 1. BREADCRUMB & LIVE STATUS RIBBON -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<nav aria-label="Breadcrumb" class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant">
+<a class="hover:text-primary-container transition-colors" data-path="anasayfa" href="#">Anasayfa</a>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+<a class="hover:text-primary-container transition-colors" data-path="atolyeler" href="#">Atölyeler</a>
+<span class="material-symbols-outlined text-[14px] text-outline-variant">chevron_right</span>
+<span class="text-primary-container font-semibold truncate max-w-[280px] sm:max-w-none">Zarafetle Hayır Demek &amp; Sağlıklı Sınırlar</span>
+</nav>
+<div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-widest shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-gold opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-accent-gold"></span>
+</span>
+<span class="font-bold tracking-wider text-burgundy-light">CANLI İNTERAKTİF MASTERCLASS</span>
+<span class="text-outline-variant">|</span>
+<span class="text-on-secondary-fixed-variant font-semibold">Son 9 Koltuk</span>
+</div>
+</div>
+<!-- 2. HERO / EVENT HEADER -->
+<div class="relative bg-canvas-pure rounded-2xl shadow-xl p-8 md:p-12 mb-10 overflow-hidden">
+<div class="relative z-10 max-w-4xl">
+<div class="flex items-center gap-2 mb-4">
+<span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm tracking-wider text-secondary font-semibold uppercase">Dişil İletişim &amp; Özsaygı Serisi</span>
+<span class="inline-flex items-center text-accent-gold text-[16px] material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-semibold">4.9/5 (140+ Mezun)</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mb-4 leading-tight">
+            Zarafetle Hayır Demek &amp; Sağlıklı Sınırlar Atölyesi
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8 max-w-3xl">
+            İlişkilerde kırıp dökmeden, suçluluk çekmeden ve değerinizi kaybetmeden "hayır" diyebilmenin; kendi kutsal alanınızı zarafet ve vakar ile korumanın dönüştürücü dişil iletişim sanatı.
+          </p>
+<!-- Quick Meta Pill Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+<div class="p-3.5 rounded-xl bg-canvas-cream flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-gold text-[22px] mt-0.5">calendar_month</span>
+<div>
+<span class="block font-label-sm text-label-sm text-secondary uppercase font-semibold">Tarih</span>
+<span class="font-title-md text-title-md text-primary font-bold">24 Mayıs 2025</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">Cumartesi Akşamı</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-canvas-cream flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-gold text-[22px] mt-0.5">schedule</span>
+<div>
+<span class="block font-label-sm text-label-sm text-secondary uppercase font-semibold">Süre &amp; Saat</span>
+<span class="font-title-md text-title-md text-primary font-bold">20:30 - 23:30</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">3 Saat Canlı &amp; Etkileşimli</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-canvas-cream flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-gold text-[22px] mt-0.5">videocam</span>
+<div>
+<span class="block font-label-sm text-label-sm text-secondary uppercase font-semibold">Platform</span>
+<span class="font-title-md text-title-md text-primary font-bold">Canlı Zoom</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">30 Gün Kayıt Erişimi</span>
+</div>
+</div>
+<div class="p-3.5 rounded-xl bg-canvas-cream flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-gold text-[22px] mt-0.5">group</span>
+<div>
+<span class="block font-label-sm text-label-sm text-secondary uppercase font-semibold">Kapasite</span>
+<span class="font-title-md text-title-md text-primary font-bold">Maks. 35 Kadın</span>
+<span class="block font-body-sm text-body-sm text-on-surface-variant">Mikro Koçluk Çemberi</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative Subtle Background Graphic -->
+<div class="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-x-8 translate-y-8">
+<span class="material-symbols-outlined text-[320px] text-primary-container">spa</span>
+</div>
+</div>
+<!-- 3. SPLIT TWO-COLUMN CONTENT & STICKY CHECKOUT -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16">
+<!-- LEFT COLUMN: CURRICULUM & DETAILS (8 Cols) -->
+<div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-10">
+<!-- Audience / Target Checklist -->
+<div class="bg-canvas-pure rounded-2xl p-7 md:p-9 shadow-md">
+<div class="flex items-center gap-3 mb-6">
+<span class="w-8 h-8 rounded-full bg-blush-surface text-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-semibold">Bu Atölye Kimler İçin İyileştiricidir?</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+              İlişkilerinizde sürekli fedakarlık yapıp günün sonunda tükenmiş, anlaşılmamış ve öfkeli hissediyorsanız; bu atölye sınırlarınızı bir cephane gibi değil, bir zarafet pelerini gibi kuşanmanız için tasarlandı.
+            </p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="flex items-start gap-3 p-4 rounded-xl bg-canvas-cream">
+<span class="material-symbols-outlined text-accent-gold text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">"Hayır" derken boğazı düğümlenen, suçluluk ve terk edilme kaygısı yaşayanlar.</span>
+</div>
+<div class="flex items-start gap-3 p-4 rounded-xl bg-canvas-cream">
+<span class="material-symbols-outlined text-accent-gold text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Partnerine veya ailesine sınır çizerken patlayan, haklıyken haksız duruma düşenler.</span>
+</div>
+<div class="flex items-start gap-3 p-4 rounded-xl bg-canvas-cream">
+<span class="material-symbols-outlined text-accent-gold text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Kendi ruhsal ve bedensel ihtiyaçlarını hep en sona bırakıp aşırı verici olan kadınlar.</span>
+</div>
+<div class="flex items-start gap-3 p-4 rounded-xl bg-canvas-cream">
+<span class="material-symbols-outlined text-accent-gold text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium leading-snug">Sertleşmeden, ses tonunu yükseltmeden vakur ve saygı uyandıran bir dişil duruş isteyenler.</span>
+</div>
+</div>
+</div>
+<!-- 3-Hour Curriculum Timeline -->
+<div class="bg-canvas-pure rounded-2xl p-7 md:p-9 shadow-md">
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-surface-container">
+<div class="flex items-center gap-3">
+<span class="w-8 h-8 rounded-full bg-blush-surface text-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+</span>
+<h2 class="font-headline-sm text-headline-sm text-primary font-semibold">3 Saatlik İnteraktif Akış &amp; Modüller</h2>
+</div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold bg-surface-container px-3 py-1 rounded-full">4 Aşamalı Yolculuk</span>
+</div>
+<div class="space-y-6 relative before:absolute before:inset-0 before:left-4 before:w-0.5 before:bg-surface-container">
+<!-- Module 1 -->
+<div class="relative flex items-start gap-6 pl-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-canvas-pure font-label-md text-label-md font-bold flex items-center justify-center z-10 shadow-sm shrink-0">1</div>
+<div class="flex-1 bg-canvas-cream p-5 rounded-xl">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="font-title-lg text-title-lg text-primary font-bold">Bilinçaltındaki 'Uslu Kız' &amp; Onay Şartlanmasını Kırma</h3>
+<span class="px-2.5 py-0.5 rounded bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold">45 Dakika</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Neden sevilmek için kendimizden vazgeçiyoruz? Çocukluktan miras kalan "iyi kalpli olursan sevilirsin" kodunun çözümlenmesi ve onay bağımlılığının kök inanç çalışması.
+                  </p>
+</div>
+</div>
+<!-- Module 2 -->
+<div class="relative flex items-start gap-6 pl-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-canvas-pure font-label-md text-label-md font-bold flex items-center justify-center z-10 shadow-sm shrink-0">2</div>
+<div class="flex-1 bg-canvas-cream p-5 rounded-xl">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="font-title-lg text-title-lg text-primary font-bold">Somatik Beden Farkındalığı: Suçluluk Duygusunu Regüle Etme</h3>
+<span class="px-2.5 py-0.5 rounded bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold">30 Dakika</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    "Hayır" dediğiniz an göğsünüze ya da boğazınıza çöken o ağırlığı anında nötrleme nefes ve somatik vuruş teknikleri. Bedenin sınır hissini içselleştirmesi.
+                  </p>
+</div>
+</div>
+<!-- Module 3 -->
+<div class="relative flex items-start gap-6 pl-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-canvas-pure font-label-md text-label-md font-bold flex items-center justify-center z-10 shadow-sm shrink-0">3</div>
+<div class="flex-1 bg-canvas-cream p-5 rounded-xl">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="font-title-lg text-title-lg text-primary font-bold">12 Kritik Yaşam Senaryosunda Zarafetle Sınır Replikleri</h3>
+<span class="px-2.5 py-0.5 rounded bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold">60 Dakika</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Eş, sevgili, kayınvalide, iş arkadaşı ve çocuklar için canlandırılan gerçek hayat senaryoları. Kavgaya davet çıkarmayan ama geri adım da atmayan 3 aşamalı sihirli iletişim şablonu.
+                  </p>
+</div>
+</div>
+<!-- Module 4 -->
+<div class="relative flex items-start gap-6 pl-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-canvas-pure font-label-md text-label-md font-bold flex items-center justify-center z-10 shadow-sm shrink-0">4</div>
+<div class="flex-1 bg-canvas-cream p-5 rounded-xl">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="font-title-lg text-title-lg text-primary font-bold">Canlı Soru-Cevap &amp; Sümeyra Aydın ile Birebir Mikro Koçluk</h3>
+<span class="px-2.5 py-0.5 rounded bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold">45 Dakika</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Mikrofonu açıp kendi özel çıkmazınızı paylaşabileceğiniz, katılımcılara özel anlık vaka analizleri ve canlı geri bildirim seansı.
+                  </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Included Bonuses & Materials -->
+<div class="bg-gradient-to-br from-blush-surface/60 via-canvas-pure to-canvas-pure rounded-2xl p-7 md:p-9 shadow-md">
+<div class="flex items-center gap-3 mb-6">
+<span class="w-8 h-8 rounded-full bg-accent-gold/20 text-accent-gold flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">featured_seasonal_and_gifts</span>
+</span>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary font-semibold">Atölye Materyalleri &amp; Değerli Hediyeler</h2>
+<span class="font-body-sm text-body-sm text-secondary font-medium">Kayıt olan tüm katılımcılara ücretsiz sunulur</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-4 rounded-xl bg-canvas-pure shadow-sm flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">menu_book</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-primary font-semibold">48 Sayfalık Çalışma Defteri</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Baskıya hazır PDF: Günlük sınır takip çizelgeleri ve pratik şablonları.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-canvas-pure shadow-sm flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">style</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-primary font-semibold">35 Özel Sınır Replik Kartı</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Eş, kayınvalide ve iş hayatı için anında telefondan bakabileceğiniz hazır cümleler.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-canvas-pure shadow-sm flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">headphones</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-primary font-semibold">'Kendi Merkezinde Kal' Meditasyonu</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Sümeyra Aydın seslendirmesiyle 15 dakikalık bilinçaltı güçlenme MP3 kaydı.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-canvas-pure shadow-sm flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-primary-container shrink-0">
+<span class="material-symbols-outlined text-[22px]">forum</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md text-primary font-semibold">14 Günlük WhatsApp Çemberi</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Atölye sonrası yalnız kalmayın; 2 hafta boyunca soru ve deneyim paylaşımı desteği.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Instructor Profile Slate -->
+<div class="bg-canvas-pure rounded-2xl p-7 md:p-9 shadow-md flex flex-col md:flex-row items-center gap-7">
+<div class="w-32 h-32 md:w-36 md:h-36 rounded-full overflow-hidden shrink-0 shadow-lg relative ring-4 ring-blush-surface">
+<img class="w-full h-full object-cover" data-alt="Warm studio portrait of Sümeyra Aydın, an elegant female relationship counselor wearing deep burgundy silk blazer against a soft cream backdrop, calm and compassionate smile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwsXyfoZdVwafWFrSVG8eaT_SpgRvx-_eIhIsLnhKqHe07Oa9EukLwirqEu28_z9scR3t1VelB4ZgjlG_8KF_lTbwF21n7rWYhRb5UlWg0DZZd_Xuo3f39w52ZPbRNzIIHG_TQHUGlzLUMGrHnt3Z8dlua3Hzl2zVcGUUOsu0_nwkKW8efYmA-t9TUwrZZIZwsQMsD6ARoUDGyFTksmLBOfYbJtQpiOyOGL9fU1Nx5wCl2_hIAkEAu"/>
+</div>
+<div class="flex-1 text-center md:text-left">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase font-bold mb-2">
+                Atölye Lideri
+              </div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Sümeyra Aydın</h3>
+<p class="font-title-md text-title-md text-secondary font-medium mb-3">İlişki &amp; Aile Danışmanı • Bilinçaltı Terapisti</p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-4">
+                12 yılı aşkın süredir kadınların öz değerini keşfetmesi, duygusal bağımlılıklardan arınması ve ilişkilerinde sağlıklı iletişim kalıpları kurması üzerine 15.000'den fazla danışana yol arkadaşlığı yapmıştır.
+              </p>
+<div class="flex flex-wrap items-center justify-center md:justify-start gap-4 font-label-md text-label-md text-on-surface-variant font-medium">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-accent-gold text-[18px]">verified</span>15.000+ Danışan</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-accent-gold text-[18px]">school</span>Akademik Altyapı</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-accent-gold text-[18px]">award_star</span>Uluslararası Akredite</span>
+</div>
+</div>
+</div>
+<!-- Testimonials Slate -->
+<div class="bg-canvas-pure rounded-2xl p-7 md:p-9 shadow-md">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-primary font-semibold">Önceki Dönem Katılımcı Yorumları</h2>
+<p class="font-body-sm text-body-sm text-secondary font-medium">Geçmiş atölyelerimizde dönüştürücü anlar yaşayan kadınların hissettikleri</p>
+</div>
+<div class="hidden sm:flex items-center gap-1 text-accent-gold">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="p-5 rounded-xl bg-canvas-cream flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1 text-accent-gold mb-3">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed italic mb-4">
+                    "Kayınvalideme karşı yıllardır içimde biriktirip patlıyordum. Atölyedeki 2. modüldeki repliği birebir uyguladım; ne tartıştık ne de beni ezebildi. İnanılmaz bir hafiflik hissi."
+                  </p>
+</div>
+<div class="pt-3 border-t border-surface-container">
+<span class="font-title-md text-title-md text-primary font-bold block text-sm">Selin K.</span>
+<span class="font-label-sm text-label-sm text-secondary">32, Mimar • İstanbul</span>
+</div>
+</div>
+<div class="p-5 rounded-xl bg-canvas-cream flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1 text-accent-gold mb-3">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed italic mb-4">
+                    "Hayır dediğimde günler süren vicdan azabım oluyordu. Somatik vuruş çalışması resmen boğazımdaki o düğümü çözdü. Sümeyra Hocam iyi ki varsınız."
+                  </p>
+</div>
+<div class="pt-3 border-t border-surface-container">
+<span class="font-title-md text-title-md text-primary font-bold block text-sm">Merve D.</span>
+<span class="font-label-sm text-label-sm text-secondary">29, Finans Uzmanı • Ankara</span>
+</div>
+</div>
+<div class="p-5 rounded-xl bg-canvas-cream flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1 text-accent-gold mb-3">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface leading-relaxed italic mb-4">
+                    "Eşimle ilişkimde 'hayır' demenin zarafetle mümkün olduğunu gördüm. Sertleşmeden kendi alanımı koruduğumda bana olan saygısının arttığını hissettim."
+                  </p>
+</div>
+<div class="pt-3 border-t border-surface-container">
+<span class="font-title-md text-title-md text-primary font-bold block text-sm">Hande T.</span>
+<span class="font-label-sm text-label-sm text-secondary">38, Öğretmen • İzmir</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: STICKY TICKET & REGISTRATION FORM (4-5 Cols) -->
+<div class="lg:col-span-5 xl:col-span-4 sticky top-32">
+<div class="bg-canvas-pure rounded-2xl shadow-xl overflow-hidden p-6 md:p-8">
+<!-- Pricing & Early Bird Badge Header -->
+<div class="flex items-center justify-between gap-2 mb-4">
+<span class="px-3 py-1 rounded-full bg-tertiary-fixed text-tertiary-container font-label-sm text-label-sm font-bold uppercase tracking-wider">
+                %35 Erken Kayıt İndirimi
+              </span>
+<span class="font-label-sm text-label-sm text-error font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span> Son 9 Koltuk
+              </span>
+</div>
+<div class="flex items-baseline gap-3 mb-4">
+<span class="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">650 TL</span>
+<span class="font-title-md text-title-md text-outline-variant line-through">1.000 TL</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">(KDV Dahil)</span>
+</div>
+<!-- Scarcity Countdown Banner -->
+<div class="p-3 rounded-xl bg-blush-surface mb-6 flex items-center justify-between">
+<div class="flex items-center gap-2 text-primary-container">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+<span class="font-label-md text-label-md font-semibold">İndirim Bitiyor:</span>
+</div>
+<div class="font-label-md text-label-md font-bold text-burgundy-light tracking-wider" id="countdownTimer">
+                02G : 14S : 22D : 45S
+              </div>
+</div>
+<!-- REGISTRATION FORM -->
+<form class="flex flex-col gap-4" id="registrationForm" onsubmit="event.preventDefault(); document.getElementById('confirmationToast').classList.remove('hidden');">
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-semibold mb-1.5" for="fullName">Adınız &amp; Soyadınız *</label>
+<div class="relative">
+<input class="w-full px-4 py-3 rounded-xl bg-canvas-cream text-on-surface placeholder:text-outline-variant text-body-md focus:outline-none focus:bg-canvas-pure shadow-sm transition-all" id="fullName" placeholder="Örn: Ayşe Yılmaz" required="" type="text"/>
+<span class="material-symbols-outlined absolute right-3.5 top-3.5 text-outline-variant text-[20px]">person</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-semibold mb-1.5" for="whatsappPhone">WhatsApp Telefon Numaranız *</label>
+<div class="relative">
+<input class="w-full px-4 py-3 rounded-xl bg-canvas-cream text-on-surface placeholder:text-outline-variant text-body-md focus:outline-none focus:bg-canvas-pure shadow-sm transition-all" id="whatsappPhone" placeholder="05XX XXX XX XX" required="" type="tel"/>
+<span class="material-symbols-outlined absolute right-3.5 top-3.5 text-outline-variant text-[20px]">call</span>
+</div>
+<span class="block font-body-sm text-body-sm text-secondary mt-1">Canlı yayın Zoom linki ve hediyeler bu numaraya iletilir.</span>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-semibold mb-1.5" for="emailAddr">E-Posta Adresiniz *</label>
+<div class="relative">
+<input class="w-full px-4 py-3 rounded-xl bg-canvas-cream text-on-surface placeholder:text-outline-variant text-body-md focus:outline-none focus:bg-canvas-pure shadow-sm transition-all" id="emailAddr" placeholder="ornek@alanadi.com" required="" type="email"/>
+<span class="material-symbols-outlined absolute right-3.5 top-3.5 text-outline-variant text-[20px]">mail</span>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-semibold mb-1.5" for="userNotes">Atölyeden Temel Beklentiniz (Opsiyonel)</label>
+<textarea class="w-full px-4 py-2.5 rounded-xl bg-canvas-cream text-on-surface placeholder:text-outline-variant text-body-sm focus:outline-none focus:bg-canvas-pure shadow-sm transition-all resize-none" id="userNotes" placeholder="En çok nerede sınır koymakta zorlanıyorsunuz? (Eş, iş, aile vb.)" rows="2"></textarea>
+</div>
+<!-- Payment Method Selection -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface font-semibold mb-2">Ödeme Yöntemi</label>
+<div class="grid grid-cols-2 gap-2">
+<label class="flex items-center gap-2 p-3 rounded-xl bg-canvas-cream cursor-pointer hover:bg-blush-surface/50 transition-colors">
+<input checked="" class="accent-primary-container text-primary-container" name="paymentType" type="radio" value="cc"/>
+<span class="font-label-md text-label-md text-on-surface font-medium">Kredi Kartı</span>
+</label>
+<label class="flex items-center gap-2 p-3 rounded-xl bg-canvas-cream cursor-pointer hover:bg-blush-surface/50 transition-colors">
+<input class="accent-primary-container text-primary-container" name="paymentType" type="radio" value="eft"/>
+<span class="font-label-md text-label-md text-on-surface font-medium">Havale / EFT</span>
+</label>
+</div>
+</div>
+<!-- Primary CTA -->
+<button class="w-full mt-2 py-4 px-6 rounded-full bg-primary-container hover:bg-burgundy-light text-on-primary font-title-md text-title-md font-bold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all" type="submit">
+<span class="material-symbols-outlined text-[20px] text-accent-gold">lock</span>
+<span>Atölyeye Hemen Kaydol (650 TL)</span>
+</button>
+<!-- Micro Guarantee Copy -->
+<p class="text-center font-body-sm text-body-sm text-on-surface-variant mt-1">
+                Kayıt sonrası tüm atölye dokümanları ve WhatsApp davet linki anında iletilir.
+              </p>
+<!-- Trust Badges Strip -->
+<div class="pt-4 border-t border-surface-container flex flex-col gap-2 font-label-sm text-label-sm text-secondary">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-gold text-[18px]">verified_user</span>
+<span>256-Bit SSL Şifreli Güvenli İyziCo Ödeme Altyapısı</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-gold text-[18px]">history_toggle_off</span>
+<span>30 Gün Boyunca Sınırsız Video Tekrarı Garantisi</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-gold text-[18px]">chat</span>
+<span>Anında WhatsApp &amp; SMS Teyit Bildirimi</span>
+</div>
+</div>
+</form>
+<!-- Interactive Toast Message (Hidden by default) -->
+<div class="hidden mt-4 p-4 rounded-xl bg-tertiary-fixed text-tertiary-container text-center shadow-lg transition-all animate-bounce" id="confirmationToast">
+<div class="flex items-center justify-center gap-2 font-bold mb-1">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+                Talebiniz Alındı!
+              </div>
+<p class="text-body-sm font-normal">Güvenli ödeme sayfasına yönlendiriliyorsunuz...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. FAQ SECTION (Interactive Details Elements) -->
+<div class="max-w-4xl mx-auto mb-16">
+<div class="text-center mb-10">
+<span class="px-4 py-1.5 rounded-full bg-surface-container font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">Merak Edilenler</span>
+<h2 class="font-headline-lg text-headline-lg text-primary font-semibold mt-3 mb-2">Sıkça Sorulan Sorular</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Atölye katılım süreci, kayıtlar ve gizlilik hakkında aklınıza takılabilecek yanıtlar</p>
+</div>
+<div class="space-y-4">
+<details class="group bg-canvas-pure rounded-2xl shadow-sm p-6 [&amp;_summary::-webkit-details-marker]:hidden cursor-pointer transition-all">
+<summary class="flex items-center justify-between gap-4 font-title-lg text-title-lg text-primary font-bold select-none">
+<span>Atölye günü müsait olamazsam veya internetim koparsa ne olur?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-4 pt-3 border-t border-surface-container">
+              Hiç endişelenmeyin. Canlı oturumun yüksek kaliteli tam video kaydı, atölye bitiminden sonraki 24 saat içinde özel izleme panelinize yüklenir. 30 gün boyunca dilediğiniz zaman, dilediğiniz kadar tekrar izleyebilir, çalışma defterinizle eş zamanlı ilerleyebilirsiniz.
+            </p>
+</details>
+<details class="group bg-canvas-pure rounded-2xl shadow-sm p-6 [&amp;_summary::-webkit-details-marker]:hidden cursor-pointer transition-all">
+<summary class="flex items-center justify-between gap-4 font-title-lg text-title-lg text-primary font-bold select-none">
+<span>Kamera ve mikrofon açmak zorunlu mu?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-4 pt-3 border-t border-surface-container">
+              Kesinlikle hayır. Bu alan sizin güvenli ve konforlu alanınızdır. Dilerseniz sadece kahvenizi alıp sessizce dinleyebilir, sorularınızı Zoom chat kutusundan yazılı iletebilirsiniz. Canlı koçluk oturumunda mikrofon açıp konuşmak tamamen sizin gönüllü tercihinize bağlıdır.
+            </p>
+</details>
+<details class="group bg-canvas-pure rounded-2xl shadow-sm p-6 [&amp;_summary::-webkit-details-marker]:hidden cursor-pointer transition-all">
+<summary class="flex items-center justify-between gap-4 font-title-lg text-title-lg text-primary font-bold select-none">
+<span>Daha önce hiç dişil enerji ya da kişisel gelişim çalışmasına katılmadım; anlayabilir miyim?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-4 pt-3 border-t border-surface-container">
+              Evet, kesinlikle! Atölye programı, karmaşık kuramlar yerine günlük hayatta hemen kullanabileceğiniz berrak, sade ve somut pratikler üzerine kurulmuştur. İlk defa katılıyor olsanız dahi ilk dakikadan itibaren kendinizden parçalar bulacaksınız.
+            </p>
+</details>
+<details class="group bg-canvas-pure rounded-2xl shadow-sm p-6 [&amp;_summary::-webkit-details-marker]:hidden cursor-pointer transition-all">
+<summary class="flex items-center justify-between gap-4 font-title-lg text-title-lg text-primary font-bold select-none">
+<span>Erkekler bu atölyeye katılabilir mi?</span>
+<span class="material-symbols-outlined text-primary-container transition-transform duration-300 group-open:rotate-180">expand_more</span>
+</summary>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mt-4 pt-3 border-t border-surface-container">
+              Bu özel atölye, kadınların en mahrem ve kırılgan deneyimlerini rahatça paylaşabilmesi, güvenli bir dişil kız kardeşlik çemberi oluşturulması adına yalnızca kadın katılımcılara açıktır. Erkek danışanlarımız için bireysel 1e1 danışmanlık seanslarımız devam etmektedir.
+            </p>
+</details>
+</div>
+</div>
+<!-- 5. WHATSAPP ADVISORY & SUPPORT BAR -->
+<div class="bg-gradient-to-r from-canvas-pure via-blush-surface to-canvas-pure rounded-2xl p-8 md:p-10 shadow-lg text-center relative overflow-hidden">
+<div class="max-w-2xl mx-auto relative z-10">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center mx-auto mb-4 shadow-md">
+<span class="material-symbols-outlined text-[24px]">chat</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-semibold mb-2">
+            Kayıt Öncesi Sorularınız veya Özel Durumunuz mu Var?
+          </h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+            Hangi atölyenin ya da seansın sizin için daha uygun olduğuna karar veremediyseniz, uzman asistanımızla WhatsApp üzerinden birebir görüşebilirsiniz.
+          </p>
+<div class="flex flex-wrap items-center justify-center gap-4">
+<a class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-primary-container hover:bg-burgundy-light text-on-primary font-label-lg text-label-lg font-semibold shadow-md transition-all" href="#">
+<span class="material-symbols-outlined text-[20px] text-accent-gold">forum</span>
+<span>WhatsApp Danışma Hattı ile Yazışın</span>
+</a>
+<a class="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-canvas-pure hover:bg-surface-container text-primary font-label-lg text-label-lg font-medium transition-colors" href="tel:+905061151010">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>+90 (506) 115 10 10</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple Countdown Timer simulation for urgent conversion
+  (function() {
+    let duration = 2 * 24 * 3600 + 14 * 3600 + 22 * 60 + 45;
+    const el = document.getElementById('countdownTimer');
+    if (!el) return;
+    
+    setInterval(() => {
+      if (duration <= 0) return;
+      duration--;
+      const days = Math.floor(duration / 86400);
+      const hours = Math.floor((duration % 86400) / 3600);
+      const minutes = Math.floor((duration % 3600) / 60);
+      const seconds = duration % 60;
+      el.textContent = 
+        String(days).padStart(2, '0') + 'G : ' +
+        String(hours).padStart(2, '0') + 'S : ' +
+        String(minutes).padStart(2, '0') + 'D : ' +
+        String(seconds).padStart(2, '0') + 'S';
+    }, 1000);
+  })();
+</script></main><footer class="w-full bg-canvas-pure text-on-surface shadow-[0_-4px_24px_rgba(92,29,36,0.03)]"><div class="max-w-[1320px] mx-auto px-6 pt-16 pb-12"><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12"><div class="flex flex-col"><div class="flex items-center gap-3 mb-4"><img alt="Sümeyra Aydın Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WmgOiNUjaiKAyx9E7v0c1TiacEOf9Ez9UIoiWtd_wu5jvZxJQkt8tgqP_1af1X7-Dq0EwBfRcJN1dVN4feUAM4OLHX21QPzTrembPsErT974fcokn2vtB79K9-ykrYd6AqJJDHa0STeq52b_josAFx-YABLqEprjUcJFEgNZ7WPTHG_XrOPUggI1lMcTBFl29nh55qk4MnTXdlVybvkd-PPE97N01i9a5AgA7WLKsp_pYadDtSCgI8oJ4"/><span class="font-headline-sm text-headline-sm text-primary font-semibold">Sümeyra Aydın</span></div><p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-6">Bireysel dönüşüm, dişil enerji farkındalığı ve ilişkilerde kalıcı uyum üzerine bilimsel ve sezgisel rehberlik sunan seçkin gelişim akademisi.</p><div class="flex items-center gap-3"><a class="w-9 h-9 rounded-full bg-blush-surface text-primary-container flex items-center justify-center hover:bg-blush-hover hover:text-burgundy-light transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">camera_alt</span></a><a class="w-9 h-9 rounded-full bg-blush-surface text-primary-container flex items-center justify-center hover:bg-blush-hover hover:text-burgundy-light transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">smart_display</span></a><a class="w-9 h-9 rounded-full bg-blush-surface text-primary-container flex items-center justify-center hover:bg-blush-hover hover:text-burgundy-light transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">podcasts</span></a><a class="w-9 h-9 rounded-full bg-blush-surface text-primary-container flex items-center justify-center hover:bg-blush-hover hover:text-burgundy-light transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">call</span></a></div></div><div class="flex flex-col"><h3 class="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">Hızlı Erişim</h3><ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant"><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">chevron_right</span><a class="hover:text-primary-container transition-colors" data-path="1e1-seanslar" href="#">1e1 Seanslar</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">chevron_right</span><a class="hover:text-primary-container transition-colors" data-path="soru-danismanligi" href="#">Soru Danışmanlığı</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">chevron_right</span><a class="hover:text-primary-container transition-colors" data-path="e-kitaplar" href="#">E-Kitaplar</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">chevron_right</span><a class="hover:text-primary-container transition-colors" data-path="egitimler" href="#">Online Eğitimler</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">chevron_right</span><a class="hover:text-primary-container transition-colors" data-path="danisan-gorusleri" href="#">Danışan Başarı Hikayeleri</a></li></ul></div><div class="flex flex-col"><h3 class="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">Kurumsal &amp; Yasal</h3><ul class="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant"><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">gavel</span><a class="hover:text-primary-container transition-colors" data-path="kvkk-aydinlatma-metni" href="#">KVKK Aydınlatma Metni</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">description</span><a class="hover:text-primary-container transition-colors" data-path="mesafeli-satis-sozlesmesi" href="#">Mesafeli Satış Sözleşmesi</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">verified_user</span><a class="hover:text-primary-container transition-colors" data-path="gizlilik-ve-cerez-politikasi" href="#">Gizlilik &amp; Çerez Politikası</a></li><li class="flex items-center gap-2"><span class="material-symbols-outlined text-accent-gold text-[16px]">assignment_return</span><a class="hover:text-primary-container transition-colors" data-path="iptal-ve-iade-kosullari" href="#">İptal ve İade Koşulları</a></li></ul></div><div class="flex flex-col"><h3 class="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">İletişim &amp; Destek</h3><div class="flex flex-col gap-3 font-body-sm text-body-sm text-on-surface-variant mb-5"><div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary-container text-[18px]">call</span><span>+90 (506) 115 10 10</span></div><div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary-container text-[18px]">mail</span><span>iletisim@sumeyraaydin.com</span></div><div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary-container text-[18px]">schedule</span><span>Hafta İçi: 09:30 - 18:30</span></div></div><a class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-blush-surface text-primary-container font-label-md text-label-md hover:bg-blush-hover hover:text-burgundy-light transition-colors" href="#"><span class="material-symbols-outlined text-[18px]">forum</span><span>WhatsApp Destek Hattı</span></a></div></div><div class="mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-on-surface-variant font-body-sm text-body-sm"><p class="text-center md:text-left">© 2026 Sümeyra Aydın Danışmanlık &amp; Akademi. Tüm Hakları Saklıdır.</p><div class="flex items-center gap-3 font-label-sm text-label-sm text-secondary"><span class="px-2 py-1 rounded bg-canvas-cream">Mastercard</span><span class="px-2 py-1 rounded bg-canvas-cream">Visa</span><span class="px-2 py-1 rounded bg-canvas-cream">Troy</span><span class="px-2 py-1 rounded bg-canvas-cream">İyziCo 256-Bit SSL</span></div></div></div></footer></body></html>

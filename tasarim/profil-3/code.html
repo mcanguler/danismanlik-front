@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html lang="tr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-surface":"#1b1c1c","tertiary-fixed":"#ffdea5","tertiary":"#291b00","secondary":"#855050","on-primary":"#ffffff","surface-variant":"#e4e2e1","on-tertiary":"#ffffff","error-container":"#ffdad6","on-secondary":"#ffffff","surface-container-lowest":"#ffffff","surface-container":"#f0eded","surface-tint":"#93474d","blush-hover":"#F2C4CE","on-secondary-fixed-variant":"#6a393a","on-error":"#ffffff","surface-bright":"#fcf9f8","on-secondary-container":"#794647","surface-container-low":"#f6f3f2","primary-fixed":"#ffdada","outline-variant":"#d9c1c1","surface-container-high":"#eae7e7","on-tertiary-container":"#ba9650","on-background":"#1b1c1c","inverse-surface":"#303030","surface":"#fcf9f8","secondary-fixed-dim":"#fab5b5","background":"#fcf9f8","blush-surface":"#F8E7E7","on-secondary-fixed":"#350f11","tertiary-fixed-dim":"#e9c176","on-tertiary-fixed-variant":"#5d4201","border-delicate":"#EFE6DE","on-tertiary-fixed":"#261900","primary-container":"#5c1d24","surface-dim":"#dcd9d9","inverse-on-surface":"#f3f0f0","on-primary-fixed-variant":"#753137","on-error-container":"#93000a","secondary-fixed":"#ffdad9","on-primary-fixed":"#3d050e","on-surface-variant":"#534343","accent-gold":"#D4AF37","secondary-container":"#fdb8b8","outline":"#867273","error":"#ba1a1a","primary-fixed-dim":"#ffb3b6","canvas-pure":"#FFFDFB","primary":"#400710","surface-container-highest":"#e4e2e1","canvas-cream":"#FAF8F5","on-primary-container":"#db8287","inverse-primary":"#ffb3b6","burgundy-light":"#78242E","tertiary-container":"#442f00"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"margin":"3rem","space-xl":"3.5rem","margin-mobile":"1.25rem","gutter":"1.5rem","gutter-mobile":"1rem","space-lg":"2rem","space-xs":"0.375rem","space-md":"1.25rem","space-sm":"0.75rem"},fontFamily:{"display-mobile":["Playfair Display"],"label-sm":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"],display:["Playfair Display"],"body-md":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"headline-lg":["Playfair Display"],"headline-lg-mobile":["Playfair Display"],"body-lg":["Plus Jakarta Sans"],"title-md":["Plus Jakarta Sans"],"headline-sm":["Playfair Display"],"title-lg":["Plus Jakarta Sans"],"headline-md":["Playfair Display"]},fontSize:{"display-mobile":["38px",{lineHeight:"46px",letterSpacing:"-0.01em",fontWeight:"600"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.1em",fontWeight:"700"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.08em",fontWeight:"600"}],display:["56px",{lineHeight:"68px",letterSpacing:"-0.02em",fontWeight:"600"}],"body-md":["15px",{lineHeight:"24px",letterSpacing:"0.005em",fontWeight:"400"}],"body-sm":["13px",{lineHeight:"20px",letterSpacing:"0.01em",fontWeight:"400"}],"label-lg":["14px",{lineHeight:"20px",letterSpacing:"0.04em",fontWeight:"600"}],"headline-lg":["40px",{lineHeight:"50px",letterSpacing:"-0.015em",fontWeight:"500"}],"headline-lg-mobile":["28px",{lineHeight:"36px",letterSpacing:"-0.01em",fontWeight:"500"}],"body-lg":["17px",{lineHeight:"28px",letterSpacing:"0.01em",fontWeight:"400"}],"title-md":["18px",{lineHeight:"26px",letterSpacing:"0em",fontWeight:"500"}],"headline-sm":["22px",{lineHeight:"30px",letterSpacing:"0em",fontWeight:"600"}],"title-lg":["20px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-md":["28px",{lineHeight:"36px",letterSpacing:"-0.01em",fontWeight:"500"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low z-50 flex flex-col justify-between py-6 px-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col gap-6"><div class="px-3 flex items-center gap-3"><img alt="Brand logo. - Primary color: #5c1d24
+- Font: playfairDisplay
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WEHz9ylAPJgLxiWkLlJRgM-CFBarrwzcFrgZq94DGef1up6aWP8jYj7Eqgeh7kvpSZi7N8Rv85F_03lARgzuT6TpA0Q2xZtffOP9GwDPbTpGKSt6pNQYCdg67L-2RqUNlwl9F1Fsnhrf1NDDgzE2TtRAkDvA0bTjdlnXITXhON1mzWO1uaIzw0xjC5Ow2D5r0f_McEmp1BzKEGy9PbjOUW4YeurM3TwX6SO982CmjxkoZCm504D2QSFWs"/><div class="flex flex-col"><span class="font-title-md text-title-md text-primary">Sümeyra Aydın</span><span class="font-label-sm text-label-sm text-accent-gold uppercase tracking-wider">Danışan Portalı</span></div></div><div class="px-3 py-3 rounded-xl bg-blush-surface flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-gold animate-pulse"></div><span class="font-body-sm text-body-sm text-secondary font-medium">Kişisel Gelişim &amp; Terapi Odası</span></div><nav class="flex flex-col gap-1.5" data-active-classes="bg-primary-container text-on-primary font-semibold shadow-sm rounded-xl"><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-on-surface-variant hover:bg-blush-surface hover:text-primary transition-all" data-path="profilim" href="#"><span class="material-symbols-outlined text-xl">person</span><span class="font-label-lg text-label-lg">Profilim &amp; Bilgilerim</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-on-surface-variant hover:bg-blush-surface hover:text-primary transition-all" data-path="randevularim" href="#"><span class="material-symbols-outlined text-xl">calendar_month</span><span class="font-label-lg text-label-lg">Randevular &amp; Takvim</span></a><a aria-current="page" class="flex items-center gap-3 px-3.5 py-3 transition-all bg-primary-container text-on-primary font-semibold shadow-sm rounded-xl" data-path="seans-paketlerim" href="#"><span class="material-symbols-outlined text-xl">card_membership</span><span class="font-label-lg text-label-lg">Seans Paketleri</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-on-surface-variant hover:bg-blush-surface hover:text-primary transition-all" data-path="materyallerim" href="#"><span class="material-symbols-outlined text-xl">auto_stories</span><span class="font-label-lg text-label-lg">E-Kitap &amp; Materyaller</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-on-surface-variant hover:bg-blush-surface hover:text-primary transition-all" data-path="adres-defterim" href="#"><span class="material-symbols-outlined text-xl">home_pin</span><span class="font-label-lg text-label-lg">Adres Defterim</span></a></nav></div><div class="flex flex-col gap-3 px-2"><a class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-canvas-pure text-primary shadow-[0_1px_8px_rgba(0,0,0,0.04)] hover:bg-blush-surface hover:text-burgundy-light transition-all" href="https://wa.me/" target="_blank"><span class="material-symbols-outlined text-lg text-accent-gold">support_agent</span><span class="font-label-md text-label-md font-semibold">WhatsApp Danışman Hattı</span></a><div class="px-2 pt-2 flex items-center justify-between text-on-surface-variant"><span class="font-label-sm text-label-sm tracking-wider uppercase opacity-70">SSL 256-Bit Korumalı</span><span class="material-symbols-outlined text-sm text-accent-gold">verified_user</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-20 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-8"><div class="flex items-center gap-4"><a class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-lg">arrow_back</span><span class="font-body-sm text-body-sm font-medium">Akademi Ana Sitesine Dön</span></a><span class="w-1 h-1 rounded-full bg-outline-variant"></span><span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Danışan Özel Alanı</span></div><div class="flex items-center gap-6"><button aria-label="Bildirimler" class="relative p-2 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-accent-gold ring-2 ring-surface"></span></button><div class="flex items-center gap-3 pl-4 bg-surface-container-low/60 py-1.5 px-3 rounded-full"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-accent-gold" src="https://lh3.googleusercontent.com/aida/AEtjO1XIlVc064reFLGQVp5YzWGYgejh3Szlol-WsR0dPKzCgqPdNzynsbZbKNRZmoHcYO3yaZBy-JHEPWmrUIowT_xuMmLyHrxJf-PSzorG6kjxi8W0EHyDO-VUpdYDTjEDDr16Nn_FS1s0I98uIJZTezecoRyWuSk2Sd1BI6QNWjrOqXUv7KgJu1m1e58kLWGkaBBaCCjdnaq3jPPbcdTkVTUzzTvl41PPu4rXToddGlQBanjasYVgy_gb5g"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md font-bold text-on-surface">Zeynep Korkmaz</span><span class="font-label-sm text-label-sm text-secondary">Danışan No: #SA-2041</span></div></div><a class="p-2 rounded-full text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-all" data-path="cikis" href="#" title="Çıkış Yap"><span class="material-symbols-outlined text-xl">logout</span></a></div></header><main class="relative pt-20 bg-surface min-h-screen"><div class="w-full px-8 py-8"><div class="flex flex-col w-full">
+<!-- Page Header & Hero Statement -->
+<div class="relative overflow-hidden rounded-xl bg-canvas-pure shadow-md mb-8 p-8 md:p-10">
+<div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-blush-surface/70 blur-3xl pointer-events-none"></div>
+<div class="absolute right-40 -bottom-10 w-64 h-64 rounded-full bg-tertiary-fixed/30 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+<div class="max-w-2xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blush-surface text-primary mb-3">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-gold"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-primary font-bold">Kişisel Hak Yönetimi</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight mb-2">
+          Seans Paketlerim &amp; Kullanım Haklarım
+        </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Satın aldığınız çoklu seans paketlerini, kullanılan seansları, kalan haklarınızı ve paket son kullanma tarihlerini buradan takip edebilir, dilediğiniz zaman yeni randevu planlayabilirsiniz.
+        </p>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md hover:bg-burgundy-light transition-all transform hover:-translate-y-0.5">
+<span class="material-symbols-outlined text-lg">add_circle</span>
+<span>Yeni Seans Paketi Satın Al</span>
+</button>
+</div>
+</div>
+<!-- Summary Metrics Ribbon -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8">
+<!-- Metric 1 -->
+<div class="p-5 rounded-xl bg-surface-container-low flex items-center gap-4 transition-all hover:bg-surface-container">
+<div class="w-12 h-12 rounded-xl bg-canvas-pure text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl">card_membership</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Toplam Alınan Seans</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">8</span>
+<span class="font-body-sm text-body-sm text-secondary">Seans</span>
+</div>
+</div>
+</div>
+<!-- Metric 2 -->
+<div class="p-5 rounded-xl bg-surface-container-low flex items-center gap-4 transition-all hover:bg-surface-container">
+<div class="w-12 h-12 rounded-xl bg-canvas-pure text-secondary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl">task_alt</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Kullanılan Seanslar</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">5</span>
+<span class="font-body-sm text-body-sm text-secondary">Seans</span>
+</div>
+</div>
+</div>
+<!-- Metric 3 -->
+<div class="p-5 rounded-xl bg-blush-surface flex items-center gap-4 transition-all">
+<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl">hourglass_top</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Kalan Aktif Seans</span>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">3</span>
+<span class="px-2 py-0.5 rounded-full bg-canvas-pure text-accent-gold font-label-sm text-label-sm font-bold shadow-sm">%37 Kalan</span>
+</div>
+</div>
+</div>
+<!-- Metric 4 - Interactive Visual Donut Ring -->
+<div class="p-5 rounded-xl bg-surface-container-low flex items-center justify-between transition-all hover:bg-surface-container">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Genel Kullanım Oranı</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary">62.5%</span>
+<span class="font-body-sm text-body-sm text-secondary">5 / 8 Seans Tamamlandı</span>
+</div>
+<div class="relative w-14 h-14 flex items-center justify-center">
+<svg class="w-14 h-14 transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+<path class="text-accent-gold" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="62.5, 100" stroke-linecap="round" stroke-width="3.5"></path>
+</svg>
+<span class="material-symbols-outlined text-sm text-accent-gold absolute">verified</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Layout Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 mb-12">
+<!-- Active Packages Stream (Left 8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-8">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-6 rounded-full bg-primary-container"></span>
+<h2 class="font-headline-sm text-headline-sm text-primary">Kullanılabilir Aktif Paketleriniz</h2>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high font-label-md text-label-md text-on-surface-variant font-semibold">2 Aktif Paket</span>
+</div>
+<!-- PACKAGE 1: 3'lü Online Görüntülü Seans Paketi -->
+<div class="bg-canvas-pure rounded-xl p-6 md:p-8 shadow-md relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-accent-gold/15 via-transparent to-transparent pointer-events-none"></div>
+<!-- Package Top Header -->
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6">
+<div class="flex gap-4">
+<div class="w-14 h-14 rounded-xl bg-blush-surface text-primary flex-shrink-0 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-3xl">psychology</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1 flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm font-bold tracking-wider uppercase">Aktif Paket</span>
+<span class="px-2.5 py-0.5 rounded-full bg-canvas-cream text-secondary font-label-sm text-label-sm font-medium">Paket ID: #PKT-9482</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">3'lü Online Görüntülü Seans Paketi</h3>
+<p class="font-body-sm text-body-sm text-secondary">Kategori: İlişki &amp; Bireysel Sınırlar Danışmanlığı</p>
+</div>
+</div>
+<div class="text-left sm:text-right flex flex-col items-start sm:items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Kalan Süre</span>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blush-surface text-primary mt-1 font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-base text-accent-gold">schedule</span>
+<span>170 Gün Kaldı</span>
+</div>
+</div>
+</div>
+<!-- Progress & Stat Box -->
+<div class="p-5 rounded-xl bg-surface-container-low mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md font-bold text-primary">1 / 3 Seans Kullanıldı</span>
+<span class="text-on-surface-variant text-sm font-body-sm">(Kalan: 2 Seans)</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-secondary">33% Tamamlandı</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-primary-container rounded-full transition-all duration-500" style="width: 33.3%;"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4 mt-4 pt-3 text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-secondary">event_available</span>
+<span>Satın Alma: <strong>05 Ekim 2026</strong></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-accent-gold">event_busy</span>
+<span>Son Kullanma Tarihi: <strong>05 Nisan 2027</strong></span>
+</div>
+</div>
+</div>
+<!-- Package Features Included -->
+<div class="mb-6 p-4 rounded-xl bg-canvas-cream">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-bold block mb-3">Paket İçeriği &amp; Özel Haklar</span>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 text-xs">
+<span class="material-symbols-outlined text-sm">video_call</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface">3 x 60 Dk Canlı Zoom</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 text-xs">
+<span class="material-symbols-outlined text-sm">chat</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface">WhatsApp Takip Desteği</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="w-6 h-6 rounded-full bg-tertiary-fixed text-tertiary flex items-center justify-center flex-shrink-0 text-xs">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+</span>
+<span class="font-body-sm text-body-sm text-on-surface">1x E-Kitap Hediyesi <span class="text-accent-gold font-semibold">(Aktif)</span></span>
+</div>
+</div>
+</div>
+<!-- Session Timeline -->
+<div class="mb-6">
+<div class="flex items-center justify-between mb-4">
+<h4 class="font-title-md text-title-md text-primary font-bold">Paket Seans Kullanım Çizelgesi</h4>
+<span class="font-label-sm text-label-sm text-secondary">3 Aşamalı Süreç</span>
+</div>
+<div class="space-y-3">
+<!-- Timeline Item 1: Completed -->
+<div class="p-4 rounded-xl bg-canvas-pure shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-base">check</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">1. Seans: Bireysel Değerlendirme</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Tamamlandı</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">12 Ekim 2026, 11:00 • Sümeyra Aydın ile Görüşüldü (60 Dk)</p>
+</div>
+</div>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-all self-start md:self-center">
+<span class="material-symbols-outlined text-base">description</span>
+<span>Seans Özeti &amp; Notlar</span>
+</button>
+</div>
+<!-- Timeline Item 2: Empty / Pending -->
+<div class="p-4 rounded-xl bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center flex-shrink-0 mt-0.5 font-bold font-label-md text-label-md">
+                  2
+                </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">2. Seans: İlişkide Sağlıklı Sınırlar</span>
+<span class="px-2 py-0.5 rounded-full bg-blush-surface text-primary font-label-sm text-label-sm font-semibold">Randevu Bekliyor</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Henüz randevu saati belirlenmedi. Takvimden uygun saat seçiniz.</p>
+</div>
+</div>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary-container text-on-primary hover:bg-burgundy-light font-label-md text-label-md transition-all self-start md:self-center">
+<span class="material-symbols-outlined text-base">calendar_add_on</span>
+<span>Şimdi Randevu Al</span>
+</button>
+</div>
+<!-- Timeline Item 3: Empty / Pending -->
+<div class="p-4 rounded-xl bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center flex-shrink-0 mt-0.5 font-bold font-label-md text-label-md">
+                  3
+                </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg font-bold text-on-surface">3. Seans: Bütünleşme &amp; Eylem Planı</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Planlanmadı</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">2. seans tamamlandıktan sonra randevu oluşturulması tavsiye edilir.</p>
+</div>
+</div>
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-variant text-on-surface font-label-md text-label-md transition-all self-start md:self-center">
+<span class="material-symbols-outlined text-base">event</span>
+<span>Randevu Planla</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Action Ribbon -->
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-base text-accent-gold">verified_user</span>
+<span>Kullanılmayan 2 seansınız 05 Nisan 2027 tarihine kadar korunmaktadır.</span>
+</div>
+<button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-burgundy-light shadow-md transition-all">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+<span>Kalan Seans İçin Randevu Al</span>
+</button>
+</div>
+</div>
+<!-- PACKAGE 2: 5'li Derin Dönüşüm & Bireysel Rehberlik Paketi -->
+<div class="bg-canvas-pure rounded-xl p-6 md:p-8 shadow-md relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+<div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-burgundy-light/10 via-transparent to-transparent pointer-events-none"></div>
+<!-- Package Top Header -->
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6">
+<div class="flex gap-4">
+<div class="w-14 h-14 rounded-xl bg-tertiary-fixed/40 text-tertiary flex-shrink-0 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-3xl">auto_awesome</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1 flex-wrap">
+<span class="px-2.5 py-0.5 rounded-full bg-accent-gold text-on-primary font-label-sm text-label-sm font-bold tracking-wider uppercase">Son 1 Seans</span>
+<span class="px-2.5 py-0.5 rounded-full bg-canvas-cream text-secondary font-label-sm text-label-sm font-medium">Paket ID: #PKT-7719</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">5'li Derin Dönüşüm &amp; Bireysel Rehberlik Paketi</h3>
+<p class="font-body-sm text-body-sm text-secondary">Kategori: Bütünsel Kişisel Gelişim &amp; İçsel Barış</p>
+</div>
+</div>
+<div class="text-left sm:text-right flex flex-col items-start sm:items-end">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Geçerlilik Uyarısı</span>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-on-error-container mt-1 font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-base">warning</span>
+<span>Kalan 50 Gün</span>
+</div>
+</div>
+</div>
+<!-- Progress & Stat Box -->
+<div class="p-5 rounded-xl bg-surface-container-low mb-6">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-title-md font-bold text-primary">4 / 5 Seans Kullanıldı</span>
+<span class="text-secondary font-body-sm font-medium">(Kalan: 1 Seans)</span>
+</div>
+<span class="font-label-md text-label-md font-bold text-accent-gold">80% Tamamlandı</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-accent-gold rounded-full transition-all duration-500" style="width: 80%;"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4 mt-4 pt-3 text-on-surface-variant font-body-sm text-body-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-secondary">event_available</span>
+<span>Satın Alma: <strong>15 Haziran 2026</strong></span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-error">event_busy</span>
+<span>Son Kullanma Tarihi: <strong class="text-error">15 Aralık 2026</strong></span>
+</div>
+</div>
+</div>
+<!-- Urgent Notice Ribbon -->
+<div class="p-4 rounded-xl bg-blush-surface flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-2xl text-primary flex-shrink-0">notification_important</span>
+<div>
+<p class="font-label-lg text-label-lg font-bold text-primary">Son Kullanım: 15 Aralık 2026</p>
+<p class="font-body-sm text-body-sm text-secondary">Paket süreniz dolmadan önce lütfen son seans randevunuzu oluşturun.</p>
+</div>
+</div>
+<button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md hover:bg-burgundy-light shadow-sm transition-all whitespace-nowrap">
+<span class="material-symbols-outlined text-base">calendar_month</span>
+<span>Son Seansımı Planla</span>
+</button>
+</div>
+</div>
+<!-- SECTION 3: Completed & Expired Packages -->
+<div class="bg-surface-container-low rounded-xl p-6 md:p-8 mt-2">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-6 rounded-full bg-secondary"></span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Tamamlanan ve Süresi Dolan Paketler</h3>
+</div>
+<span class="font-label-sm text-label-sm text-secondary">Arşiv</span>
+</div>
+<!-- Completed Package Card -->
+<div class="p-5 rounded-xl bg-canvas-pure shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high text-on-surface-variant flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">diversity_1</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-semibold">Tamamlandı</span>
+<span class="font-label-sm text-label-sm text-secondary">Mayıs 2026</span>
+</div>
+<h4 class="font-title-md text-title-md font-bold text-on-surface mt-1">Görüntülü Aile &amp; Çift Danışmanlığı (3'lü Paket)</h4>
+<p class="font-body-sm text-body-sm text-secondary">3 / 3 Seans Başarıyla Tamamlandı • Danışman: Sümeyra Aydın</p>
+</div>
+</div>
+<div class="flex items-center gap-3 self-end lg:self-center">
+<button class="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-all">
+<span class="material-symbols-outlined text-base">receipt_long</span>
+<span>Fatura &amp; Dekont</span>
+</button>
+<button class="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-all">
+<span class="material-symbols-outlined text-base">history_edu</span>
+<span>Seans Raporu</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side Sidebar: Rules, Assistant & Luxury Visual (Right 4 Cols) -->
+<div class="xl:col-span-4 flex flex-col gap-6">
+<!-- Luxury Visual Editorial Card -->
+<div class="relative rounded-xl overflow-hidden shadow-md bg-primary-container text-on-primary p-6">
+<div class="absolute inset-0 opacity-20 bg-cover bg-center" data-alt="A tranquil, luxurious aesthetic corner with soft velvet cushions, warm champagne reflections, ceramic vases with dried neutral florals, and warm ambient sunlight representing calm therapeutic care." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCYAWglw2As5Me3t5sdGoaubHAye2tyosZzFq-UFt7DGLYnQUrXuxUzS6sNY2TPyP0ZRtyr4N02j5g_NqkKDf9xbkj4oVrDDpcvXAoMzcll_VODv7ruBcE-px_XjNx5Vqa-5VakexeT9DEBnL7_Zuqr41_dwa_pBR8EZ1DCQo1SSozrhYuKymQnCQkBJKGTRREoYId7mrk4Cvv-k1cmdRkqdHYNbYCnDDsZciFkRi-kguBK5JiqxhS')"></div>
+<div class="relative z-10 flex flex-col justify-between h-full">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-accent-gold font-bold block mb-2">Danışan Ayrıcalığı</span>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-primary mb-2">Dönüşüm Sürecinizi Güvenceye Alın</h3>
+<p class="font-body-sm text-body-sm text-surface-variant leading-relaxed">
+              Çoklu paketler, danışmanlık sürecinde süreklilik ve derin içsel entegrasyon sağlamak adına tasarlanmıştır. Randevularınızı haftalık veya iki haftalık aralıklarla oluşturmanız tavsiye edilir.
+            </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-tertiary-fixed">
+<span class="font-label-md text-label-md">Sümeyra Aydın Akademi</span>
+<span class="material-symbols-outlined text-xl text-accent-gold">spa</span>
+</div>
+</div>
+</div>
+<!-- Rules & Terms Card -->
+<div class="bg-canvas-pure rounded-xl p-6 shadow-md">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-accent-gold">rule</span>
+<h3 class="font-title-lg text-title-lg font-bold text-primary">Paket Kullanım Kuralları</h3>
+</div>
+<ul class="space-y-3.5 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-start gap-3">
+<span class="w-5 h-5 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">1</span>
+<span><strong>Geçerlilik Süresi:</strong> Tüm seans paketleri satın alma tarihinden itibaren <strong>6 ay (180 gün)</strong> boyunca geçerlidir.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="w-5 h-5 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">2</span>
+<span><strong>Şahsa Özeldir:</strong> Paket hakları ve randevu kontenjanları üçüncü kişilere devredilemez veya bölünemez.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="w-5 h-5 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">3</span>
+<span><strong>Esnek İptal &amp; Erteleme:</strong> Planlanan seans saatinden en geç <strong>24 saat öncesine kadar</strong> ücretsiz iptal veya tarih değişikliği yapılabilir.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="w-5 h-5 rounded-full bg-blush-surface text-primary flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold">4</span>
+<span><strong>Zoom Bağlantısı:</strong> Seans günü randevu saatinden 15 dakika önce SMS ve e-posta ile şifreli katılım linki iletilir.</span>
+</li>
+</ul>
+</div>
+<!-- Assistant WhatsApp Support Card -->
+<div class="bg-blush-surface rounded-xl p-6 shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-canvas-pure text-accent-gold flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-2xl">support_agent</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md font-bold text-primary">Paket Danışma Asistanı</h4>
+<span class="font-label-sm text-label-sm text-secondary">Hızlı WhatsApp İletişim Hattı</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+            Paket süre uzatımı, seans takvimi senkronizasyonu veya özel durumlarınız için kişisel asistanımızla doğrudan iletişime geçebilirsiniz.
+          </p>
+</div>
+<a class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-canvas-pure text-primary font-label-md text-label-md font-bold hover:bg-blush-hover transition-all shadow-sm" href="https://wa.me/" target="_blank">
+<span class="material-symbols-outlined text-lg text-accent-gold">chat</span>
+<span>Asistana Soru Sor</span>
+</a>
+</div>
+<!-- Quick FAQ Interactive Accordion Accord -->
+<div class="bg-canvas-pure rounded-xl p-6 shadow-md">
+<h3 class="font-title-md text-title-md font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-gold">help_outline</span>
+<span>Sıkça Sorulan Sorular</span>
+</h3>
+<div class="space-y-3">
+<details class="group rounded-lg bg-surface-container-low p-3.5 transition-all">
+<summary class="flex items-center justify-between cursor-pointer list-none font-label-md text-label-md font-bold text-on-surface">
+<span>Süresi dolan seanslarımı uzatabilir miyim?</span>
+<span class="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Mazeret bildirimi halinde asistan onaylı olarak paket bitim tarihine +15 gün tek seferlik ek süre tanımlanabilmektedir.
+            </p>
+</details>
+<details class="group rounded-lg bg-surface-container-low p-3.5 transition-all">
+<summary class="flex items-center justify-between cursor-pointer list-none font-label-md text-label-md font-bold text-on-surface">
+<span>Paket seansları yüz yüze kullanılabilir mi?</span>
+<span class="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Online paketler Zoom üzerinden yürütülmektedir. İstanbul Nişantaşı ofisindeki yüz yüze seanslar için özel yüz yüze paketler tercih edilmelidir.
+            </p>
+</details>
+</div>
+</div>
+</div>
+</div>
+</div></div></main><footer class="w-full bg-surface-container-low py-6 px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-on-surface-variant"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-base text-accent-gold">lock</span><span class="font-body-sm text-body-sm">© 2024 Sümeyra Aydın Akademi &amp; Danışmanlık. Gizlilik ve Danışan Hakları Güvencesindedir.</span></div><div class="flex items-center gap-6 font-body-sm text-body-sm"><span class="hover:text-primary cursor-pointer transition-colors">Kişisel Veri Koruma (KVKK)</span><span class="hover:text-primary cursor-pointer transition-colors">Etik İlkeler</span><span class="hover:text-primary cursor-pointer transition-colors">Yardım &amp; Destek</span></div></footer></div></body></html>
