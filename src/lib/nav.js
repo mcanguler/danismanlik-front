@@ -11,11 +11,13 @@ import {
   CreditCard,
   FolderTree,
   GraduationCap,
+  HeartHandshake,
   Home,
   LayoutDashboard,
   Package,
+  PackageOpen,
   ReceiptText,
-  Settings,
+  Settings, ShoppingBag,
   ShoppingCart,
   Store,
   Tags,
@@ -35,40 +37,81 @@ export const NAV = {
   [ROLES.ADMIN]: [
     { label: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard, bottom: true },
     { label: "Randevular", href: "/appointments", icon: CalendarDays, bottom: true },
-    { label: "Danışmanlar", href: "/dashboard/admin/danismanlar", icon: UserCog },
-    { label: "Müşteriler", href: "/dashboard/admin/musteriler", icon: Users, bottom: true },
-    { label: "Hizmetler", href: "/dashboard/admin/hizmetler", icon: Briefcase },
     {
-      label: "Danışman Hizmetleri",
-      href: "/dashboard/admin/danisman-hizmetleri",
-      icon: CalendarClock,
+      label: "Danışmanlık Sistemleri",
+      icon: HeartHandshake,
+      children: [
+        {
+          label: "Danışmanlar",
+          href: "/dashboard/admin/danismanlar",
+          icon: UserCog,
+        },
+        {
+          label: "Müşteriler",
+          href: "/dashboard/admin/musteriler",
+          icon: Users,
+          bottom: true,
+        },
+        { label: "Hizmetler", href: "/dashboard/admin/hizmetler", icon: Briefcase },
+        {
+          label: "Hizmet Kategorileri",
+          href: "/dashboard/admin/hizmet-kategorileri",
+          icon: Tags,
+        },
+        {
+          label: "Danışman Hizmetleri",
+          href: "/dashboard/admin/danisman-hizmetleri",
+          icon: CalendarClock,
+        },
+      ],
     },
     {
-      label: "Çalışma Saatleri",
-      href: "/dashboard/admin/calisma-saatleri",
-      icon: Clock,
+      label: "Takvim & Zaman",
+      icon: Calendar,
+      children: [
+        {
+          label: "Çalışma Saatleri",
+          href: "/dashboard/admin/calisma-saatleri",
+          icon: Clock,
+        },
+        { label: "Molalar", href: "/dashboard/admin/molalar", icon: Coffee },
+        {
+          label: "Bloklu Zamanlar",
+          href: "/dashboard/admin/bloklu-zamanlar",
+          icon: CalendarX,
+        },
+      ],
     },
-    { label: "Molalar", href: "/dashboard/admin/molalar", icon: Coffee },
     {
-      label: "Bloklu Zamanlar",
-      href: "/dashboard/admin/bloklu-zamanlar",
-      icon: CalendarX,
+      label: "Paketler & Satış",
+      icon: Package,
+      children: [
+        { label: "Paketler", href: "/dashboard/admin/paketler", icon: PackageOpen },
+        {
+          label: "Paket Kategorileri",
+          href: "/dashboard/admin/paket-kategorileri",
+          icon: FolderTree,
+        },
+        {
+          label: "Paket Satın Alımları",
+          href: "/dashboard/admin/paket-satin-alimlari",
+          icon: ReceiptText,
+        },
+      ],
     },
-    { label: "Hizmet Kategorileri", href: "/dashboard/admin/hizmet-kategorileri", icon: Tags },
     {
-      label: "Paket Kategorileri",
-      href: "/dashboard/admin/paket-kategorileri",
-      icon: FolderTree,
+      label: "Mağaza & Eğitim",
+      icon: Store,
+      children: [
+        { label: "Ürünler", href: "/dashboard/admin/urunler", icon: ShoppingBag },
+        {
+          label: "Siparişler",
+          href: "/dashboard/admin/siparisler",
+          icon: ShoppingCart,
+        },
+        { label: "Kurslar", href: "/dashboard/admin/kurslar", icon: GraduationCap },
+      ],
     },
-    { label: "Paketler", href: "/dashboard/admin/paketler", icon: Package },
-    {
-      label: "Paket Satın Alımları",
-      href: "/dashboard/admin/paket-satin-alimlari",
-      icon: ReceiptText,
-    },
-    { label: "Ürünler", href: "/dashboard/admin/urunler", icon: Package },
-    { label: "Siparişler", href: "/dashboard/admin/siparisler", icon: ShoppingCart },
-    { label: "Kurslar", href: "/dashboard/admin/kurslar", icon: GraduationCap },
     { label: "Ödemeler", href: "/dashboard/admin/odemeler", icon: CreditCard },
     { label: "Ayarlar", href: "/dashboard/admin/ayarlar", icon: Settings, bottom: true },
   ],
@@ -113,16 +156,24 @@ export const NAV = {
   ],
 };
 
+export function flattenNavItems(items) {
+  return items.flatMap((item) => (item.children ? item.children : [item]));
+}
+
 export function getNav(role) {
   return NAV[role] ?? [];
 }
 
 export function getBottomNav(role) {
-  return getNav(role).filter((item) => item.bottom);
+  return flattenNavItems(getNav(role)).filter((item) => item.bottom);
 }
 
 export function findModule(role, moduleSlug) {
   const base = ROLE_HOME[role];
   if (!base) return null;
-  return getNav(role).find((item) => item.href === `${base}/${moduleSlug}`) ?? null;
+  return (
+    flattenNavItems(getNav(role)).find(
+      (item) => item.href === `${base}/${moduleSlug}`
+    ) ?? null
+  );
 }

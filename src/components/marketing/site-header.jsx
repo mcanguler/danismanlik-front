@@ -49,32 +49,32 @@ export function SiteHeader({
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
-      <div className="w-full bg-blush-surface text-on-secondary-container px-4 py-2 shadow-[0_1px_4px_rgba(92,29,36,0.04)]">
-        <div className="max-w-[1320px] mx-auto flex items-center justify-between font-label-md text-label-md">
-          <div className="flex items-center gap-2 min-w-0">
-            <Sparkles className="size-4 shrink-0 text-accent-gold" />
-            <span className="truncate">
-              ✨ Yeni Çıkan E-Kitaplarda %50 Lansman İndirimi! Kod:{" "}
-              <strong className="text-primary-container font-semibold tracking-wider">
-                DISIL50
-              </strong>
-            </span>
-          </div>
-          <div className="hidden lg:flex items-center gap-6 shrink-0">
-            <a
-              className="flex items-center gap-1.5 text-on-secondary-container hover:text-primary-container transition-colors"
-              href="#"
-            >
-              <MessageCircle className="size-4" />
-              <span>WhatsApp Danışma Hattı</span>
-            </a>
-            <span className="text-outline-variant">|</span>
-            <span className="text-on-surface-variant font-body-sm text-body-sm">
-              Hafta İçi 09:30 - 18:30
-            </span>
-          </div>
-        </div>
-      </div>
+      {/*<div className="w-full bg-blush-surface text-on-secondary-container px-4 py-2 shadow-[0_1px_4px_rgba(92,29,36,0.04)]">*/}
+      {/*  <div className="max-w-[1320px] mx-auto flex items-center justify-between font-label-md text-label-md">*/}
+      {/*    <div className="flex items-center gap-2 min-w-0">*/}
+      {/*      <Sparkles className="size-4 shrink-0 text-accent-gold" />*/}
+      {/*      <span className="truncate">*/}
+      {/*        ✨ Yeni Çıkan E-Kitaplarda %50 Lansman İndirimi! Kod:{" "}*/}
+      {/*        <strong className="text-primary-container font-semibold tracking-wider">*/}
+      {/*          DISIL50*/}
+      {/*        </strong>*/}
+      {/*      </span>*/}
+      {/*    </div>*/}
+      {/*    <div className="hidden lg:flex items-center gap-6 shrink-0">*/}
+      {/*      <a*/}
+      {/*        className="flex items-center gap-1.5 text-on-secondary-container hover:text-primary-container transition-colors"*/}
+      {/*        href="#"*/}
+      {/*      >*/}
+      {/*        <MessageCircle className="size-4" />*/}
+      {/*        <span>WhatsApp Danışma Hattı</span>*/}
+      {/*      </a>*/}
+      {/*      <span className="text-outline-variant">|</span>*/}
+      {/*      <span className="text-on-surface-variant font-body-sm text-body-sm">*/}
+      {/*        Hafta İçi 09:30 - 18:30*/}
+      {/*      </span>*/}
+      {/*    </div>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
       <header className="w-full bg-canvas-pure/90 backdrop-blur-md shadow-[0_4px_24px_rgba(92,29,36,0.04)]">
         <div className="h-20 max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-6">
           <div className="flex items-center gap-4 flex-shrink-0">
@@ -165,38 +165,13 @@ export function SiteHeader({
                 2
               </span>
             </button>
-            {accountName ? (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <Link
-                  className="hidden sm:flex h-9 items-center gap-2 rounded-full bg-blush-surface px-3 text-primary transition-colors hover:bg-blush-hover"
-                  href={accountHref}
-                >
-                  <User className="size-4" />
-                  <span className="max-w-[160px] truncate font-label-md text-label-md font-semibold">
-                    {accountName}
-                  </span>
-                </Link>
-                {onAccountLogout && (
-                  <button
-                    className="flex size-9 items-center justify-center rounded-full text-primary transition-colors hover:bg-blush-surface"
-                    type="button"
-                    aria-label="Çıkış Yap"
-                    title="Çıkış Yap"
-                    onClick={onAccountLogout}
-                  >
-                    <LogOut className="size-4" />
-                  </button>
-                )}
-              </div>
-            ) : (
-              <Link
+            <Link
                 className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-burgundy-light transition-colors"
                 href={accountHref}
                 aria-label="Giriş Yap"
-              >
-                <User className="size-4" />
-              </Link>
-            )}
+            >
+              <User className="size-4" />
+            </Link>
             <button
               className="xl:hidden w-9 h-9 rounded-full flex items-center justify-center text-primary hover:bg-blush-surface transition-colors"
               type="button"
@@ -267,40 +242,14 @@ export function SiteHeader({
                 <CalendarPlus className="size-4" />
                 <span>Randevu Al</span>
               </a>
-              {accountName ? (
-                <>
-                  <Link
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blush-surface text-primary-container font-label-lg text-label-lg hover:bg-blush-hover transition-colors"
-                    href={accountHref}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    <User className="size-4" />
-                    <span>{accountName}</span>
-                  </Link>
-                  {onAccountLogout && (
-                    <button
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full border border-border-delicate text-primary font-label-lg text-label-lg hover:bg-blush-surface transition-colors"
-                      type="button"
-                      onClick={() => {
-                        setMobileOpen(false);
-                        onAccountLogout();
-                      }}
-                    >
-                      <LogOut className="size-4" />
-                      <span>Çıkış Yap</span>
-                    </button>
-                  )}
-                </>
-              ) : (
-                <Link
+              <Link
                   className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blush-surface text-primary-container font-label-lg text-label-lg hover:bg-blush-hover transition-colors"
                   href={accountHref}
                   onClick={() => setMobileOpen(false)}
-                >
-                  <User className="size-4" />
-                  <span>Giriş Yap</span>
-                </Link>
-              )}
+              >
+                <User className="size-4" />
+                <span>Giriş Yap</span>
+              </Link>
             </div>
           </div>
         )}

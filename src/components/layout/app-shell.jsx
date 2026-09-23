@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {ROLE_LABELS, roleHomePath, ROLES} from "@/lib/auth";
 import { getBottomNav, getNav } from "@/lib/nav";
-import { portalNavLinks } from "@/lib/marketing-nav";
+import {marketingNavLinks, portalNavLinks} from "@/lib/marketing-nav";
 import { useAuth, useLogout } from "@/lib/auth-hooks";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { SiteHeader } from "@/components/marketing/site-header";
@@ -52,7 +52,7 @@ export function AppShell({ children }) {
         <SiteHeader
           accountHref="/dashboard/customer"
           accountName={user?.name}
-          links={portalNavLinks(pathname)}
+          links={marketingNavLinks(pathname)}
           onAccountLogout={handleLogout}
         />
         <main className="w-full flex-1 pt-28">{children}</main>

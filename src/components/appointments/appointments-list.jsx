@@ -144,10 +144,6 @@ export function AppointmentsList() {
                         </p>
                     )}
                 </div>
-                <Button nativeButton={false} size="lg" className="h-10" render={<Link href="/dashboard/randevu-al"/>}>
-                    <Plus className="size-4"/>
-                    Randevu Oluştur
-                </Button>
             </div>
 
             <div className="mt-4">
@@ -174,12 +170,8 @@ export function AppointmentsList() {
                     <div className="flex flex-col items-center gap-3 rounded-xl border px-4 py-14 text-center">
                         <p className="text-sm font-medium">Randevunuz bulunmuyor</p>
                         <p className="text-sm text-muted-foreground">
-                            Randevu oluşturarak takviminizi doldurmaya başlayın
+                            Geçerli bir randevunuz bulunmamaktadır. Yeni bir randevu almak için lütfen randevu alma sayfasını ziyaret edin.
                         </p>
-                        <Button nativeButton={false} variant="outline" render={<Link href="/dashboard/randevu-al"/>}>
-                            <Plus className="size-4"/>
-                            Randevu Oluştur
-                        </Button>
                     </div>
                 )}
 

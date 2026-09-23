@@ -189,10 +189,6 @@ function CustomerProfile() {
                 Danışan Portalı
               </span>
               <span className="size-1.5 rounded-full bg-accent-gold" />
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-blush-surface px-3 py-1 font-label-sm text-label-sm font-medium text-primary shadow-sm">
-                <BadgeCheck className="size-4 text-accent-gold" />
-                Danışan Hesabı
-              </div>
               {createdAt && (
                 <span className="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
                   <CalendarDays className="size-3.5" />
@@ -279,20 +275,6 @@ function CustomerProfile() {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col gap-3 rounded-2xl bg-surface-container-low p-6 shadow-sm">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="size-5 text-primary" />
-              <h3 className="font-title-md text-title-md font-medium text-primary">
-                Mahremiyet &amp; Gizlilik
-              </h3>
-            </div>
-            <p className="font-body-sm text-body-sm leading-relaxed text-on-surface-variant">
-              Paylaştığınız tüm kişisel veriler ve seans notları 256-Bit SSL
-              korumalı şifreleme ve Türk Psikologlar Derneği Etik Kuralları
-              çerçevesinde korunur.
-            </p>
-          </div>
         </div>
 
         {/* Right Column: Personal Info Form */}
@@ -373,7 +355,7 @@ function CustomerProfile() {
                       value={field.value}
                       onChange={field.onChange}
                       aria-invalid={Boolean(form.formState.errors.phone)}
-                      selectClassName="h-auto w-auto self-stretch rounded-xl border-0 bg-canvas-cream px-2.5 text-sm font-medium text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/30"
+                      selectClassName="w-auto self-stretch rounded-xl border-0 bg-canvas-cream px-2.5 text-sm font-medium text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/30"
                       inputClassName="h-auto rounded-xl border-0 bg-canvas-cream px-4 py-3 font-body-md text-body-md text-on-surface outline-none transition-all focus-visible:bg-canvas-pure focus-visible:ring-2 focus-visible:ring-ring/30 aria-invalid:ring-3 aria-invalid:ring-destructive/20"
                     />
                   )}

@@ -18,10 +18,10 @@ import { packageIsUsable } from "@/lib/service-packages";
 
 const QUICK_LINKS = [
   {
-    title: "Randevu Al",
-    description: "Hizmeti seçin, tarih ve saat seçerek randevunuzu oluşturun",
-    href: "/hizmetler",
-    icon: CalendarPlus,
+    title: "Profil ve Fatura Bilgileri",
+    description: "Profilinizi ve fatura bilgilerinizi güncelleyin",
+    href: "/dashboard/customer/profil",
+    icon: CreditCard,
   },
   {
     title: "Randevular & Takvim",
@@ -35,12 +35,7 @@ const QUICK_LINKS = [
     href: "/dashboard/customer/paketlerim",
     icon: Package,
   },
-  {
-    title: "Paketleri Keşfet",
-    description: "Size uygun avantajlı seans paketlerini inceleyin",
-    href: "/paketler",
-    icon: Store,
-  },
+
 ];
 
 export default function CustomerDashboardPage() {
@@ -74,11 +69,6 @@ function CustomerHome() {
               <span className="font-label-sm text-label-sm font-semibold uppercase tracking-widest text-secondary">
                 Danışan Portalı
               </span>
-              <span className="size-1.5 rounded-full bg-accent-gold" />
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-blush-surface px-3 py-1 font-label-sm text-label-sm font-medium text-primary shadow-sm">
-                <CreditCard className="size-4 text-accent-gold" />
-                Danışan Hesabı
-              </div>
             </div>
             <h1 className="mt-1 font-headline-lg text-headline-lg tracking-tight text-primary">
               Hoş Geldiniz,{" "}
@@ -87,27 +77,8 @@ function CustomerHome() {
               </span>
             </h1>
             <p className="max-w-2xl font-body-md text-body-md text-on-surface-variant">
-              Randevularınızı planlayın, seans paketlerinizi takip edin ve
-              danışan haklarınızı bu panodan yönetin.
+              Profilinizi ve randevularınızı yönetmek için aşağıdaki bağlantıları kullanabilirsiniz.
             </p>
-          </div>
-          <div className="flex min-w-[260px] items-center gap-5 rounded-2xl bg-surface-container-lowest/80 p-5 shadow-sm backdrop-blur-md">
-            <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-blush-surface text-primary">
-              <Clock className="size-6 text-accent-gold" />
-            </div>
-            <div className="flex min-w-0 flex-col">
-              <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
-                Aktif Seans Paketiniz
-              </span>
-              <span className="truncate font-title-md text-title-md font-medium text-primary">
-                {packageName ?? "Aktif paket bulunmuyor"}
-              </span>
-              <span className="mt-0.5 font-label-sm text-label-sm text-secondary">
-                {activePurchase
-                  ? `${remaining} seans hakkı kaldı${expiresAt ? ` · ${expiresAt} tarihine kadar geçerli` : ""}`
-                  : "Yeni paket satın alarak başlayın"}
-              </span>
-            </div>
           </div>
         </div>
       </div>

@@ -47,8 +47,7 @@ const CTA_SECONDARY_CLASS =
   "inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest text-primary font-label-lg text-label-lg shadow-sm hover:bg-blush-surface transition-all";
 
 const CARD_CTA_CLASS =
-  " inline-flex items-center justify-center px-7 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold group-hover:bg-burgundy-light shadow-md transition-all";
-
+    "inline-flex items-center justify-center px-7 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold group-hover:bg-burgundy-light shadow-md transition-all";
 function excerpt(text, maxLength = 140) {
   const value = String(text ?? "").trim();
   if (value.length <= maxLength) return value;
@@ -263,10 +262,10 @@ function CategoryCard({ category }) {
             {category.name}
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant mb-1">
-            {excerpt(category.seo_description || category.seo_title, 120)}
+            {category.short_description}
           </p>
         </div>
-        <span className={cn(CARD_CTA_CLASS, "mt-4 sm:mt-6")}>
+        <span className={`${CARD_CTA_CLASS} mt-4 sm:mt-6`}>
           Kategoriyi Keşfet
         </span>
       </div>
@@ -285,10 +284,10 @@ function ServiceCard({ categoryHref, service }) {
             {service.name}
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant mb-1">
-            {excerpt(service.seo_description || service.description, 120)}
+            {service.short_description}
           </p>
         </div>
-        <span className={cn(CARD_CTA_CLASS, "mt-4 sm:mt-6")} >
+        <span className={`${CARD_CTA_CLASS} mt-4 sm:mt-6`}>
           Randevu Al
         </span>
       </div>
@@ -669,7 +668,7 @@ export function CategoryServicesPage({ slug }) {
   }, [category, servicesQuery.data]);
 
   const heroDescription =
-    category?.seo_description?.trim() || DEFAULT_HERO_DESCRIPTION;
+    category?.content;
 
   return (
     <ServicesPageShell>

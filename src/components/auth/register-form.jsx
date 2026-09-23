@@ -366,7 +366,7 @@ export function RegisterForm() {
                         value={field.value}
                         onChange={field.onChange}
                         aria-invalid={Boolean(form.formState.errors.phone)}
-                        selectClassName="h-auto w-auto self-stretch rounded-xl border-0 bg-canvas-cream px-3 text-sm font-medium text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/40"
+                        selectClassName="w-auto self-stretch rounded-xl border-0 bg-canvas-cream px-3 text-sm font-medium text-primary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring/40"
                         inputClassName="h-auto rounded-xl border-0 bg-canvas-cream px-4 py-3 font-body-md text-body-md text-on-surface outline-none transition-all focus-visible:bg-canvas-pure focus-visible:ring-2 focus-visible:ring-ring/40 aria-invalid:ring-3 aria-invalid:ring-destructive/20"
                       />
                     )}
