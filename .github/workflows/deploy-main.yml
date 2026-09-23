@@ -17,10 +17,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 7474
           script: |
+            set -e
             cd /var/www/danismanlik/frontend/main
             git pull origin main
             rm -rf node_modules
             rm -rf .next
             npm install
             npm run build
-            pm2 restart danismanlik-frontend-main
+            pm2 restart danismanlik-frontend-main --update-env
