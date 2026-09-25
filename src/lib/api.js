@@ -801,4 +801,26 @@ export const api = {
   deleteMenuItem(token, id) {
     return request(`/v1/menu-items/${id}`, { method: "DELETE", token });
   },
+  adminContactMessages(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/contact-messages${search ? `?${search}` : ""}`, { token });
+  },
+  adminContactMessage(token, id) {
+    return request(`/v1/admin/contact-messages/${id}`, { token });
+  },
+  markContactMessageRead(token, id, payload) {
+    return request(`/v1/admin/contact-messages/${id}/read`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteContactMessage(token, id) {
+    return request(`/v1/admin/contact-messages/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
 };

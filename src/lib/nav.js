@@ -15,6 +15,7 @@ import {
   Home,
   LayoutDashboard,
   ListTree,
+  Mail,
   Package,
   PackageOpen,
   ReceiptText,
@@ -121,6 +122,12 @@ export const NAV = {
       ],
     },
     { label: "Ödemeler", href: "/dashboard/admin/odemeler", icon: CreditCard },
+    {
+      label: "İletişim Formları",
+      href: "/dashboard/admin/iletisim-formlari",
+      icon: Mail,
+      bottom: true,
+    },
     {
       label: "İçerik",
       icon: FileText,
