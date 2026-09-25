@@ -14,6 +14,7 @@ import {
   HeartHandshake,
   Home,
   LayoutDashboard,
+  ListTree,
   Package,
   PackageOpen,
   ReceiptText,
@@ -24,6 +25,7 @@ import {
   User,
   UserCog,
   Users,
+  FileText,
 } from "lucide-react";
 import { ROLES, ROLE_HOME } from "./auth";
 
@@ -69,6 +71,7 @@ export const NAV = {
       label: "Takvim & Zaman",
       icon: Calendar,
       children: [
+        { label: "Takvim", href: "/takvim", icon: CalendarDays },
         {
           label: "Çalışma Saatleri",
           href: "/dashboard/admin/calisma-saatleri",
@@ -105,6 +108,11 @@ export const NAV = {
       children: [
         { label: "Ürünler", href: "/dashboard/admin/urunler", icon: ShoppingBag },
         {
+          label: "Ürün Kategorileri",
+          href: "/dashboard/admin/urun-kategorileri",
+          icon: Tags,
+        },
+        {
           label: "Siparişler",
           href: "/dashboard/admin/siparisler",
           icon: ShoppingCart,
@@ -113,11 +121,19 @@ export const NAV = {
       ],
     },
     { label: "Ödemeler", href: "/dashboard/admin/odemeler", icon: CreditCard },
+    {
+      label: "İçerik",
+      icon: FileText,
+      children: [
+        { label: "Sayfalar", href: "/dashboard/admin/sayfalar", icon: FileText },
+        { label: "Menüler", href: "/dashboard/admin/menuler", icon: ListTree },
+      ],
+    },
     { label: "Ayarlar", href: "/dashboard/admin/ayarlar", icon: Settings, bottom: true },
   ],
   [ROLES.CONSULTANT]: [
     { label: "Dashboard", href: "/dashboard/consultant", icon: LayoutDashboard, bottom: true },
-    { label: "Takvim", href: "/dashboard/consultant/takvim", icon: Calendar, bottom: true },
+    { label: "Takvim", href: "/takvim", icon: Calendar, bottom: true },
     { label: "Randevular", href: "/appointments", icon: CalendarDays, bottom: true },
     { label: "Çalışma Saatleri", href: "/dashboard/consultant/calisma-saatleri", icon: Clock },
     { label: "Molalar", href: "/dashboard/consultant/molalar", icon: Coffee },
@@ -144,9 +160,9 @@ export const NAV = {
       href: "/dashboard/customer/paketlerim",
       icon: Package,
     },
-    { label: "Mağaza", href: "/dashboard/customer/magaza", icon: Store, bottom: true },
+    { label: "Mağaza", href: "/urunler", icon: Store, bottom: true },
     { label: "Siparişlerim", href: "/dashboard/customer/siparislerim", icon: ShoppingCart },
-    { label: "Kurslarım", href: "/dashboard/customer/kurslarim", icon: GraduationCap },
+    { label: "Eğitimlerim", href: "/dashboard/egitimlerim", icon: GraduationCap },
     {
       label: "Profilim & Bilgilerim",
       href: "/dashboard/customer/profil",

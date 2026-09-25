@@ -7,6 +7,7 @@ import {
   CalendarDays,
   CalendarPlus,
   CreditCard,
+  GraduationCap,
   Clock,
   Package,
   Store,
@@ -35,7 +36,12 @@ const QUICK_LINKS = [
     href: "/dashboard/customer/paketlerim",
     icon: Package,
   },
-
+  {
+    title: "Eğitimlerim",
+    description: "Satın aldığınız ve size atanan eğitimleri izleyin",
+    href: "/dashboard/egitimlerim",
+    icon: GraduationCap,
+  },
 ];
 
 export default function CustomerDashboardPage() {

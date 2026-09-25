@@ -1,7 +1,7 @@
 export const MARKETING_NAV_LINKS = [
   { label: "Anasayfa", href: "/" },
   { label: "Hakkımda", href: "#hakkimda" },
-  { label: "Eğitimler", href: "#egitimler" },
+  { label: "Eğitimler", href: "/egitimler" },
   { label: "E-Kitaplar", href: "#e-kitaplar", dropdown: true },
   { label: "Atölyeler", href: "#" },
   {

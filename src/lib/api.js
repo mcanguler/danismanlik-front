@@ -342,6 +342,16 @@ export const api = {
   adminOrder(token, id) {
     return request(`/v1/admin/orders/${id}`, { token });
   },
+  adminCreateOrder(token, payload) {
+    return request("/v1/admin/orders", { method: "POST", body: payload, token });
+  },
+  adminUpdateOrderStatus(token, id, payload) {
+    return request(`/v1/admin/orders/${id}/status`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
   adminPayments(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -356,5 +366,439 @@ export const api = {
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
     ).toString();
     return request(`/v1/admin/payment-logs${search ? `?${search}` : ""}`, { token });
+  },
+  adminCourses(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/courses${search ? `?${search}` : ""}`, { token });
+  },
+  adminCourse(token, id) {
+    return request(`/v1/admin/courses/${id}`, { token });
+  },
+  createCourse(token, payload) {
+    return request("/v1/courses", { method: "POST", body: payload, token });
+  },
+  updateCourse(token, id, payload) {
+    const isFormData =
+      typeof FormData !== "undefined" && payload instanceof FormData;
+    return request(`/v1/courses/${id}`, {
+      method: isFormData ? "POST" : "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteCourse(token, id) {
+    return request(`/v1/courses/${id}`, { method: "DELETE", token });
+  },
+  createCourseSection(token, courseId, payload) {
+    return request(`/v1/courses/${courseId}/sections`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateCourseSection(token, id, payload) {
+    return request(`/v1/course-sections/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteCourseSection(token, id) {
+    return request(`/v1/course-sections/${id}`, { method: "DELETE", token });
+  },
+  createCourseLesson(token, sectionId, payload) {
+    return request(`/v1/course-sections/${sectionId}/lessons`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateCourseLesson(token, id, payload) {
+    return request(`/v1/course-lessons/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteCourseLesson(token, id) {
+    return request(`/v1/course-lessons/${id}`, { method: "DELETE", token });
+  },
+  bunnyVideos(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/bunny/videos${search ? `?${search}` : ""}`, { token });
+  },
+  uploadBunnyVideo(token, formData, onProgress) {
+    return new Promise((resolve, reject) => {
+      if (typeof XMLHttpRequest === "undefined") {
+        resolve(
+          request("/v1/bunny/videos", { method: "POST", body: formData, token })
+        );
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_BASE_URL}/v1/bunny/videos`);
+      xhr.responseType = "json";
+      if (token) {
+        xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      }
+      xhr.setRequestHeader("Accept", "application/json");
+
+      if (xhr.upload && onProgress) {
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            onProgress(Math.round((event.loaded / event.total) * 100));
+          }
+        });
+      }
+
+      xhr.addEventListener("load", () => {
+        const data = xhr.response ?? null;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(data);
+          return;
+        }
+        reject(
+          new ApiError(
+            data?.message ?? `İstek başarısız (${xhr.status})`,
+            xhr.status,
+            data?.errors ?? null
+          )
+        );
+      });
+      xhr.addEventListener("error", () => {
+        reject(
+          new ApiError("Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.", 0)
+        );
+      });
+      xhr.addEventListener("abort", () => {
+        reject(new ApiError("Yükleme iptal edildi.", 0));
+      });
+
+      xhr.send(formData);
+    });
+  },
+  bunnyVideo(token, videoId) {
+    return request(`/v1/bunny/videos/${videoId}`, { token });
+  },
+  deleteBunnyVideo(token, videoId) {
+    return request(`/v1/bunny/videos/${videoId}`, { method: "DELETE", token });
+  },
+  courseUsers(token, courseId) {
+    return request(`/v1/courses/${courseId}/users`, { token });
+  },
+  grantCourseAccess(token, courseId, payload) {
+    return request(`/v1/courses/${courseId}/users`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  revokeCourseAccess(token, courseId, userId) {
+    return request(`/v1/courses/${courseId}/users/${userId}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+  adminProducts(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/products${search ? `?${search}` : ""}`, { token });
+  },
+  adminProduct(token, id) {
+    return request(`/v1/admin/products/${id}`, { token });
+  },
+  createProduct(token, payload) {
+    return request("/v1/products", { method: "POST", body: payload, token });
+  },
+  updateProduct(token, id, payload) {
+    const isFormData =
+      typeof FormData !== "undefined" && payload instanceof FormData;
+    return request(`/v1/products/${id}`, {
+      method: isFormData ? "POST" : "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProduct(token, id) {
+    return request(`/v1/products/${id}`, { method: "DELETE", token });
+  },
+  addProductGalleryImage(token, productId, formData) {
+    return request(`/v1/products/${productId}/gallery`, {
+      method: "POST",
+      body: formData,
+      token,
+    });
+  },
+  updateProductGalleryImage(token, id, payload) {
+    return request(`/v1/product-gallery/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductGalleryImage(token, id) {
+    return request(`/v1/product-gallery/${id}`, { method: "DELETE", token });
+  },
+  createProductField(token, productId, payload) {
+    return request(`/v1/products/${productId}/fields`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateProductField(token, id, payload) {
+    return request(`/v1/product-fields/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductField(token, id) {
+    return request(`/v1/product-fields/${id}`, { method: "DELETE", token });
+  },
+  createProductFieldOption(token, fieldId, payload) {
+    return request(`/v1/product-fields/${fieldId}/options`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateProductFieldOption(token, id, payload) {
+    return request(`/v1/product-field-options/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductFieldOption(token, id) {
+    return request(`/v1/product-field-options/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+  productVariations(token, productId) {
+    return request(`/v1/products/${productId}/variations`, { token });
+  },
+  createProductVariation(token, productId, payload) {
+    return request(`/v1/products/${productId}/variations`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateProductVariation(token, id, payload) {
+    return request(`/v1/product-variations/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductVariation(token, id) {
+    return request(`/v1/product-variations/${id}`, { method: "DELETE", token });
+  },
+  productDownloads(token, productId) {
+    return request(`/v1/products/${productId}/downloads`, { token });
+  },
+  uploadProductDownload(token, productId, formData, onProgress) {
+    return new Promise((resolve, reject) => {
+      if (typeof XMLHttpRequest === "undefined") {
+        resolve(
+          request(`/v1/products/${productId}/downloads`, {
+            method: "POST",
+            body: formData,
+            token,
+          })
+        );
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", `${API_BASE_URL}/v1/products/${productId}/downloads`);
+      xhr.responseType = "json";
+      if (token) {
+        xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+      }
+      xhr.setRequestHeader("Accept", "application/json");
+
+      if (xhr.upload && onProgress) {
+        xhr.upload.addEventListener("progress", (event) => {
+          if (event.lengthComputable) {
+            onProgress(Math.round((event.loaded / event.total) * 100));
+          }
+        });
+      }
+
+      xhr.addEventListener("load", () => {
+        const data = xhr.response ?? null;
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(data);
+          return;
+        }
+        reject(
+          new ApiError(
+            data?.message ?? `İstek başarısız (${xhr.status})`,
+            xhr.status,
+            data?.errors ?? null
+          )
+        );
+      });
+      xhr.addEventListener("error", () => {
+        reject(
+          new ApiError("Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.", 0)
+        );
+      });
+      xhr.addEventListener("abort", () => {
+        reject(new ApiError("Yükleme iptal edildi.", 0));
+      });
+
+      xhr.send(formData);
+    });
+  },
+  updateProductDownload(token, id, payload) {
+    return request(`/v1/product-downloads/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductDownload(token, id) {
+    return request(`/v1/product-downloads/${id}`, { method: "DELETE", token });
+  },
+  publicProducts(params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/products${search ? `?${search}` : ""}`, { token: null });
+  },
+  publicProduct(id) {
+    return request(`/v1/products/${id}`, { token: null });
+  },
+  productCategories(token = null, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/product-categories${search ? `?${search}` : ""}`, { token });
+  },
+  productCategory(token, id) {
+    return request(`/v1/product-categories/${id}`, { token });
+  },
+  createProductCategory(token, payload) {
+    return request("/v1/product-categories", { method: "POST", body: payload, token });
+  },
+  updateProductCategory(token, id, payload) {
+    const isFormData =
+      typeof FormData !== "undefined" && payload instanceof FormData;
+    return request(`/v1/product-categories/${id}`, {
+      method: isFormData ? "POST" : "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteProductCategory(token, id) {
+    return request(`/v1/product-categories/${id}`, { method: "DELETE", token });
+  },
+  publicCart(token) {
+    return request("/v1/cart", { token });
+  },
+  createCartItem(token, payload) {
+    return request("/v1/cart/items", { method: "POST", body: payload, token });
+  },
+  checkoutCart(token) {
+    return request("/v1/cart/checkout", { method: "POST", token });
+  },
+  publicCourses(params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/courses${search ? `?${search}` : ""}`, { token: null });
+  },
+  publicCourse(idOrSlug) {
+    return request(`/v1/courses/${idOrSlug}`, { token: null });
+  },
+  courseDetail(token, id) {
+    return request(`/v1/courses/${id}`, { token });
+  },
+  myCourses(token) {
+    return request("/v1/my-courses", { token });
+  },
+  courseSections(token, courseId) {
+    return request(`/v1/courses/${courseId}/sections`, { token });
+  },
+  lesson(token, lessonId) {
+    return request(`/v1/lessons/${lessonId}`, { token });
+  },
+  lessonVideo(token, lessonId) {
+    return request(`/v1/lessons/${lessonId}/video`, { token });
+  },
+  publicPages() {
+    return request("/v1/pages", { token: null });
+  },
+  publicPage(slug) {
+    return request(`/v1/pages/${slug}`, { token: null });
+  },
+  adminPages(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/pages${search ? `?${search}` : ""}`, { token });
+  },
+  adminPage(token, id) {
+    return request(`/v1/admin/pages/${id}`, { token });
+  },
+  createPage(token, payload) {
+    return request("/v1/pages", { method: "POST", body: payload, token });
+  },
+  updatePage(token, id, payload) {
+    return request(`/v1/pages/${id}`, { method: "PATCH", body: payload, token });
+  },
+  deletePage(token, id) {
+    return request(`/v1/pages/${id}`, { method: "DELETE", token });
+  },
+  publicMenus() {
+    return request("/v1/menus", { token: null });
+  },
+  publicMenu(slug) {
+    return request(`/v1/menus/${slug}`, { token: null });
+  },
+  adminMenus(token) {
+    return request("/v1/admin/menus", { token });
+  },
+  adminMenu(token, id) {
+    return request(`/v1/admin/menus/${id}`, { token });
+  },
+  createMenu(token, payload) {
+    return request("/v1/menus", { method: "POST", body: payload, token });
+  },
+  updateMenu(token, id, payload) {
+    return request(`/v1/menus/${id}`, { method: "PATCH", body: payload, token });
+  },
+  deleteMenu(token, id) {
+    return request(`/v1/menus/${id}`, { method: "DELETE", token });
+  },
+  adminMenuItems(token, menuId) {
+    return request(`/v1/admin/menus/${menuId}/items`, { token });
+  },
+  createMenuItem(token, menuId, payload) {
+    return request(`/v1/menus/${menuId}/items`, {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+  updateMenuItem(token, id, payload) {
+    return request(`/v1/menu-items/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteMenuItem(token, id) {
+    return request(`/v1/menu-items/${id}`, { method: "DELETE", token });
   },
 };

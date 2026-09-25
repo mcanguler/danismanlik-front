@@ -9,6 +9,7 @@ import {
   CircleCheck,
   Clock,
   CreditCard,
+  GraduationCap,
   LoaderCircle,
   Package,
   RefreshCw,
@@ -141,6 +142,9 @@ export function PaymentCheckout({ orderId }) {
   const hasAppointmentItem = (order?.items ?? []).some(
     (item) => item.itemType === "APPOINTMENT"
   );
+  const hasCourseItem = (order?.items ?? []).some(
+    (item) => item.itemType === "COURSE"
+  );
 
   const startPayment = useCreateOrderPayment();
   const createOrder = useCreateOrder();
@@ -177,10 +181,12 @@ export function PaymentCheckout({ orderId }) {
       title: "Ödeme başarılı",
       description: hasAppointmentItem
         ? "Randevunuz onaylandı."
-        : "Satın aldığınız paket hesabınıza eklendi.",
+        : hasCourseItem
+          ? "Eğitiminize erişim sağlandı."
+          : "Satın aldığınız paket hesabınıza eklendi.",
       type: "success",
     });
-  }, [orderStatus, hasAppointmentItem]);
+  }, [orderStatus, hasAppointmentItem, hasCourseItem]);
 
   if (orderQuery.isPending) {
     return (
@@ -217,13 +223,20 @@ export function PaymentCheckout({ orderId }) {
         <p className="max-w-md text-sm text-muted-foreground">
           {hasAppointmentItem
             ? "Randevunuz onaylandı. Randevu detayları SMS ve WhatsApp üzerinden size iletilecek."
-            : "Satın aldığınız paket hesabınıza eklendi. Randevu oluştururken paketinizi kullanabilirsiniz."}
+            : hasCourseItem
+              ? "Eğitim kaydınız onaylandı. Eğitim içerikleri hesabınıza tanımlandı."
+              : "Satın aldığınız paket hesabınıza eklendi. Randevu oluştururken paketinizi kullanabilirsiniz."}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           {hasAppointmentItem ? (
             <Button render={<Link href="/appointments" />}>
               <BadgeCheck className="size-4" />
               Randevularıma Git
+            </Button>
+          ) : hasCourseItem ? (
+            <Button render={<Link href={`/egitimler/kayit-onay/${orderId}`} />}>
+              <GraduationCap className="size-4" />
+              Kayıt Onayım
             </Button>
           ) : (
             <Button render={<Link href="/dashboard/customer/paketlerim" />}>

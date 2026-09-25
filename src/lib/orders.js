@@ -287,6 +287,55 @@ export function useAdminOrderQuery(id, options = {}) {
   });
 }
 
+export function useAdminCreateOrder() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: async (payload) =>
+      normalizeOrderDetail(await api.adminCreateOrder(token, payload)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminOrdersQueryKey });
+      queryClient.invalidateQueries({ queryKey: ordersQueryKey });
+    },
+  });
+}
+
+export function useAdminUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: async ({ id, status }) =>
+      normalizeOrderDetail(
+        await api.adminUpdateOrderStatus(token, id, { status })
+      ),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: adminOrdersQueryKey });
+      queryClient.invalidateQueries({ queryKey: ordersQueryKey });
+      queryClient.invalidateQueries({
+        queryKey: [...adminOrdersQueryKey, "detail", String(id)],
+      });
+    },
+  });
+}
+
+/**
+ * UI mirror of the backend transition map (OrderService::setStatus).
+ * The backend remains the source of truth; 422 messages are surfaced as-is.
+ */
+export const ALLOWED_ORDER_STATUS_TRANSITIONS = {
+  [ORDER_STATUSES.PENDING]: [
+    ORDER_STATUSES.PAID,
+    ORDER_STATUSES.FAILED,
+    ORDER_STATUSES.CANCELLED,
+  ],
+  [ORDER_STATUSES.FAILED]: [ORDER_STATUSES.PAID, ORDER_STATUSES.CANCELLED],
+  [ORDER_STATUSES.PAID]: [ORDER_STATUSES.REFUNDED],
+  [ORDER_STATUSES.CANCELLED]: [],
+  [ORDER_STATUSES.REFUNDED]: [],
+};
+
 export function useAdminPaymentsQuery(params = {}, options = {}) {
   const token = useToken();
 

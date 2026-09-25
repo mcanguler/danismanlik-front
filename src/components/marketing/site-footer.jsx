@@ -26,10 +26,26 @@ const QUICK_LINKS = [
 ];
 
 const LEGAL_LINKS = [
-  { label: "KVKK Aydınlatma Metni", icon: Gavel },
-  { label: "Mesafeli Satış Sözleşmesi", icon: FileText },
-  { label: "Gizlilik & Çerez Politikası", icon: ShieldCheck },
-  { label: "İptal ve İade Koşulları", icon: RotateCcw },
+  {
+    label: "KVKK Aydınlatma Metni",
+    slug: "kvkk-aydinlatma-metni",
+    icon: Gavel,
+  },
+  {
+    label: "Mesafeli Satış Sözleşmesi",
+    slug: "mesafeli-satis-sozlesmesi",
+    icon: FileText,
+  },
+  {
+    label: "Gizlilik & Çerez Politikası",
+    slug: "gizlilik-cerez-politikasi",
+    icon: ShieldCheck,
+  },
+  {
+    label: "İptal ve İade Koşulları",
+    slug: "iptal-ve-iade-kosullari",
+    icon: RotateCcw,
+  },
 ];
 
 const SOCIAL_LINKS = [
@@ -88,10 +104,13 @@ export function SiteFooter() {
               Kurumsal &amp; Yasal
             </h3>
             <ul className="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant">
-              {LEGAL_LINKS.map(({ icon: Icon, label }) => (
+              {LEGAL_LINKS.map(({ icon: Icon, label, slug }) => (
                 <li key={label} className="flex items-center gap-2">
                   <Icon className="text-accent-gold size-4 shrink-0" />
-                  <a className="hover:text-primary-container transition-colors" href="#">
+                  <a
+                    className="hover:text-primary-container transition-colors"
+                    href={`/${slug}`}
+                  >
                     {label}
                   </a>
                 </li>

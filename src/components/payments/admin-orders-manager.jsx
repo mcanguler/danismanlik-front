@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CircleAlert, LoaderCircle, ReceiptText, Search } from "lucide-react";
+import { CircleAlert, LoaderCircle, Plus, ReceiptText, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -78,6 +78,13 @@ export function AdminOrdersManager() {
             {meta ? `${meta.total} sipariş` : "Tüm siparişler"}
           </p>
         </div>
+        <Button
+          className="h-10"
+          render={<Link href="/dashboard/admin/siparisler/yeni" />}
+        >
+          <Plus className="size-4" />
+          Yeni Sipariş
+        </Button>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
