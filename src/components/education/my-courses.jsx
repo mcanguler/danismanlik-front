@@ -43,7 +43,7 @@ export function MyCourses() {
   const accesses = query.data ?? [];
 
   return (
-    <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div>
         <h1 className="font-headline-md text-headline-md tracking-tight text-primary">
           Eğitimlerim

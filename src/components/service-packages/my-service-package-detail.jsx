@@ -51,7 +51,7 @@ export function MyServicePackageDetail({ id }) {
 
   if (query.isPending) {
     return (
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <div className="flex justify-center py-16">
           <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
         </div>
@@ -62,7 +62,7 @@ export function MyServicePackageDetail({ id }) {
   if (query.isError) {
     const isNotFound = query.error?.status === 404;
     return (
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <div className="flex flex-col items-center gap-3 rounded-xl border px-4 py-14 text-center">
           <CircleAlert className="size-8 text-muted-foreground" />
           <p className="text-sm font-medium">
@@ -87,7 +87,7 @@ export function MyServicePackageDetail({ id }) {
   const percent = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4">
         <Link
           className="text-sm text-muted-foreground hover:text-foreground"

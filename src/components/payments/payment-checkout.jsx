@@ -115,7 +115,7 @@ function PaymentProcessing() {
 
 function ResultShell({ children }) {
   return (
-    <div className="mx-auto w-full max-w-xl flex-1 px-4 py-10">
+    <div className="w-full flex-1 px-4 py-10">
       <div className="flex flex-col items-center gap-5 rounded-[2rem] border border-border-delicate bg-canvas-pure px-8 py-14 text-center shadow-[0_8px_32px_rgba(92,29,36,0.06)]">
         {children}
       </div>
@@ -326,7 +326,7 @@ export function PaymentCheckout({ orderId }) {
   const errorMessage = initError ? getQueryErrorMessage(initError) : null;
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-headline-md text-headline-md text-primary tracking-tight">Ödeme</h1>

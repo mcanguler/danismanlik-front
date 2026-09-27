@@ -872,6 +872,18 @@ export const api = {
     ).toString();
     return request(`/v1/blog-categories${search ? `?${search}` : ""}`);
   },
+  submitContactMessage(payload) {
+    return request("/v1/contact", { method: "POST", body: payload });
+  },
+  testimonials(params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/testimonials${search ? `?${search}` : ""}`);
+  },
+  submitTestimonial(payload) {
+    return request("/v1/testimonials", { method: "POST", body: payload });
+  },
   adminBlogPosts(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")

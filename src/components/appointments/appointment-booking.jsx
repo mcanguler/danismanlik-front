@@ -348,7 +348,7 @@ export function AppointmentBooking() {
 
   if (isConsultant && !user?.consultant_id) {
     return (
-      <div className="mx-auto w-full max-w-lg flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <Card>
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
             <CircleAlert className="size-6 text-destructive" />
@@ -364,7 +364,7 @@ export function AppointmentBooking() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4">
         <h1 className="text-xl font-semibold tracking-tight">
           {isCustomer ? "Randevu Al" : "Randevu Ekle"}

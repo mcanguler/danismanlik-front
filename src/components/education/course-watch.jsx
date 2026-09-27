@@ -223,7 +223,7 @@ export function CourseWatch({ courseId }) {
 
   if (courseQuery.isPending) {
     return (
-      <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <div className="flex justify-center py-16">
           <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
         </div>
@@ -233,14 +233,14 @@ export function CourseWatch({ courseId }) {
 
   if (courseQuery.isError || !course) {
     return (
-      <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <CourseError error={courseQuery.error} />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4">
         <Link
           className="text-sm text-muted-foreground transition-colors hover:text-foreground"

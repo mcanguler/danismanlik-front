@@ -81,7 +81,7 @@ export function ServicesManager() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Hizmetler</h1>

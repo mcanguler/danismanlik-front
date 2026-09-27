@@ -179,7 +179,7 @@ export function AppointmentEditForm({ id }) {
     query.isError && query.error instanceof ApiError ? query.error : null;
 
   return (
-    <div className="mx-auto w-full max-w-lg flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4">
         <h1 className="text-xl font-semibold tracking-tight">
           Randevuyu Düzenle

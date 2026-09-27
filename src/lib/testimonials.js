@@ -28,8 +28,8 @@ export function normalizeTestimonial(item) {
     name: fullName ?? "",
     message:
       item.message ??
-      item.comment ??
       item.content ??
+      item.comment ??
       item.opinion ??
       item.review ??
       item.text ??
@@ -72,6 +72,21 @@ export function useTestimonialsQuery(params = {}, options = {}) {
       normalizeTestimonialList(await api.adminTestimonials(token, params)),
     enabled: options.enabled !== false && Boolean(token),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function usePublicTestimonialsQuery(params = {}, options = {}) {
+  return useQuery({
+    queryKey: [...testimonialsQueryKey, "public", params],
+    queryFn: async () => normalizeTestimonialList(await api.testimonials(params)),
+    enabled: options.enabled !== false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useSubmitTestimonial() {
+  return useMutation({
+    mutationFn: (payload) => api.submitTestimonial(payload),
   });
 }
 

@@ -215,7 +215,7 @@ export function CalendarPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">

@@ -24,7 +24,7 @@ export default function RoleModulePage() {
 
   return (
     <RequireRole role={role}>
-      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">
+      <div className="w-full flex-1 px-4 py-6">
         <h1 className="text-xl font-semibold tracking-tight">{moduleItem.label}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Bu modül yakında kullanıma açılacak.

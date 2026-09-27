@@ -64,7 +64,7 @@ function CustomerHome() {
     : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:px-8">
+    <div className="w-full flex-1 px-4 py-6 lg:px-8">
       {/* Hero Header */}
       <div className="relative w-full overflow-hidden rounded-2xl bg-surface-container-low p-6 sm:p-8 shadow-sm">
         <div className="pointer-events-none absolute -right-16 -top-20 size-80 rounded-full bg-secondary-container/20 blur-3xl" />

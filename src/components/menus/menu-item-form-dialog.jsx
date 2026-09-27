@@ -23,6 +23,8 @@ import { cn } from "@/lib/utils";
 import {
   CONSULTANTS_LIST_URL,
   BLOG_LIST_URL,
+  TESTIMONIALS_LIST_URL,
+  CONTACT_PAGE_URL,
   MENU_LINK_SOURCES,
   MENU_LINK_SOURCE_LABELS,
   MENU_TARGETS,
@@ -262,7 +264,9 @@ export function MenuItemFormDialog({
   const sourceHasContent =
     sourceType !== MENU_LINK_SOURCES.MANUAL &&
     sourceType !== MENU_LINK_SOURCES.CONSULTANTS &&
-    sourceType !== MENU_LINK_SOURCES.BLOG;
+    sourceType !== MENU_LINK_SOURCES.BLOG &&
+    sourceType !== MENU_LINK_SOURCES.TESTIMONIALS &&
+    sourceType !== MENU_LINK_SOURCES.CONTACT;
 
   const resolvedUrl =
     sourceType === MENU_LINK_SOURCES.MANUAL
@@ -271,7 +275,11 @@ export function MenuItemFormDialog({
         ? CONSULTANTS_LIST_URL
         : sourceType === MENU_LINK_SOURCES.BLOG
           ? BLOG_LIST_URL
-          : (selectedOption?.url ?? "");
+          : sourceType === MENU_LINK_SOURCES.TESTIMONIALS
+            ? TESTIMONIALS_LIST_URL
+            : sourceType === MENU_LINK_SOURCES.CONTACT
+              ? CONTACT_PAGE_URL
+              : (selectedOption?.url ?? "");
   const resolvedPageId =
     sourceType === MENU_LINK_SOURCES.PAGE && sourceId
       ? Number(sourceId)

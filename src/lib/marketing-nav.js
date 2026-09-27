@@ -12,7 +12,7 @@ export const MARKETING_NAV_LINKS = [
   },
   { label: "Paketler", href: "/paketler" },
   { label: "Soru Danışmanlığı", href: "#soru-danismanligi" },
-  { label: "İletişim", href: "#" },
+  { label: "İletişim", href: "/iletisim" },
 ];
 
 export function marketingNavLinks(activeHref) {

@@ -10,7 +10,7 @@ export function ProductCreatePage() {
   const router = useRouter();
 
   return (
-    <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+    <div className="w-full flex-1 px-4 py-6">
       <div className="mb-4">
         <Link
           className="text-sm text-muted-foreground hover:text-foreground"

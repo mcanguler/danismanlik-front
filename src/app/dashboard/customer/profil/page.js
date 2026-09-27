@@ -177,7 +177,7 @@ function CustomerProfile() {
     "w-full px-4 py-3 rounded-xl bg-canvas-cream text-on-surface font-body-md text-body-md outline-none transition-all focus-visible:bg-canvas-pure focus-visible:ring-2 focus-visible:ring-ring/30 aria-invalid:ring-3 aria-invalid:ring-destructive/20";
 
   return (
-    <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 lg:px-8">
+    <div className="w-full flex-1 px-4 py-6 lg:px-8">
       {/* Hero Header */}
       <div className="relative w-full overflow-hidden rounded-2xl bg-surface-container-low p-6 sm:p-8 shadow-sm">
         <div className="pointer-events-none absolute -right-16 -top-20 size-80 rounded-full bg-secondary-container/20 blur-3xl" />

@@ -15,6 +15,8 @@
  * - Blog (liste)         → /blog                      (src/app/blog)
  * - Blog Kategorisi      → /blog?category={slug}      (src/app/blog — kategori filtresi)
  * - Blog Yazısı          → /blog/{slug}               (src/app/blog/[slug])
+ * - Danışan Yorumları    → /danisan-yorumlari         (src/app/danisan-yorumlari)
+ * - İletişim             → /iletisim                  (src/app/iletisim)
  * - Harici / Manuel URL  → admin'in girdiği url
  */
 
@@ -31,6 +33,8 @@ export const MENU_LINK_SOURCES = {
   BLOG: "BLOG",
   BLOG_CATEGORY: "BLOG_CATEGORY",
   BLOG_POST: "BLOG_POST",
+  TESTIMONIALS: "TESTIMONIALS",
+  CONTACT: "CONTACT",
   MANUAL: "MANUAL",
 };
 
@@ -47,11 +51,15 @@ export const MENU_LINK_SOURCE_LABELS = {
   [MENU_LINK_SOURCES.BLOG]: "Blog",
   [MENU_LINK_SOURCES.BLOG_CATEGORY]: "Blog Kategorisi",
   [MENU_LINK_SOURCES.BLOG_POST]: "Blog Yazısı",
+  [MENU_LINK_SOURCES.TESTIMONIALS]: "Danışan Yorumları",
+  [MENU_LINK_SOURCES.CONTACT]: "İletişim",
   [MENU_LINK_SOURCES.MANUAL]: "Harici / Manuel URL",
 };
 
 export const CONSULTANTS_LIST_URL = "/danisanlar";
 export const BLOG_LIST_URL = "/blog";
+export const TESTIMONIALS_LIST_URL = "/danisan-yorumlari";
+export const CONTACT_PAGE_URL = "/iletisim";
 
 export const MENU_TARGETS = {
   SELF: "_self",
