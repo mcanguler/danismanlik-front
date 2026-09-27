@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -28,7 +29,8 @@ import {
   useConsultantServicesQuery,
   useDeleteConsultantService,
 } from "@/lib/consultant-services";
-import { ConsultantServiceFormDialog } from "@/components/consultant-services/consultant-service-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/danisman-hizmetleri";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -36,7 +38,7 @@ function getErrorMessage(error) {
 }
 
 export function ConsultantServicesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteConsultantService();
 
@@ -75,7 +77,7 @@ export function ConsultantServicesManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ consultantService: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Atama
@@ -109,7 +111,7 @@ export function ConsultantServicesManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ consultantService: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Atama
@@ -159,7 +161,7 @@ export function ConsultantServicesManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setDialogState({ consultantService: item })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.consultantName} - ${item.serviceName} düzenle`}
                           >
@@ -210,9 +212,7 @@ export function ConsultantServicesManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() =>
-                        setDialogState({ consultantService: item })
-                      }
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -233,17 +233,6 @@ export function ConsultantServicesManager() {
           </>
         )}
       </div>
-
-      <ConsultantServiceFormDialog
-        key={
-          dialogState ? (dialogState.consultantService?.id ?? "new") : "closed"
-        }
-        open={Boolean(dialogState)}
-        consultantService={dialogState?.consultantService ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

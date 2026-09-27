@@ -2,9 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   FileText,
@@ -16,11 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { ContentEditor } from "@/components/ui/content-editor";
 import {
   Table,
   TableBody,
@@ -29,14 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,23 +37,7 @@ import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { formatDateTr } from "@/lib/format";
 import { getQueryErrorMessage } from "@/lib/query-errors";
-import {
-  useAdminPagesQuery,
-  useCreatePage,
-  useDeletePage,
-  useUpdatePage,
-} from "@/lib/pages";
-
-const pageFormSchema = z.object({
-  title: z
-    .string()
-    .min(1, "Başlık zorunludur")
-    .max(255, "En fazla 255 karakter olabilir"),
-  content: z.string(),
-  seo_title: z.string().max(255, "En fazla 255 karakter olabilir"),
-  seo_description: z.string(),
-  is_active: z.boolean(),
-});
+import { useAdminPagesQuery, useDeletePage } from "@/lib/pages";
 
 const PAGE_SIZE = 15;
 
@@ -76,217 +46,12 @@ function getErrorMessage(error) {
   return "Beklenmeyen bir hata oluştu";
 }
 
-function PageFormDialog({ open, page, onOpenChange }) {
-  const isEdit = Boolean(page);
-  const create = useCreatePage();
-  const update = useUpdatePage();
-  const mutation = isEdit ? update : create;
-  const fieldNames = Object.keys(pageFormSchema.shape);
-
-  const form = useForm({
-    resolver: zodResolver(pageFormSchema),
-    defaultValues: {
-      title: page?.title ?? "",
-      content: page?.content ?? "",
-      seo_title: page?.seo_title ?? "",
-      seo_description: page?.seo_description ?? "",
-      is_active: page ? Boolean(page.is_active) : true,
-    },
-  });
-
-  const handleError = (error) => {
-    if (error instanceof ApiError) {
-      for (const [field, messages] of Object.entries(error.errors ?? {})) {
-        if (fieldNames.includes(field)) {
-          const message = Array.isArray(messages) ? messages[0] : messages;
-          form.setError(field, { message });
-        }
-      }
-      form.setError("root", { message: error.message });
-    } else {
-      form.setError("root", { message: getErrorMessage(error) });
-    }
-  };
-
-  const onSubmit = form.handleSubmit((values) => {
-    const payload = {
-      title: values.title,
-      content: values.content ?? "",
-      seo_title: values.seo_title ?? "",
-      seo_description: values.seo_description ?? "",
-      is_active: values.is_active,
-    };
-
-    if (isEdit) {
-      update.mutate(
-        { id: page.id, payload },
-        {
-          onSuccess: (updated) => {
-            toast.add({ title: "Sayfa güncellendi", type: "success" });
-            form.reset({
-              title: updated.title ?? "",
-              content: updated.content ?? "",
-              seo_title: updated.seo_title ?? "",
-              seo_description: updated.seo_description ?? "",
-              is_active: Boolean(updated.is_active),
-            });
-            onOpenChange(false);
-          },
-          onError: handleError,
-        }
-      );
-      return;
-    }
-
-    create.mutate(payload, {
-      onSuccess: () => {
-        toast.add({ title: "Sayfa oluşturuldu", type: "success" });
-        onOpenChange(false);
-      },
-      onError: handleError,
-    });
-  });
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85dvh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? "Sayfayı Düzenle" : "Yeni Sayfa"}</DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? page.slug
-                ? `Public adres: /${page.slug}`
-                : "Sayfa bilgilerini güncelleyin"
-              : "Public sayfa içeriği oluşturun; slug başlıktan otomatik üretilir"}
-          </DialogDescription>
-        </DialogHeader>
-        <form className="flex flex-col gap-4" noValidate onSubmit={onSubmit}>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="page_title">Başlık</Label>
-            <Input
-              id="page_title"
-              placeholder="Örn. KVKK Aydınlatma Metni"
-              type="text"
-              {...form.register("title")}
-            />
-            {form.formState.errors.title && (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.title.message}
-              </p>
-            )}
-          </div>
-          {isEdit && page.slug && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="page_slug">Slug</Label>
-              <Input
-                disabled
-                id="page_slug"
-                readOnly
-                type="text"
-                value={page.slug}
-              />
-              <p className="text-xs text-muted-foreground">
-                Başlık değişirse otomatik güncellenir
-              </p>
-            </div>
-          )}
-          <div className="flex flex-col gap-1.5">
-            <Label>Content</Label>
-            <Controller
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <ContentEditor
-                  disabled={mutation.isPending}
-                  error={form.formState.errors.content?.message}
-                  id="page_content"
-                  minHeight="12rem"
-                  onChange={field.onChange}
-                  placeholder="Sayfa içeriğini yazın..."
-                  value={field.value ?? ""}
-                />
-              )}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="page_seo_title">SEO Title</Label>
-            <Input
-              id="page_seo_title"
-              placeholder="Boş bırakılırsa başlık kullanılır"
-              type="text"
-              {...form.register("seo_title")}
-            />
-            {form.formState.errors.seo_title && (
-              <p className="text-xs text-destructive">
-                {form.formState.errors.seo_title.message}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="page_seo_description">SEO Description</Label>
-            <Textarea
-              id="page_seo_description"
-              placeholder="Boş bırakılırsa content özeti kullanılır"
-              rows={3}
-              {...form.register("seo_description")}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="page_is_active">Aktif</Label>
-              <p className="text-xs text-muted-foreground">
-                Aktif sayfalar public tarafta yayınlanır
-              </p>
-            </div>
-            <Controller
-              control={form.control}
-              name="is_active"
-              render={({ field }) => (
-                <Switch
-                  checked={field.value}
-                  id="page_is_active"
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-          </div>
-          {form.formState.errors.root && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.root.message}
-            </p>
-          )}
-          <DialogFooter>
-            <Button
-              className="h-10"
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              İptal
-            </Button>
-            <Button className="h-10" disabled={mutation.isPending} type="submit">
-              {mutation.isPending && (
-                <LoaderCircle className="size-4 animate-spin" />
-              )}
-              {mutation.isPending
-                ? "Kaydediliyor..."
-                : isEdit
-                  ? "Kaydet"
-                  : "Oluştur"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export function PagesManager() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [clientPage, setClientPage] = useState(1);
   const [search, setSearch] = useState("");
   const [isActive, setIsActive] = useState("");
-  const [dialogState, setDialogState] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
   const searching = Boolean(search.trim());
@@ -370,7 +135,7 @@ export function PagesManager() {
         </div>
         <Button
           className="h-10"
-          onClick={() => setDialogState({ page: null })}
+          onClick={() => router.push("/dashboard/admin/sayfalar/yeni")}
         >
           <Plus className="size-4" />
           Yeni Sayfa
@@ -432,7 +197,7 @@ export function PagesManager() {
             </p>
             {!search && !isActive && (
               <Button
-                onClick={() => setDialogState({ page: null })}
+                onClick={() => router.push("/dashboard/admin/sayfalar/yeni")}
                 variant="outline"
               >
                 <Plus className="size-4" />
@@ -483,7 +248,9 @@ export function PagesManager() {
                         <div className="flex items-center justify-end gap-1">
                           <Button
                             aria-label={`${page.title} düzenle`}
-                            onClick={() => setDialogState({ page })}
+                            onClick={() =>
+                              router.push(`/dashboard/admin/sayfalar/${page.id}`)
+                            }
                             size="icon-sm"
                             type="button"
                             variant="ghost"
@@ -533,7 +300,9 @@ export function PagesManager() {
                   </div>
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <Button
-                      onClick={() => setDialogState({ page })}
+                      onClick={() =>
+                        router.push(`/dashboard/admin/sayfalar/${page.id}`)
+                      }
                       size="sm"
                       type="button"
                       variant="outline"
@@ -606,15 +375,6 @@ export function PagesManager() {
           </div>
         )}
       </div>
-
-      <PageFormDialog
-        key={dialogState ? (dialogState.page?.id ?? "new") : "closed"}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-        open={Boolean(dialogState)}
-        page={dialogState?.page ?? null}
-      />
 
       <AlertDialog
         onOpenChange={(open) => {

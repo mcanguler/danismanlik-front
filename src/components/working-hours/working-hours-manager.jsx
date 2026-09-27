@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -29,7 +30,8 @@ import {
   useDeleteWorkingHour,
   useWorkingHoursQuery,
 } from "@/lib/working-hours";
-import { WorkingHourFormDialog } from "@/components/working-hours/working-hour-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/calisma-saatleri";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -37,7 +39,7 @@ function getErrorMessage(error) {
 }
 
 export function WorkingHoursManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteWorkingHour();
 
@@ -76,7 +78,7 @@ export function WorkingHoursManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ workingHour: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Çalışma Saati
@@ -110,7 +112,7 @@ export function WorkingHoursManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ workingHour: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Çalışma Saati
@@ -156,7 +158,7 @@ export function WorkingHoursManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setDialogState({ workingHour: item })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.consultantName} ${dayLabel(item.day_of_week)} düzenle`}
                           >
@@ -204,7 +206,7 @@ export function WorkingHoursManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setDialogState({ workingHour: item })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -225,15 +227,6 @@ export function WorkingHoursManager() {
           </>
         )}
       </div>
-
-      <WorkingHourFormDialog
-        key={dialogState ? (dialogState.workingHour?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        workingHour={dialogState?.workingHour ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

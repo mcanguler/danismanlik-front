@@ -527,6 +527,20 @@ export function useProductCategoriesQuery(filters = {}, options = {}) {
   });
 }
 
+export function useProductCategoryQuery(id, options = {}) {
+  const token = useToken();
+
+  return useQuery({
+    queryKey: [...productCategoriesQueryKey, id],
+    queryFn: async () => {
+      const payload = await api.productCategory(token, id);
+      return normalizeProductCategory(payload?.data ?? payload);
+    },
+    enabled: options.enabled !== false && Boolean(token && id),
+    retry: false,
+  });
+}
+
 export function usePublicProductCategoriesQuery(filters = {}, options = {}) {
   return useQuery({
     queryKey: [...productCategoriesQueryKey, "public", filters],

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,11 +26,11 @@ import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { StatusBadge } from "@/components/ui/status-badge";
 import {
-  useConsultantQuery,
   useConsultantsQuery,
   useDeleteConsultant,
 } from "@/lib/consultants";
-import { ConsultantFormDialog } from "@/components/consultants/consultant-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/danismanlar";
 
 const FILTERS = [
   { label: "Tümü", value: "all" },
@@ -43,13 +44,10 @@ function getErrorMessage(error) {
 }
 
 export function ConsultantsManager() {
+  const router = useRouter();
   const [filter, setFilter] = useState("all");
-  const [dialogState, setDialogState] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteConsultant();
-
-  const editingId = dialogState?.id ?? null;
-  const detailQuery = useConsultantQuery(editingId);
 
   const query = useConsultantsQuery(filter === "all" ? {} : { is_active: filter });
   const consultants = query.data ?? [];
@@ -83,7 +81,7 @@ export function ConsultantsManager() {
         </div>
         <Button
           size="lg"
-          onClick={() => setDialogState({ id: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
           className="h-10"
         >
           <Plus className="size-4" />
@@ -137,10 +135,7 @@ export function ConsultantsManager() {
                 İlk danışmanı ekleyerek başlayın
               </p>
             )}
-            <Button
-              variant="outline"
-              onClick={() => setDialogState({ id: null })}
-            >
+            <Button variant="outline" onClick={() => router.push(`${LIST_PATH}/yeni`)}>
               <Plus className="size-4" />
               Yeni Danışman
             </Button>
@@ -181,7 +176,7 @@ export function ConsultantsManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setDialogState({ id: item.id })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.name} düzenle`}
                           >
@@ -227,7 +222,7 @@ export function ConsultantsManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setDialogState({ id: item.id })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -248,19 +243,6 @@ export function ConsultantsManager() {
           </>
         )}
       </div>
-
-      <ConsultantFormDialog
-        key={dialogState ? (dialogState.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        mode={dialogState?.id ? "edit" : "create"}
-        consultant={dialogState?.id ? (detailQuery.data ?? null) : null}
-        loading={Boolean(dialogState?.id) && detailQuery.isPending}
-        error={dialogState?.id ? detailQuery.error : null}
-        onRetry={() => detailQuery.refetch()}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

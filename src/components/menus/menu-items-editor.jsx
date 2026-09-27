@@ -180,7 +180,7 @@ export function MenuItemsEditor({ menuId }) {
   const [dialogState, setDialogState] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const menu = menuQuery.data.data;
+  const menu = menuQuery.data;
   const flatItems = itemsQuery.data ?? [];
   const tree = buildTree(flatItems);
 

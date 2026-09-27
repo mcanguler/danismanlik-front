@@ -17,6 +17,8 @@ import {
   ListTree,
   Mail,
   MessageSquareQuote,
+  MessageSquareText,
+  Newspaper,
   Package,
   PackageOpen,
   ReceiptText,
@@ -140,6 +142,17 @@ export const NAV = {
       children: [
         { label: "Sayfalar", href: "/dashboard/admin/sayfalar", icon: FileText },
         { label: "Menüler", href: "/dashboard/admin/menuler", icon: ListTree },
+        { label: "Blog", href: "/dashboard/admin/blog", icon: Newspaper },
+        {
+          label: "Blog Kategorileri",
+          href: "/dashboard/admin/blog-kategorileri",
+          icon: Tags,
+        },
+        {
+          label: "Blog Yorumları",
+          href: "/dashboard/admin/blog-yorumlari",
+          icon: MessageSquareText,
+        },
       ],
     },
     { label: "Ayarlar", href: "/dashboard/admin/ayarlar", icon: Settings, bottom: true },

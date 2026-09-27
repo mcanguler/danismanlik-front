@@ -21,6 +21,8 @@ import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import {
+  CONSULTANTS_LIST_URL,
+  BLOG_LIST_URL,
   MENU_LINK_SOURCES,
   MENU_LINK_SOURCE_LABELS,
   MENU_TARGETS,
@@ -35,6 +37,8 @@ import {
 } from "@/lib/products";
 import { usePublicCoursesQuery } from "@/lib/courses";
 import { usePublicServicePackagesQuery } from "@/lib/service-packages";
+import { useConsultantsQuery } from "@/lib/consultants";
+import { useBlogCategoriesQuery, useAdminBlogPostsQuery } from "@/lib/blog";
 import {useCreateMenuItem, useUpdateMenuItem} from "@/lib/menus";
 
 const selectClassName =
@@ -67,6 +71,17 @@ function useSourceOptions(sourceType) {
   const packagesQuery = usePublicServicePackagesQuery({
     enabled: sourceType === MENU_LINK_SOURCES.SERVICE_PACKAGE,
   });
+  const consultantsQuery = useConsultantsQuery(
+    { is_active: "1" },
+    { enabled: sourceType === MENU_LINK_SOURCES.CONSULTANT }
+  );
+  const blogCategoriesQuery = useBlogCategoriesQuery({
+    enabled: sourceType === MENU_LINK_SOURCES.BLOG_CATEGORY,
+  });
+  const blogPostsQuery = useAdminBlogPostsQuery(
+    { per_page: 100 },
+    { enabled: sourceType === MENU_LINK_SOURCES.BLOG_POST }
+  );
 
   return useMemo(() => {
     const loading =
@@ -76,7 +91,10 @@ function useSourceOptions(sourceType) {
       productCategoriesQuery.isPending ||
       productsQuery.isPending ||
       coursesQuery.isPending ||
-      packagesQuery.isPending;
+      packagesQuery.isPending ||
+      consultantsQuery.isPending ||
+      blogCategoriesQuery.isPending ||
+      blogPostsQuery.isPending;
 
     switch (sourceType) {
       case MENU_LINK_SOURCES.PAGE:
@@ -144,6 +162,35 @@ function useSourceOptions(sourceType) {
             url: `/paketler/${pack.slug || pack.id}`,
           })),
         };
+      case MENU_LINK_SOURCES.CONSULTANT:
+        return {
+          loading: consultantsQuery.isPending,
+          options: (consultantsQuery.data ?? []).map((consultant) => ({
+            id: String(consultant.id),
+            label: consultant.name,
+            url: `/danisanlar/${consultant.id}`,
+          })),
+        };
+      case MENU_LINK_SOURCES.BLOG_CATEGORY:
+        return {
+          loading: blogCategoriesQuery.isPending,
+          options: (blogCategoriesQuery.data ?? []).map((category) => ({
+            id: String(category.id),
+            label: category.name,
+            url: category.slug
+              ? `/blog?category=${category.slug}`
+              : `/blog?category_id=${category.id}`,
+          })),
+        };
+      case MENU_LINK_SOURCES.BLOG_POST:
+        return {
+          loading: blogPostsQuery.isPending,
+          options: (blogPostsQuery.data?.items ?? []).map((post) => ({
+            id: String(post.id),
+            label: post.title,
+            url: `/blog/${post.slug}`,
+          })),
+        };
       default:
         return { loading: false, options: [] };
     }
@@ -156,6 +203,9 @@ function useSourceOptions(sourceType) {
     productsQuery,
     coursesQuery,
     packagesQuery,
+    consultantsQuery,
+    blogCategoriesQuery,
+    blogPostsQuery,
   ]);
 }
 
@@ -209,10 +259,19 @@ export function MenuItemFormDialog({
     (option) => option.id === sourceId
   );
 
+  const sourceHasContent =
+    sourceType !== MENU_LINK_SOURCES.MANUAL &&
+    sourceType !== MENU_LINK_SOURCES.CONSULTANTS &&
+    sourceType !== MENU_LINK_SOURCES.BLOG;
+
   const resolvedUrl =
     sourceType === MENU_LINK_SOURCES.MANUAL
       ? manualUrl.trim()
-      : (selectedOption?.url ?? "");
+      : sourceType === MENU_LINK_SOURCES.CONSULTANTS
+        ? CONSULTANTS_LIST_URL
+        : sourceType === MENU_LINK_SOURCES.BLOG
+          ? BLOG_LIST_URL
+          : (selectedOption?.url ?? "");
   const resolvedPageId =
     sourceType === MENU_LINK_SOURCES.PAGE && sourceId
       ? Number(sourceId)
@@ -255,7 +314,7 @@ export function MenuItemFormDialog({
       setError("URL girin");
       return;
     }
-    if (sourceType !== MENU_LINK_SOURCES.MANUAL && !sourceId) {
+    if (sourceHasContent && !sourceId) {
       setError("İçerik seçin");
       return;
     }
@@ -374,7 +433,7 @@ export function MenuItemFormDialog({
                 </select>
               </div>
             </div>
-          ) : (
+          ) : sourceHasContent ? (
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="menu_item_content">İçerik</Label>
               {options.loading ? (
@@ -413,6 +472,13 @@ export function MenuItemFormDialog({
                   </span>
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2">
+              <Link2 className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="truncate font-mono text-xs text-muted-foreground">
+                Oluşan URL: {resolvedUrl}
+              </span>
             </div>
           )}
 

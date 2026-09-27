@@ -10,6 +10,11 @@
  * - Ürün                 → /urunler/{slug}            (src/app/urunler/[slug])
  * - Kurs                 → /egitimler/{slug}          (src/app/egitimler/[slug])
  * - Hizmet Paketi        → /paketler/{slug}           (src/app/paketler/[slug])
+ * - Danışanlar (liste)   → /danisanlar                (src/app/danisanlar)
+ * - Danışan              → /danisanlar/{id}           (src/app/danisanlar/[id])
+ * - Blog (liste)         → /blog                      (src/app/blog)
+ * - Blog Kategorisi      → /blog?category={slug}      (src/app/blog — kategori filtresi)
+ * - Blog Yazısı          → /blog/{slug}               (src/app/blog/[slug])
  * - Harici / Manuel URL  → admin'in girdiği url
  */
 
@@ -21,6 +26,11 @@ export const MENU_LINK_SOURCES = {
   PRODUCT: "PRODUCT",
   COURSE: "COURSE",
   SERVICE_PACKAGE: "SERVICE_PACKAGE",
+  CONSULTANTS: "CONSULTANTS",
+  CONSULTANT: "CONSULTANT",
+  BLOG: "BLOG",
+  BLOG_CATEGORY: "BLOG_CATEGORY",
+  BLOG_POST: "BLOG_POST",
   MANUAL: "MANUAL",
 };
 
@@ -32,8 +42,16 @@ export const MENU_LINK_SOURCE_LABELS = {
   [MENU_LINK_SOURCES.PRODUCT]: "Ürün",
   [MENU_LINK_SOURCES.COURSE]: "Kurs",
   [MENU_LINK_SOURCES.SERVICE_PACKAGE]: "Hizmet Paketi",
+  [MENU_LINK_SOURCES.CONSULTANTS]: "Danışanlar",
+  [MENU_LINK_SOURCES.CONSULTANT]: "Danışan",
+  [MENU_LINK_SOURCES.BLOG]: "Blog",
+  [MENU_LINK_SOURCES.BLOG_CATEGORY]: "Blog Kategorisi",
+  [MENU_LINK_SOURCES.BLOG_POST]: "Blog Yazısı",
   [MENU_LINK_SOURCES.MANUAL]: "Harici / Manuel URL",
 };
+
+export const CONSULTANTS_LIST_URL = "/danisanlar";
+export const BLOG_LIST_URL = "/blog";
 
 export const MENU_TARGETS = {
   SELF: "_self",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   CircleCheck,
@@ -14,7 +15,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { TestimonialFormDialog } from "@/components/testimonials/testimonial-form-dialog";
 import {
   Dialog,
   DialogContent,
@@ -119,11 +119,11 @@ function DetailRow({ label, value, mono = false }) {
 }
 
 export function TestimonialsManager() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [approvalFilter, setApprovalFilter] = useState("");
   const [detailId, setDetailId] = useState(null);
   const [deleting, setDeleting] = useState(null);
-  const [creating, setCreating] = useState(false);
 
   const query = useTestimonialsQuery({
     page,
@@ -248,7 +248,7 @@ export function TestimonialsManager() {
             {pendingCount > 0 ? ` · ${pendingCount} onay bekliyor` : ""}
           </p>
         </div>
-        <Button onClick={() => setCreating(true)} type="button">
+        <Button onClick={() => router.push("/dashboard/admin/yorumlar/yeni")} type="button">
           <Plus className="size-4" />
           Yorum Ekle
         </Button>
@@ -420,13 +420,6 @@ export function TestimonialsManager() {
           </div>
         )}
       </div>
-
-      <TestimonialFormDialog
-        onOpenChange={(open) => {
-          if (!open) setCreating(false);
-        }}
-        open={creating}
-      />
 
       <Dialog
         onOpenChange={(open) => {

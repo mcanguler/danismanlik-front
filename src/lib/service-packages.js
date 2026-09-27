@@ -205,6 +205,18 @@ export function useServicePackagesQuery(filters = {}, options = {}) {
   });
 }
 
+export function useServicePackageQuery(id, options = {}) {
+  const token = useToken();
+
+  return useQuery({
+    queryKey: [...servicePackagesQueryKey, id],
+    queryFn: async () =>
+      normalizePackageDetail(await api.servicePackage(token, id)),
+    enabled: options.enabled !== false && Boolean(token && id),
+    retry: false,
+  });
+}
+
 export function useCreateServicePackage() {
   const queryClient = useQueryClient();
   const token = useToken();

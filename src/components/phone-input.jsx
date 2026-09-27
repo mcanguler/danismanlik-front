@@ -135,7 +135,6 @@ export function PhoneInput({
             </svg>
           </button>
 
-          {/* Açılır Arama Penceresi */}
           {isOpen && (
               <div className="absolute left-0 top-full z-50 mt-1 w-64 rounded-lg border border-border bg-popover p-1.5 shadow-md text-popover-foreground">
                 <div className="p-1">

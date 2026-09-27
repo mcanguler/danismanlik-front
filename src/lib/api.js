@@ -848,4 +848,88 @@ export const api = {
       token,
     });
   },
+  blogPosts(params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/blog${search ? `?${search}` : ""}`);
+  },
+  blogPost(slug) {
+    return request(`/v1/blog/${slug}`);
+  },
+  blogComments(slug, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/blog/${slug}/comments${search ? `?${search}` : ""}`);
+  },
+  createBlogComment(slug, payload) {
+    return request(`/v1/blog/${slug}/comments`, { method: "POST", body: payload });
+  },
+  blogCategories(params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/blog-categories${search ? `?${search}` : ""}`);
+  },
+  adminBlogPosts(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/blog${search ? `?${search}` : ""}`, { token });
+  },
+  adminBlogPost(token, id) {
+    return request(`/v1/admin/blog/${id}`, { token });
+  },
+  createBlogPost(token, payload) {
+    return request("/v1/admin/blog", { method: "POST", body: payload, token });
+  },
+  updateBlogPost(token, id, payload) {
+    return request(`/v1/admin/blog/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteBlogPost(token, id) {
+    return request(`/v1/admin/blog/${id}`, { method: "DELETE", token });
+  },
+  adminBlogCategories(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/blog-categories${search ? `?${search}` : ""}`, { token });
+  },
+  createBlogCategory(token, payload) {
+    return request("/v1/admin/blog-categories", { method: "POST", body: payload, token });
+  },
+  updateBlogCategory(token, id, payload) {
+    return request(`/v1/admin/blog-categories/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteBlogCategory(token, id) {
+    return request(`/v1/admin/blog-categories/${id}`, { method: "DELETE", token });
+  },
+  adminBlogComments(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/blog-comments${search ? `?${search}` : ""}`, { token });
+  },
+  adminBlogComment(token, id) {
+    return request(`/v1/admin/blog-comments/${id}`, { token });
+  },
+  updateBlogCommentApproval(token, id, payload) {
+    return request(`/v1/admin/blog-comments/${id}/approval`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteBlogComment(token, id) {
+    return request(`/v1/admin/blog-comments/${id}`, { method: "DELETE", token });
+  },
 };

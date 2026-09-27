@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   Eye,
@@ -38,8 +39,9 @@ import {
   useCustomersQuery,
   useDeleteCustomer,
 } from "@/lib/customers";
-import { CustomerFormDialog } from "@/components/customers/customer-form-dialog";
 import { CustomerDetailDialog } from "@/components/customers/customer-detail-dialog";
+
+const LIST_PATH = "/dashboard/admin/musteriler";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -47,11 +49,12 @@ function getErrorMessage(error) {
 }
 
 export function CustomersManager() {
+  const router = useRouter();
   const [view, setView] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteCustomer();
 
-  const customerId = view?.mode && view.mode !== "create" ? view.id : null;
+  const customerId = view?.mode === "detail" ? view.id : null;
   const detailQuery = useCustomerQuery(customerId);
 
   const query = useCustomersQuery();
@@ -87,7 +90,7 @@ export function CustomersManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setView({ mode: "create" })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Müşteri
@@ -120,7 +123,7 @@ export function CustomersManager() {
             <p className="text-sm text-muted-foreground">
               İlk müşteriyi ekleyerek başlayın
             </p>
-            <Button variant="outline" onClick={() => setView({ mode: "create" })}>
+            <Button variant="outline" onClick={() => router.push(`${LIST_PATH}/yeni`)}>
               <Plus className="size-4" />
               Yeni Müşteri
             </Button>
@@ -173,7 +176,7 @@ export function CustomersManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setView({ mode: "edit", id: item.id })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.name} düzenle`}
                           >
@@ -229,7 +232,7 @@ export function CustomersManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setView({ mode: "edit", id: item.id })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -250,19 +253,6 @@ export function CustomersManager() {
           </>
         )}
       </div>
-
-      <CustomerFormDialog
-        key={view ? (view.id ?? "new") : "closed"}
-        open={Boolean(view && (view.mode === "create" || view.mode === "edit"))}
-        mode={view?.mode === "edit" ? "edit" : "create"}
-        customer={view?.mode === "edit" ? (detailQuery.data ?? null) : null}
-        loading={view?.mode === "edit" && detailQuery.isPending}
-        error={view?.mode === "edit" ? detailQuery.error : null}
-        onRetry={() => detailQuery.refetch()}
-        onOpenChange={(open) => {
-          if (!open) setView(null);
-        }}
-      />
 
       <CustomerDetailDialog
         open={Boolean(view?.mode === "detail")}

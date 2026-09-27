@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   Image as ImageIcon,
@@ -37,7 +38,8 @@ import {
   useDeleteServiceCategory,
   useServiceCategoriesQuery,
 } from "@/lib/service-categories";
-import { ServiceCategoryFormDialog } from "@/components/service-categories/service-category-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/hizmet-kategorileri";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -56,7 +58,7 @@ function CategoryAvatar({ category }) {
 }
 
 export function ServiceCategoriesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteServiceCategory();
 
@@ -95,7 +97,7 @@ export function ServiceCategoriesManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ category: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Kategori
@@ -130,7 +132,7 @@ export function ServiceCategoriesManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ category: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Kategori
@@ -175,7 +177,7 @@ export function ServiceCategoriesManager() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => setDialogState({ category: item })}
+                            onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                             aria-label={`${item.name} düzenle`}
                           >
                             <Pencil className="size-4" />
@@ -222,7 +224,7 @@ export function ServiceCategoriesManager() {
                         size="sm"
                         variant="outline"
                         className="h-9"
-                        onClick={() => setDialogState({ category: item })}
+                        onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                       >
                         <Pencil className="size-3.5" />
                         Düzenle
@@ -244,15 +246,6 @@ export function ServiceCategoriesManager() {
           </>
         )}
       </div>
-
-      <ServiceCategoryFormDialog
-        key={dialogState ? (dialogState.category?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        category={dialogState?.category ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   Image as ImageIcon,
@@ -37,7 +38,8 @@ import {
   useDeleteProductCategory,
   useProductCategoriesQuery,
 } from "@/lib/products";
-import { ProductCategoryFormDialog } from "@/components/product-categories/product-category-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/urun-kategorileri";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -56,7 +58,7 @@ function CategoryAvatar({ category }) {
 }
 
 export function ProductCategoriesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteProductCategory();
 
@@ -95,7 +97,7 @@ export function ProductCategoriesManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ category: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Kategori
@@ -130,7 +132,7 @@ export function ProductCategoriesManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ category: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Kategori
@@ -175,7 +177,7 @@ export function ProductCategoriesManager() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => setDialogState({ category: item })}
+                            onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                             aria-label={`${item.name} düzenle`}
                           >
                             <Pencil className="size-4" />
@@ -222,7 +224,7 @@ export function ProductCategoriesManager() {
                         size="sm"
                         variant="outline"
                         className="h-9"
-                        onClick={() => setDialogState({ category: item })}
+                        onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                       >
                         <Pencil className="size-3.5" />
                         Düzenle
@@ -244,15 +246,6 @@ export function ProductCategoriesManager() {
           </>
         )}
       </div>
-
-      <ProductCategoryFormDialog
-        key={dialogState ? (dialogState.category?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        category={dialogState?.category ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

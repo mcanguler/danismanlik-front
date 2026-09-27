@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,8 @@ import {
 import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { dayLabel, useBreaksQuery, useDeleteBreak } from "@/lib/breaks";
-import { BreakFormDialog } from "@/components/breaks/break-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/molalar";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -32,7 +34,7 @@ function getErrorMessage(error) {
 }
 
 export function BreaksManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteBreak();
 
@@ -69,7 +71,7 @@ export function BreaksManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ breakItem: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Mola
@@ -103,7 +105,7 @@ export function BreaksManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ breakItem: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Mola
@@ -144,7 +146,9 @@ export function BreaksManager() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => setDialogState({ breakItem: item })}
+                            onClick={() =>
+                              router.push(`${LIST_PATH}/${item.id}`)
+                            }
                             aria-label={`${item.consultantName} ${dayLabel(item.day_of_week)} molayı düzenle`}
                           >
                             <Pencil className="size-4" />
@@ -190,7 +194,7 @@ export function BreaksManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setDialogState({ breakItem: item })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -211,15 +215,6 @@ export function BreaksManager() {
           </>
         )}
       </div>
-
-      <BreakFormDialog
-        key={dialogState ? (dialogState.breakItem?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        breakItem={dialogState?.breakItem ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

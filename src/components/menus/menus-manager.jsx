@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   ListTree,
@@ -11,18 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { Switch } from "@/components/ui/switch";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,9 +29,7 @@ import { getQueryErrorMessage } from "@/lib/query-errors";
 import {
   HEADER_MENU_SLUG,
   useAdminMenusQuery,
-  useCreateMenu,
   useDeleteMenu,
-  useUpdateMenu,
 } from "@/lib/menus";
 
 function getErrorMessage(error) {
@@ -49,153 +37,11 @@ function getErrorMessage(error) {
   return "Beklenmeyen bir hata oluştu";
 }
 
-function MenuFormDialog({ open, menu, onOpenChange }) {
-  const isEdit = Boolean(menu);
-  const create = useCreateMenu();
-  const update = useUpdateMenu();
-  const mutation = isEdit ? update : create;
-  const [name, setName] = useState(menu?.name ?? "");
-  const [isActive, setIsActive] = useState(
-    menu ? Boolean(menu.is_active) : true
-  );
-  const [error, setError] = useState("");
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError("Menü adı zorunludur");
-      return;
-    }
-
-    const payload = { name: trimmedName, is_active: isActive };
-
-    if (isEdit) {
-      mutation.mutate(
-        { id: menu.id, payload },
-        {
-          onSuccess: (updated) => {
-            toast.add({ title: "Menü güncellendi", type: "success" });
-            setName(updated.name ?? trimmedName);
-            setIsActive(Boolean(updated.is_active));
-            setError("");
-            onOpenChange(false);
-          },
-          onError: (mutationError) => {
-            setError(getErrorMessage(mutationError));
-          },
-        }
-      );
-      return;
-    }
-
-    mutation.mutate(
-      { name: trimmedName, is_active: isActive },
-      {
-        onSuccess: () => {
-          toast.add({ title: "Menü oluşturuldu", type: "success" });
-          setError("");
-          onOpenChange(false);
-        },
-        onError: (mutationError) => {
-          setError(getErrorMessage(mutationError));
-        },
-      }
-    );
-  };
-
-  return (
-    <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? "Menüyü Düzenle" : "Yeni Menü"}</DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? menu?.slug
-                ? `Public adres: /api/v1/menus/${menu.slug}`
-                : "Menü bilgilerini güncelleyin"
-              : "Slug, menü adından otomatik oluşturulur"}
-          </DialogDescription>
-        </DialogHeader>
-        <form className="flex flex-col gap-4" noValidate onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="menu_name">Menü Adı</Label>
-            <Input
-              id="menu_name"
-              onChange={(event) => {
-                setName(event.target.value);
-                setError("");
-              }}
-              placeholder="Örn. Header Ana Menü"
-              type="text"
-              value={name}
-            />
-          </div>
-          {isEdit && menu?.slug && (
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="menu_slug">Slug</Label>
-              <Input
-                disabled
-                id="menu_slug"
-                readOnly
-                type="text"
-                value={menu.slug}
-              />
-              <p className="text-xs text-muted-foreground">
-                Menü adı değişirse otomatik güncellenir
-              </p>
-            </div>
-          )}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="menu_is_active">Aktif</Label>
-              <p className="text-xs text-muted-foreground">
-                Aktif menüler public tarafta kullanılabilir
-              </p>
-            </div>
-            <Switch
-              checked={isActive}
-              id="menu_is_active"
-              onCheckedChange={setIsActive}
-            />
-          </div>
-          {isEdit && menu?.slug === HEADER_MENU_SLUG && (
-            <p className="rounded-lg bg-blush-surface px-3 py-2 text-xs text-primary">
-              Bu menü site header&apos;ında otomatik olarak kullanılır.
-            </p>
-          )}
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <DialogFooter>
-            <Button
-              className="h-10"
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              İptal
-            </Button>
-            <Button className="h-10" disabled={mutation.isPending} type="submit">
-              {mutation.isPending && (
-                <LoaderCircle className="size-4 animate-spin" />
-              )}
-              {mutation.isPending
-                ? "Kaydediliyor..."
-                : isEdit
-                  ? "Kaydet"
-                  : "Oluştur"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 export function MenusManager() {
+  const router = useRouter();
   const query = useAdminMenusQuery();
   const menus = query.data ?? [];
   const deleteMutation = useDeleteMenu();
-  const [dialogState, setDialogState] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
   const handleDelete = () => {
@@ -226,7 +72,10 @@ export function MenusManager() {
             <span className="font-mono">{HEADER_MENU_SLUG}</span>
           </p>
         </div>
-        <Button className="h-10" onClick={() => setDialogState({ menu: null })}>
+        <Button
+          className="h-10"
+          onClick={() => router.push("/dashboard/admin/menuler/yeni")}
+        >
           <Plus className="size-4" />
           Yeni Menü
         </Button>
@@ -260,7 +109,7 @@ export function MenusManager() {
               bir menü oluşturabilirsiniz
             </p>
             <Button
-              onClick={() => setDialogState({ menu: null })}
+              onClick={() => router.push("/dashboard/admin/menuler/yeni")}
               variant="outline"
             >
               <Plus className="size-4" />
@@ -306,7 +155,9 @@ export function MenusManager() {
                   </Button>
                   <Button
                     aria-label={`${menu.name} düzenle`}
-                    onClick={() => setDialogState({ menu })}
+                    onClick={() =>
+                      router.push(`/dashboard/admin/menuler/${menu.id}/duzenle`)
+                    }
                     size="icon-sm"
                     type="button"
                     variant="ghost"
@@ -329,15 +180,6 @@ export function MenusManager() {
           </div>
         )}
       </div>
-
-      <MenuFormDialog
-        key={dialogState ? (dialogState.menu?.id ?? "new") : "closed"}
-        menu={dialogState?.menu ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-        open={Boolean(dialogState)}
-      />
 
       <AlertDialog
         onOpenChange={(open) => {

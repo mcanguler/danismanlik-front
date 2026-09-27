@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   Image as ImageIcon,
@@ -39,7 +40,8 @@ import {
 } from "@/lib/service-packages";
 import { formatPrice } from "@/lib/format";
 import { getQueryErrorMessage } from "@/lib/query-errors";
-import { ServicePackageFormDialog } from "@/components/service-packages/service-package-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/paketler";
 
 function PackageAvatar({ servicePackage }) {
   return (
@@ -57,7 +59,7 @@ function PackageAvatar({ servicePackage }) {
 }
 
 export function ServicePackagesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteServicePackage();
 
@@ -91,7 +93,7 @@ export function ServicePackagesManager() {
             {packages.length} paket
           </p>
         </div>
-        <Button className="h-10" onClick={() => setDialogState({ servicePackage: null })}>
+        <Button className="h-10" onClick={() => router.push(`${LIST_PATH}/yeni`)}>
           <Plus className="size-4" />
           Yeni Paket
         </Button>
@@ -125,7 +127,7 @@ export function ServicePackagesManager() {
             </p>
             <Button
               className="mt-1"
-              onClick={() => setDialogState({ servicePackage: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
               variant="outline"
             >
               <Plus className="size-4" />
@@ -179,7 +181,7 @@ export function ServicePackagesManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setDialogState({ servicePackage })
+                              router.push(`${LIST_PATH}/${servicePackage.id}`)
                             }
                             aria-label={`${servicePackage.name} düzenle`}
                           >
@@ -228,7 +230,7 @@ export function ServicePackagesManager() {
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <Button
                       className="h-9"
-                      onClick={() => setDialogState({ servicePackage })}
+                      onClick={() => router.push(`${LIST_PATH}/${servicePackage.id}`)}
                       size="sm"
                       variant="outline"
                     >
@@ -251,15 +253,6 @@ export function ServicePackagesManager() {
           </>
         )}
       </div>
-
-      <ServicePackageFormDialog
-        key={dialogState ? (dialogState.servicePackage?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        servicePackage={dialogState?.servicePackage ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         onOpenChange={(open) => {

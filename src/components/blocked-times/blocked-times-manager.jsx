@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { CircleAlert, LoaderCircle, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +28,8 @@ import {
   useBlockedTimesQuery,
   useDeleteBlockedTime,
 } from "@/lib/blocked-times";
-import { BlockedTimeFormDialog } from "@/components/blocked-times/blocked-time-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/bloklu-zamanlar";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -35,7 +37,7 @@ function getErrorMessage(error) {
 }
 
 export function BlockedTimesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteBlockedTime();
 
@@ -74,7 +76,7 @@ export function BlockedTimesManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ blockedTime: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Bloklu Zaman
@@ -108,7 +110,7 @@ export function BlockedTimesManager() {
             </p>
             <Button
               variant="outline"
-              onClick={() => setDialogState({ blockedTime: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
             >
               <Plus className="size-4" />
               Yeni Bloklu Zaman
@@ -150,7 +152,7 @@ export function BlockedTimesManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setDialogState({ blockedTime: item })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.consultantName} bloklu zamanını düzenle`}
                           >
@@ -197,7 +199,7 @@ export function BlockedTimesManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setDialogState({ blockedTime: item })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -218,15 +220,6 @@ export function BlockedTimesManager() {
           </>
         )}
       </div>
-
-      <BlockedTimeFormDialog
-        key={dialogState ? (dialogState.blockedTime?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        blockedTime={dialogState?.blockedTime ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

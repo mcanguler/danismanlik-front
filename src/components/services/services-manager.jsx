@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   Image as ImageIcon,
@@ -34,7 +35,8 @@ import {
 import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { useDeleteService, useServicesQuery } from "@/lib/services";
-import { ServiceFormDialog } from "@/components/services/service-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/hizmetler";
 
 function getErrorMessage(error) {
   if (error instanceof ApiError) return error.message;
@@ -53,7 +55,7 @@ function ServiceAvatar({ service }) {
 }
 
 export function ServicesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteService();
 
@@ -90,7 +92,7 @@ export function ServicesManager() {
         <Button
           size="lg"
           className="h-10"
-          onClick={() => setDialogState({ service: null })}
+          onClick={() => router.push(`${LIST_PATH}/yeni`)}
         >
           <Plus className="size-4" />
           Yeni Hizmet
@@ -123,7 +125,7 @@ export function ServicesManager() {
             <p className="text-sm text-muted-foreground">
               İlk hizmeti ekleyerek başlayın
             </p>
-            <Button variant="outline" onClick={() => setDialogState({ service: null })}>
+            <Button variant="outline" onClick={() => router.push(`${LIST_PATH}/yeni`)}>
               <Plus className="size-4" />
               Yeni Hizmet
             </Button>
@@ -171,7 +173,7 @@ export function ServicesManager() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => setDialogState({ service: item })}
+                            onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                             aria-label={`${item.name} düzenle`}
                           >
                             <Pencil className="size-4" />
@@ -221,7 +223,7 @@ export function ServicesManager() {
                         size="sm"
                         variant="outline"
                         className="h-9"
-                        onClick={() => setDialogState({ service: item })}
+                        onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                       >
                         <Pencil className="size-3.5" />
                         Düzenle
@@ -243,15 +245,6 @@ export function ServicesManager() {
           </>
         )}
       </div>
-
-      <ServiceFormDialog
-        key={dialogState ? (dialogState.service?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        service={dialogState?.service ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

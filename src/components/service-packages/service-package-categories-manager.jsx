@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CircleAlert,
   FolderTree,
@@ -35,10 +36,11 @@ import {
   useServicePackageCategoriesQuery,
 } from "@/lib/service-packages";
 import { getQueryErrorMessage } from "@/lib/query-errors";
-import { ServicePackageCategoryFormDialog } from "@/components/service-packages/service-package-category-form-dialog";
+
+const LIST_PATH = "/dashboard/admin/paket-kategorileri";
 
 export function ServicePackageCategoriesManager() {
-  const [dialogState, setDialogState] = useState(null);
+  const router = useRouter();
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteServicePackageCategory();
 
@@ -74,7 +76,7 @@ export function ServicePackageCategoriesManager() {
             {categories.length} kategori
           </p>
         </div>
-        <Button className="h-10" onClick={() => setDialogState({ category: null })}>
+        <Button className="h-10" onClick={() => router.push(`${LIST_PATH}/yeni`)}>
           <Plus className="size-4" />
           Yeni Kategori
         </Button>
@@ -108,7 +110,7 @@ export function ServicePackageCategoriesManager() {
             </p>
             <Button
               className="mt-1"
-              onClick={() => setDialogState({ category: null })}
+              onClick={() => router.push(`${LIST_PATH}/yeni`)}
               variant="outline"
             >
               <Plus className="size-4" />
@@ -150,7 +152,7 @@ export function ServicePackageCategoriesManager() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
-                            onClick={() => setDialogState({ category })}
+                            onClick={() => router.push(`${LIST_PATH}/${category.id}`)}
                             aria-label={`${category.name} düzenle`}
                           >
                             <Pencil className="size-4" />
@@ -191,7 +193,7 @@ export function ServicePackageCategoriesManager() {
                     <div className="flex items-center gap-2">
                       <Button
                         className="h-9"
-                        onClick={() => setDialogState({ category })}
+                        onClick={() => router.push(`${LIST_PATH}/${category.id}`)}
                         size="sm"
                         variant="outline"
                       >
@@ -215,15 +217,6 @@ export function ServicePackageCategoriesManager() {
           </>
         )}
       </div>
-
-      <ServicePackageCategoryFormDialog
-        key={dialogState ? (dialogState.category?.id ?? "new") : "closed"}
-        open={Boolean(dialogState)}
-        category={dialogState?.category ?? null}
-        onOpenChange={(open) => {
-          if (!open) setDialogState(null);
-        }}
-      />
 
       <AlertDialog
         onOpenChange={(open) => {
