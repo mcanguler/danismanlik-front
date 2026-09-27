@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from "react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import {CircleAlert, LoaderCircle, Pencil, Plus, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {
@@ -88,6 +89,7 @@ function AppointmentRowCells({appointment, role}) {
 }
 
 export function AppointmentsList() {
+    const router = useRouter();
     const {user} = useAuth();
     const role = user?.role;
     const endSession = useAuthStore((state) => state.endSession);
@@ -144,6 +146,15 @@ export function AppointmentsList() {
                         </p>
                     )}
                 </div>
+                {(role === "ADMIN" || role === "CONSULTANT") && (
+                    <Button
+                        onClick={() => router.push("/appointments/yeni")}
+                        type="button"
+                    >
+                        <Plus className="size-4"/>
+                        Yeni Randevu
+                    </Button>
+                )}
             </div>
 
             <div className="mt-4">

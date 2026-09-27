@@ -57,7 +57,7 @@ function fieldErrorsFromApiError(error) {
   return fieldErrors;
 }
 
-export function AppointmentBooking() {
+export function AppointmentBooking({ redirectTo = null }) {
   const router = useRouter();
   const { user } = useAuth();
   const endSession = useAuthStore((state) => state.endSession);
@@ -311,7 +311,10 @@ export function AppointmentBooking() {
             type: "success",
           });
           setCustomerServicePackageId(null);
-   //       router.push("/appointments");
+          if (redirectTo) {
+            router.push(redirectTo);
+          }
+ //       router.push("/appointments");
         },
         onError: (error) => {
           if (error instanceof ApiError && error.status === 401) {

@@ -13,9 +13,11 @@ export function EbookCard({ ebook }) {
           src={ebook.image}
         />
         <div className="relative z-10 flex justify-between items-start">
-          <span className="px-3 py-1 rounded-full bg-accent-gold text-primary font-label-sm text-label-sm font-bold shadow-md">
-            {ebook.discount}
-          </span>
+          {ebook.discount && (
+            <span className="px-3 py-1 rounded-full bg-accent-gold text-primary font-label-sm text-label-sm font-bold shadow-md">
+              {ebook.discount}
+            </span>
+          )}
         </div>
       </div>
       <div className="p-5 flex flex-col flex-grow justify-between">
@@ -24,9 +26,11 @@ export function EbookCard({ ebook }) {
         </h3>
         <div className="pt-3 flex items-center justify-between border-t border-surface-container">
           <div className="flex flex-col">
-            <span className="font-body-sm text-body-sm line-through text-outline">
-              {ebook.oldPrice}
-            </span>
+            {ebook.oldPrice && (
+              <span className="font-body-sm text-body-sm line-through text-outline">
+                {ebook.oldPrice}
+              </span>
+            )}
             <span className="font-title-lg text-title-lg font-bold text-primary-container">
               {ebook.price}
             </span>

@@ -14,9 +14,11 @@ export function CourseCard({ course }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent" />
         <div className="absolute top-4 left-4">
-          <span className="px-3.5 py-1.5 rounded-full bg-accent-gold text-primary font-label-sm text-label-sm font-bold shadow-md">
-            {course.discount}
-          </span>
+          {course.discount && (
+            <span className="px-3.5 py-1.5 rounded-full bg-accent-gold text-primary font-label-sm text-label-sm font-bold shadow-md">
+              {course.discount}
+            </span>
+          )}
         </div>
       </div>
       <div className="p-7 flex flex-col flex-grow justify-between">
@@ -25,9 +27,11 @@ export function CourseCard({ course }) {
         </h3>
         <div className="pt-6 border-t border-surface-container flex items-center justify-between">
           <div>
-            <span className="block font-body-sm text-body-sm line-through text-outline">
-              {course.oldPrice}
-            </span>
+            {course.oldPrice && (
+              <span className="block font-body-sm text-body-sm line-through text-outline">
+                {course.oldPrice}
+              </span>
+            )}
             <span className="font-headline-sm text-headline-sm font-bold text-primary">
               {course.price}
             </span>

@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePublicServiceCategoriesQuery } from "@/lib/service-categories";
 import { useHeaderMenuLinks } from "@/lib/menus";
+import { useSettingsQuery } from "@/lib/settings";
 
 const LOGO_URL =
   "https://lh3.googleusercontent.com/aida/AEtjO1WmgOiNUjaiKAyx9E7v0c1TiacEOf9Ez9UIoiWtd_wu5jvZxJQkt8tgqP_1af1X7-Dq0EwBfRcJN1dVN4feUAM4OLHX21QPzTrembPsErT974fcokn2vtB79K9-ykrYd6AqJJDHa0STeq52b_josAFx-YABLqEprjUcJFEgNZ7WPTHG_XrOPUggI1lMcTBFl29nh55qk4MnTXdlVybvkd-PPE97N01i9a5AgA7WLKsp_pYadDtSCgI8oJ4";
@@ -58,6 +59,11 @@ export function SiteHeader({
   onAccountLogout,
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const settingsQuery = useSettingsQuery();
+  const settings = settingsQuery.data ?? {};
+  const headerSiteName = settings["site_name"] || "Sümeyra Aydın";
+  const headerSiteTagline = settings["site_tagline"] || "Akademi & Danışmanlık";
 
   const headerMenu = useHeaderMenuLinks(fallbackLinks);
   const links = headerMenu.links;
@@ -114,10 +120,10 @@ export function SiteHeader({
           <div className="flex items-center gap-4 flex-shrink-0">
             <Link className="flex flex-col" href="/">
               <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-semibold">
-                Sümeyra Aydın
+                {headerSiteName}
               </span>
               <span className="font-label-sm text-label-sm tracking-[0.18em] uppercase text-secondary font-medium">
-                Akademi &amp; Danışmanlık
+                {headerSiteTagline}
               </span>
             </Link>
           </div>

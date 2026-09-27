@@ -884,6 +884,28 @@ export const api = {
   submitTestimonial(payload) {
     return request("/v1/testimonials", { method: "POST", body: payload });
   },
+  settings() {
+    return request("/v1/settings");
+  },
+  adminSettings(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/settings${search ? `?${search}` : ""}`, { token });
+  },
+  createSetting(token, payload) {
+    return request("/v1/settings", { method: "POST", body: payload, token });
+  },
+  updateSetting(token, id, payload) {
+    return request(`/v1/settings/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteSetting(token, id) {
+    return request(`/v1/settings/${id}`, { method: "DELETE", token });
+  },
   adminBlogPosts(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")

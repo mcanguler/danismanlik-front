@@ -13,9 +13,18 @@ import {
   ShieldCheck,
   CirclePlay,
 } from "lucide-react";
+import { useSettingsQuery } from "@/lib/settings";
 
 const LOGO_URL =
   "https://lh3.googleusercontent.com/aida/AEtjO1WmgOiNUjaiKAyx9E7v0c1TiacEOf9Ez9UIoiWtd_wu5jvZxJQkt8tgqP_1af1X7-Dq0EwBfRcJN1dVN4feUAM4OLHX21QPzTrembPsErT974fcokn2vtB79K9-ykrYd6AqJJDHa0STeq52b_josAFx-YABLqEprjUcJFEgNZ7WPTHG_XrOPUggI1lMcTBFl29nh55qk4MnTXdlVybvkd-PPE97N01i9a5AgA7WLKsp_pYadDtSCgI8oJ4";
+
+const DEFAULT_SITE_NAME = "Sümeyra Aydın";
+const DEFAULT_SITE_DESCRIPTION =
+  "Bireysel dönüşüm, dişil enerji farkındalığı ve ilişkilerde kalıcı uyum üzerine bilimsel ve sezgisel rehberlik sunan seçkin gelişim akademisi.";
+const DEFAULT_PHONE = "+90 (506) 115 10 10";
+const DEFAULT_EMAIL = "iletisim@sumeyraaydin.com";
+const DEFAULT_COPYRIGHT =
+  "© 2026 Sümeyra Aydın Danışmanlık & Akademi. Tüm Hakları Saklıdır.";
 
 const QUICK_LINKS = [
   { label: "1e1 Seanslar", href: "#seanslar" },
@@ -49,13 +58,26 @@ const LEGAL_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", icon: Camera },
-  { label: "YouTube", icon: CirclePlay },
-  { label: "Podcast", icon: Podcast },
-  { label: "Telefon", icon: Phone },
+  { label: "Instagram", icon: Camera, settingKey: "social.instagram" },
+  { label: "YouTube", icon: CirclePlay, settingKey: "social.youtube" },
+  { label: "Podcast", icon: Podcast, settingKey: "social.podcast" },
 ];
 
+function whatsappUrl(phone) {
+  const digits = String(phone ?? "").replace(/\D/g, "");
+  if (!digits) return "#";
+  return `https://wa.me/${digits}`;
+}
+
 export function SiteFooter() {
+  const settingsQuery = useSettingsQuery();
+  const settings = settingsQuery.data ?? {};
+  const siteName = settings["site_name"] || DEFAULT_SITE_NAME;
+  const siteDescription = settings["site_description"] || DEFAULT_SITE_DESCRIPTION;
+  const contactPhone = settings["contact.phone"] || DEFAULT_PHONE;
+  const contactEmail = settings["contact.email"] || "iletisim@sumeyraaydin.com";
+  const copyright = settings["footer.copyright"] || DEFAULT_COPYRIGHT;
+
   return (
     <footer className="w-full bg-canvas-pure text-on-surface shadow-[0_-4px_24px_rgba(92,29,36,0.03)]">
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 pt-16 pb-12">
@@ -63,21 +85,21 @@ export function SiteFooter() {
           <div className="flex flex-col">
             <div className="flex items-center gap-3 mb-4">
               <span className="font-headline-sm text-headline-sm text-primary font-semibold">
-                Sümeyra Aydın
+                {siteName}
               </span>
             </div>
             <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-6">
-              Bireysel dönüşüm, dişil enerji farkındalığı ve ilişkilerde kalıcı
-              uyum üzerine bilimsel ve sezgisel rehberlik sunan seçkin gelişim
-              akademisi.
+              {siteDescription}
             </p>
             <div className="flex items-center gap-3">
-              {SOCIAL_LINKS.map(({ icon: Icon, label }) => (
+              {SOCIAL_LINKS.map(({ icon: Icon, label, settingKey }) => (
                 <a
                   key={label}
                   aria-label={label}
                   className="w-9 h-9 rounded-full bg-blush-surface text-primary-container flex items-center justify-center hover:bg-blush-hover hover:text-burgundy-light transition-colors"
-                  href="#"
+                  href={settings[settingKey] || "#"}
+                  rel="noopener noreferrer"
+                  target={settings[settingKey] ? "_blank" : undefined}
                 >
                   <Icon className="size-4" />
                 </a>
@@ -122,14 +144,14 @@ export function SiteFooter() {
               İletişim &amp; Destek
             </h3>
             <div className="flex flex-col gap-3 font-body-sm text-body-sm text-on-surface-variant mb-5">
-              <div className="flex items-start gap-2">
+              <a className="flex items-start gap-2 hover:text-primary-container transition-colors" href={`tel:${contactPhone.replace(/\s/g, "")}`}>
                 <Phone className="text-primary-container size-[18px] shrink-0" />
-                <span>+90 (506) 115 10 10</span>
-              </div>
-              <div className="flex items-start gap-2">
+                <span>{contactPhone}</span>
+              </a>
+              <a className="flex items-start gap-2 hover:text-primary-container transition-colors" href={`mailto:${contactEmail}`}>
                 <Mail className="text-primary-container size-[18px] shrink-0" />
-                <span>iletisim@sumeyraaydin.com</span>
-              </div>
+                <span>{contactEmail}</span>
+              </a>
               <div className="flex items-start gap-2">
                 <Clock className="text-primary-container size-[18px] shrink-0" />
                 <span>Hafta İçi: 09:30 - 18:30</span>
@@ -137,7 +159,9 @@ export function SiteFooter() {
             </div>
             <a
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full bg-blush-surface text-primary-container font-label-md text-label-md hover:bg-blush-hover hover:text-burgundy-light transition-colors"
-              href="#"
+              href={whatsappUrl(contactPhone)}
+              rel="noopener noreferrer"
+              target="_blank"
             >
               <MessageCircle className="size-[18px]" />
               <span>WhatsApp Destek Hattı</span>
@@ -145,10 +169,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-on-surface-variant font-body-sm text-body-sm">
-          <p className="text-center md:text-left">
-            © 2026 Sümeyra Aydın Danışmanlık &amp; Akademi. Tüm Hakları
-            Saklıdır.
-          </p>
+          <p className="text-center md:text-left">{copyright}</p>
           <div className="flex items-center gap-3 font-label-sm text-label-sm text-secondary">
             <span className="px-2 py-1 rounded bg-canvas-cream">Mastercard</span>
             <span className="px-2 py-1 rounded bg-canvas-cream">Visa</span>

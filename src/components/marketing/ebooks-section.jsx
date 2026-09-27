@@ -1,31 +1,51 @@
-import { ArrowRight } from "lucide-react";
 import { EbookCard } from "@/components/marketing/ebook-card";
 import { SectionHeading } from "@/components/marketing/section-heading";
 
-export function EbooksSection({ ebooks }) {
+function EbooksGridSkeleton({ count = 4 }) {
+  return (
+    <div className="grid animate-pulse grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          className="overflow-hidden rounded-2xl border border-border-delicate bg-canvas-pure"
+          key={index}
+        >
+          <div className="aspect-[4/5] bg-blush-surface/60" />
+          <div className="flex flex-col gap-3 p-5">
+            <div className="h-4 w-3/4 rounded bg-surface-container" />
+            <div className="h-3 w-1/2 rounded bg-surface-container" />
+            <div className="mt-2 h-9 w-full rounded-full bg-surface-container" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function EbooksSection({ ebooks, loading = false }) {
+  if (loading) {
+    return (
+      <section
+        className="mx-auto w-full max-w-[1320px] px-4 py-16 sm:px-6"
+        id="e-kitaplar"
+      >
+        <SectionHeading description="" eyebrow="" title="E-Kitaplar" />
+        <EbooksGridSkeleton count={4} />
+      </section>
+    );
+  }
+
+  if (!ebooks || ebooks.length === 0) return null;
+
   return (
     <section
-      className="max-w-[1320px] mx-auto px-4 sm:px-6 py-16 w-full"
+      className="mx-auto w-full max-w-[1320px] px-4 py-16 sm:px-6"
       id="e-kitaplar"
     >
-      <SectionHeading
-        description=""
-        eyebrow=""
-        title="Öne Çıkan E-Kitaplar"
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <SectionHeading description="" eyebrow="" title="E-Kitaplar" />
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {ebooks.map((ebook) => (
-          <EbookCard key={ebook.title} ebook={ebook} />
+          <EbookCard ebook={ebook} key={ebook.id ?? ebook.title} />
         ))}
-      </div>
-      <div className="mt-12 text-center">
-        <a
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-canvas-pure text-primary-container font-label-lg text-label-lg shadow-sm hover:shadow-md hover:bg-blush-surface transition-all"
-          href="#"
-        >
-          <span>Tüm E-Kitapları Gör (14 Kitap)</span>
-          <ArrowRight className="size-[18px]" />
-        </a>
       </div>
     </section>
   );
