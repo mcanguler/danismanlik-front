@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -32,7 +32,7 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { resolveMenuItemHref } from "@/lib/menu-link-sources";
 import {
-  useAdminMenuItemsQuery,
+  flattenMenuItems,
   useAdminMenuQuery,
   useDeleteMenuItem,
   useUpdateMenuItem,
@@ -173,7 +173,6 @@ function MenuItemNode({
 
 export function MenuItemsEditor({ menuId }) {
   const menuQuery = useAdminMenuQuery(menuId);
-  const itemsQuery = useAdminMenuItemsQuery(menuId);
   const updateItem = useUpdateMenuItem(menuId);
   const deleteItem = useDeleteMenuItem(menuId);
 
@@ -181,7 +180,10 @@ export function MenuItemsEditor({ menuId }) {
   const [deleting, setDeleting] = useState(null);
 
   const menu = menuQuery.data;
-  const flatItems = itemsQuery.data ?? [];
+  const flatItems = useMemo(
+    () => flattenMenuItems(menu?.items ?? []),
+    [menu?.items]
+  );
   const tree = buildTree(flatItems);
 
   const moveToRoot = (item) => {
@@ -220,9 +222,7 @@ export function MenuItemsEditor({ menuId }) {
     });
   };
 
-  console.log(menu)
-
-  if (menuQuery.isPending || itemsQuery.isPending) {
+  if (menuQuery.isPending) {
     return (
       <div className="w-full flex-1 px-4 py-6">
         <div className="flex justify-center py-16">

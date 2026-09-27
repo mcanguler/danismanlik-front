@@ -47,7 +47,7 @@ function OrderStatusBadge({ status }) {
 
 export function AdminOrdersManager() {
   const [filters, setFilters] = useState({
-    order_no: "",
+    search: "",
     status: "",
     created_from: "",
     created_to: "",
@@ -55,7 +55,7 @@ export function AdminOrdersManager() {
   const [page, setPage] = useState(1);
 
   const query = useAdminOrdersQuery({
-    order_no: filters.order_no,
+    search: filters.search,
     status: filters.status,
     created_from: filters.created_from,
     created_to: filters.created_to,
@@ -91,11 +91,11 @@ export function AdminOrdersManager() {
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            className="w-48 pl-8"
-            onChange={(event) => updateFilter("order_no", event.target.value)}
-            placeholder="Sipariş no ara"
+            className="w-64 pl-8"
+            onChange={(event) => updateFilter("search", event.target.value)}
+            placeholder="Sipariş no, müşteri, telefon veya e-posta ara"
             type="text"
-            value={filters.order_no}
+            value={filters.search}
           />
         </div>
         <select

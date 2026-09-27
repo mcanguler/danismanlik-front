@@ -7,8 +7,8 @@
  * - Hizmet               → /hizmetler/{categorySlug}/{serviceSlug}
  *                                                      (src/app/hizmetler/[slug]/[service])
  * - Ürün Kategorisi      → /urunler?category_id={id}  (src/app/urunler — kategori filtresi)
- * - Ürün                 → /urunler/{slug}            (src/app/urunler/[slug])
- * - Kurs                 → /egitimler/{slug}          (src/app/egitimler/[slug])
+ * - Ürün & Ürün Listesi  → /urunler (+ /urunler/{slug}) (src/app/urunler)
+ * - Kurs & Eğitim Listesi→ /egitimler (+ /egitimler/{slug}) (src/app/egitimler)
  * - Hizmet Paketi        → /paketler/{slug}           (src/app/paketler/[slug])
  * - Danışanlar (liste)   → /danisanlar                (src/app/danisanlar)
  * - Danışan              → /danisanlar/{id}           (src/app/danisanlar/[id])
@@ -24,9 +24,12 @@ export const MENU_LINK_SOURCES = {
   PAGE: "PAGE",
   SERVICE_CATEGORY: "SERVICE_CATEGORY",
   SERVICE: "SERVICE",
+  SERVICE_LIST: "SERVICE_LIST",
   PRODUCT_CATEGORY: "PRODUCT_CATEGORY",
   PRODUCT: "PRODUCT",
+  PRODUCT_LIST: "PRODUCT_LIST",
   COURSE: "COURSE",
+  COURSE_LIST: "COURSE_LIST",
   SERVICE_PACKAGE: "SERVICE_PACKAGE",
   CONSULTANTS: "CONSULTANTS",
   CONSULTANT: "CONSULTANT",
@@ -42,9 +45,12 @@ export const MENU_LINK_SOURCE_LABELS = {
   [MENU_LINK_SOURCES.PAGE]: "CMS Sayfası",
   [MENU_LINK_SOURCES.SERVICE_CATEGORY]: "Hizmet Kategorisi",
   [MENU_LINK_SOURCES.SERVICE]: "Hizmet",
+  [MENU_LINK_SOURCES.SERVICE_LIST]: "Hizmet Listeleme",
   [MENU_LINK_SOURCES.PRODUCT_CATEGORY]: "Ürün Kategorisi",
   [MENU_LINK_SOURCES.PRODUCT]: "Ürün",
+  [MENU_LINK_SOURCES.PRODUCT_LIST]: "Ürün Listeleme",
   [MENU_LINK_SOURCES.COURSE]: "Kurs",
+  [MENU_LINK_SOURCES.COURSE_LIST]: "Eğitim Listeleme",
   [MENU_LINK_SOURCES.SERVICE_PACKAGE]: "Hizmet Paketi",
   [MENU_LINK_SOURCES.CONSULTANTS]: "Danışanlar",
   [MENU_LINK_SOURCES.CONSULTANT]: "Danışan",
@@ -60,6 +66,9 @@ export const CONSULTANTS_LIST_URL = "/danisanlar";
 export const BLOG_LIST_URL = "/blog";
 export const TESTIMONIALS_LIST_URL = "/danisan-yorumlari";
 export const CONTACT_PAGE_URL = "/iletisim";
+export const PRODUCT_LIST_URL = "/urunler";
+export const COURSE_LIST_URL = "/egitimler";
+export const SERVICE_LIST_URL = "/hizmetler";
 
 export const MENU_TARGETS = {
   SELF: "_self",
@@ -78,5 +87,6 @@ export const MENU_TARGET_LABELS = {
 export function resolveMenuItemHref(item) {
   if (!item) return "#";
   if (item.page?.slug) return `/${item.page.slug}`;
+  if (item.source === MENU_LINK_SOURCES.SERVICE_LIST) return SERVICE_LIST_URL;
   return item.url ?? "#";
 }

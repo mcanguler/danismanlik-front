@@ -21,14 +21,17 @@ import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import {
-  CONSULTANTS_LIST_URL,
   BLOG_LIST_URL,
-  TESTIMONIALS_LIST_URL,
+  CONSULTANTS_LIST_URL,
   CONTACT_PAGE_URL,
+  COURSE_LIST_URL,
   MENU_LINK_SOURCES,
   MENU_LINK_SOURCE_LABELS,
   MENU_TARGETS,
   MENU_TARGET_LABELS,
+  PRODUCT_LIST_URL,
+  SERVICE_LIST_URL,
+  TESTIMONIALS_LIST_URL,
 } from "@/lib/menu-link-sources";
 import { usePublicPagesQuery } from "@/lib/pages";
 import { usePublicServiceCategoriesQuery } from "@/lib/service-categories";
@@ -265,6 +268,9 @@ export function MenuItemFormDialog({
     sourceType !== MENU_LINK_SOURCES.MANUAL &&
     sourceType !== MENU_LINK_SOURCES.CONSULTANTS &&
     sourceType !== MENU_LINK_SOURCES.BLOG &&
+    sourceType !== MENU_LINK_SOURCES.SERVICE_LIST &&
+    sourceType !== MENU_LINK_SOURCES.PRODUCT_LIST &&
+    sourceType !== MENU_LINK_SOURCES.COURSE_LIST &&
     sourceType !== MENU_LINK_SOURCES.TESTIMONIALS &&
     sourceType !== MENU_LINK_SOURCES.CONTACT;
 
@@ -275,11 +281,17 @@ export function MenuItemFormDialog({
         ? CONSULTANTS_LIST_URL
         : sourceType === MENU_LINK_SOURCES.BLOG
           ? BLOG_LIST_URL
-          : sourceType === MENU_LINK_SOURCES.TESTIMONIALS
-            ? TESTIMONIALS_LIST_URL
-            : sourceType === MENU_LINK_SOURCES.CONTACT
-              ? CONTACT_PAGE_URL
-              : (selectedOption?.url ?? "");
+          : sourceType === MENU_LINK_SOURCES.SERVICE_LIST
+            ? SERVICE_LIST_URL
+            : sourceType === MENU_LINK_SOURCES.PRODUCT_LIST
+              ? PRODUCT_LIST_URL
+              : sourceType === MENU_LINK_SOURCES.COURSE_LIST
+                ? COURSE_LIST_URL
+                : sourceType === MENU_LINK_SOURCES.TESTIMONIALS
+                  ? TESTIMONIALS_LIST_URL
+                  : sourceType === MENU_LINK_SOURCES.CONTACT
+                    ? CONTACT_PAGE_URL
+                    : (selectedOption?.url ?? "");
   const resolvedPageId =
     sourceType === MENU_LINK_SOURCES.PAGE && sourceId
       ? Number(sourceId)

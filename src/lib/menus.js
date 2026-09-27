@@ -48,6 +48,21 @@ export function normalizeMenu(item) {
   };
 }
 
+/** Backend'in döndürdüğü items ağacını editor'ün kullandığı düz listeye çevirir. */
+export function flattenMenuItems(items, parentId = null) {
+  const result = [];
+  for (const raw of asArray(items)) {
+    const item = normalizeMenuItem({ ...raw, parent_id: raw.parent_id ?? parentId });
+    if (!item) continue;
+    const { children, ...rest } = item;
+    result.push(rest);
+    if (children.length > 0) {
+      result.push(...flattenMenuItems(children, item.id));
+    }
+  }
+  return result;
+}
+
 function normalizeMenuDetail(payload) {
   const menu = normalizeMenu(payload?.data ?? payload);
   if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
@@ -84,30 +99,8 @@ export function useAdminMenuQuery(id, options = {}) {
 
   return useQuery({
     queryKey: [...adminMenusQueryKey, "detail", String(id)],
-    queryFn: async () => {
-      const menu = normalizeMenu(await api.adminMenu(token, id));
-      if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
-      return menu;
-    },
+    queryFn: async () => normalizeMenuDetail(await api.adminMenu(token, id)),
     enabled: (options.enabled ?? true) !== false && Boolean(token && id),
-    retry: false,
-  });
-}
-
-export function useAdminMenuItemsQuery(menuId, options = {}) {
-  const token = useToken();
-
-  return useQuery({
-    queryKey: [...adminMenusQueryKey, "items", String(menuId)],
-    queryFn: async () => {
-      const payload = await api.adminMenuItems(token, menuId);
-      const data = payload?.data ?? payload;
-      if (!Array.isArray(data)) {
-        throw new ApiError("Beklenmeyen yanıt formatı");
-      }
-      return data.map(normalizeMenuItem).filter(Boolean);
-    },
-    enabled: (options.enabled ?? true) !== false && Boolean(token && menuId),
     retry: false,
   });
 }
@@ -117,11 +110,8 @@ export function useCreateMenu() {
   const token = useToken();
 
   return useMutation({
-    mutationFn: async (payload) => {
-      const menu = normalizeMenu(await api.createMenu(token, payload));
-      if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
-      return menu;
-    },
+    mutationFn: async (payload) =>
+      normalizeMenuDetail(await api.createMenu(token, payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminMenusQueryKey });
       queryClient.invalidateQueries({ queryKey: publicMenusQueryKey });
@@ -134,18 +124,26 @@ export function useUpdateMenu() {
   const token = useToken();
 
   return useMutation({
-    mutationFn: ({ id, payload }) => api.updateMenu(token, id, payload),
-    onSuccess: (menu, { id }) => {
-      queryClient.invalidateQueries({ queryKey: adminMenusQueryKey });
-      queryClient.invalidateQueries({ queryKey: publicMenusQueryKey });
-      queryClient.invalidateQueries({
-        queryKey: [...adminMenusQueryKey, "detail", String(id)],
-      });
-      if (menu?.slug) {
-        queryClient.invalidateQueries({
-          queryKey: [...publicMenusQueryKey, "detail", menu.slug],
+    mutationFn: async ({ id, payload }) =>
+      normalizeMenuDetail(await api.updateMenu(token, id, payload)),
+    onSuccess: (menu, { id, oldSlug }) => {
+      queryClient.setQueryData(
+        [...adminMenusQueryKey, "detail", String(id)],
+        menu
+      );
+      queryClient.setQueryData(adminMenusQueryKey, (old) =>
+        Array.isArray(old)
+          ? old.map((item) =>
+              String(item.id) === String(menu.id) ? menu : item
+            )
+          : old
+      );
+      if (oldSlug && menu.slug && oldSlug !== menu.slug) {
+        queryClient.removeQueries({
+          queryKey: [...publicMenusQueryKey, "detail", oldSlug],
         });
       }
+      queryClient.invalidateQueries({ queryKey: publicMenusQueryKey });
     },
   });
 }
@@ -185,9 +183,6 @@ export function useUpdateMenuItem(menuId) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminMenusQueryKey });
       queryClient.invalidateQueries({ queryKey: publicMenusQueryKey });
-      queryClient.invalidateQueries({
-        queryKey: [...adminMenusQueryKey, "items", String(menuId)],
-      });
     },
   });
 }
@@ -201,9 +196,6 @@ export function useDeleteMenuItem(menuId) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminMenusQueryKey });
       queryClient.invalidateQueries({ queryKey: publicMenusQueryKey });
-      queryClient.invalidateQueries({
-        queryKey: [...adminMenusQueryKey, "items", String(menuId)],
-      });
     },
   });
 }
@@ -226,11 +218,8 @@ export function usePublicMenusQuery(options = {}) {
 export function usePublicMenuQuery(slug, options = {}) {
   return useQuery({
     queryKey: [...publicMenusQueryKey, "detail", String(slug)],
-    queryFn: async () => {
-      const menu = normalizeMenu(await api.publicMenu(slug));
-      if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
-      return menu;
-    },
+    queryFn: async () =>
+      normalizeMenuDetail(await api.publicMenu(slug)),
     enabled: (options.enabled ?? true) !== false && Boolean(slug),
     retry: false,
   });

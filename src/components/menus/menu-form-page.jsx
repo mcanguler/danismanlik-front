@@ -92,6 +92,7 @@ function MenuForm({ isEdit, menu }) {
   const update = useUpdateMenu();
   const mutation = isEdit ? update : create;
   const [name, setName] = useState(menu?.name ?? "");
+  const [slug, setSlug] = useState(menu?.slug ?? "");
   const [isActive, setIsActive] = useState(
     menu ? Boolean(menu.is_active) : true
   );
@@ -105,11 +106,14 @@ function MenuForm({ isEdit, menu }) {
       return;
     }
 
-    const payload = { name: trimmedName, is_active: isActive };
-
     if (isEdit) {
+      const payload = { name: trimmedName, is_active: isActive };
+      const trimmedSlug = slug.trim();
+      if (trimmedSlug && trimmedSlug !== menu.slug) {
+        payload.slug = trimmedSlug;
+      }
       mutation.mutate(
-        { id: menu.id, payload },
+        { id: menu.id, payload, oldSlug: menu.slug },
         {
           onSuccess: () => {
             toast.add({ title: "Menü güncellendi", type: "success" });
@@ -156,14 +160,17 @@ function MenuForm({ isEdit, menu }) {
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="menu_slug">Slug</Label>
           <Input
-            disabled
             id="menu_slug"
-            readOnly
+            onChange={(event) => {
+              setSlug(event.target.value);
+              setError("");
+            }}
             type="text"
-            value={menu.slug}
+            value={slug}
           />
           <p className="text-xs text-muted-foreground">
-            Menü adı değişirse otomatik güncellenir
+            Değiştirmediğiniz takdirde mevcut slug korunur; isim değiştirmek
+            slug&apos;ı etkilemez.
           </p>
         </div>
       )}

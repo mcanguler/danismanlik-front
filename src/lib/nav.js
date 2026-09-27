@@ -137,6 +137,11 @@ export const NAV = {
       icon: MessageSquareQuote,
     },
     {
+      label: "Randevular",
+      href: "/dashboard/admin/randevular",
+      icon: CalendarDays,
+    },
+    {
       label: "İçerik",
       icon: FileText,
       children: [

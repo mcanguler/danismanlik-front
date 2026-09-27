@@ -34,12 +34,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
-import {
-  useCustomerQuery,
-  useCustomersQuery,
-  useDeleteCustomer,
-} from "@/lib/customers";
-import { CustomerDetailDialog } from "@/components/customers/customer-detail-dialog";
+import { useCustomersQuery, useDeleteCustomer } from "@/lib/customers";
 
 const LIST_PATH = "/dashboard/admin/musteriler";
 
@@ -50,12 +45,8 @@ function getErrorMessage(error) {
 
 export function CustomersManager() {
   const router = useRouter();
-  const [view, setView] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteCustomer();
-
-  const customerId = view?.mode === "detail" ? view.id : null;
-  const detailQuery = useCustomerQuery(customerId);
 
   const query = useCustomersQuery();
   const customers = query.data ?? [];
@@ -166,7 +157,7 @@ export function CustomersManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              setView({ mode: "detail", id: item.id })
+                              router.push(`${LIST_PATH}/${item.id}`)
                             }
                             aria-label={`${item.name} detayı`}
                           >
@@ -176,7 +167,7 @@ export function CustomersManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              router.push(`${LIST_PATH}/${item.id}`)
+                              router.push(`${LIST_PATH}/${item.id}/duzenle`)
                             }
                             aria-label={`${item.name} düzenle`}
                           >
@@ -223,7 +214,7 @@ export function CustomersManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => setView({ mode: "detail", id: item.id })}
+                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
                     >
                       <Eye className="size-3.5" />
                       Detay
@@ -232,7 +223,9 @@ export function CustomersManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
+                      onClick={() =>
+                        router.push(`${LIST_PATH}/${item.id}/duzenle`)
+                      }
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
@@ -253,17 +246,6 @@ export function CustomersManager() {
           </>
         )}
       </div>
-
-      <CustomerDetailDialog
-        open={Boolean(view?.mode === "detail")}
-        customer={view?.mode === "detail" ? (detailQuery.data ?? null) : null}
-        loading={view?.mode === "detail" && detailQuery.isPending}
-        error={view?.mode === "detail" ? detailQuery.error : null}
-        onRetry={() => detailQuery.refetch()}
-        onOpenChange={(open) => {
-          if (!open) setView(null);
-        }}
-      />
 
       <AlertDialog
         open={Boolean(deleting)}

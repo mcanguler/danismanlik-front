@@ -59,8 +59,60 @@ export function useCustomersQuery(filters = {}, options = {}) {
   });
 }
 
-export function useCustomerQuery(id) {
+export const customerDetailQueryKey = (id) => [
+  ...customersQueryKey,
+  "detail",
+  String(id),
+];
+
+export function normalizeCustomerDetail(payload) {
+  const data = payload?.data ?? payload ?? {};
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new ApiError("Beklenmeyen yanıt formatı");
+  }
+  const profile = normalizeCustomer({
+    ...data,
+    addresses: Array.isArray(data.addresses) ? data.addresses : [],
+  });
+  return {
+    ...data,
+    profile,
+    name: profile.name,
+    phone: profile.phone,
+    email: profile.email,
+    addresses: profile.addresses,
+    stats:
+      data.stats && typeof data.stats === "object"
+        ? {
+            appointments: Number(data.stats.appointments ?? 0),
+            orders: Number(data.stats.orders ?? 0),
+            payments: Number(data.stats.payments ?? 0),
+            service_packages: Number(data.stats.service_packages ?? 0),
+          }
+        : null,
+    appointments: Array.isArray(data.appointments) ? data.appointments : [],
+    orders: Array.isArray(data.orders) ? data.orders : [],
+    payments: Array.isArray(data.payments) ? data.payments : [],
+    service_packages: Array.isArray(data.service_packages)
+      ? data.service_packages
+      : [],
+    courses: Array.isArray(data.courses) ? data.courses : [],
+  };
+}
+
+export function useCustomerDetailQuery(id, options = {}) {
   const token = useToken();
+
+  return useQuery({
+    queryKey: customerDetailQueryKey(id),
+    queryFn: async () =>
+      normalizeCustomerDetail(await api.customerDetail(token, id)),
+    enabled: options.enabled !== false && Boolean(token && id),
+    retry: false,
+  });
+}
+
+export function useCustomerQuery(id) {  const token = useToken();
 
   return useQuery({
     queryKey: [...customersQueryKey, id],

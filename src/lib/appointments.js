@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
 import {format} from "date-fns";
@@ -179,6 +180,35 @@ export function useAppointmentsQuery(params = {}, options = {}) {
       normalizeAppointmentList(await api.appointments(token, params)),
     enabled: options.enabled !== false && Boolean(token),
     retry: false,
+  });
+}
+
+export function useAdminAppointmentsQuery(params = {}, options = {}) {
+  const token = useToken();
+
+  return useQuery({
+    queryKey: [...appointmentsQueryKey, "admin", params],
+    queryFn: async () => {
+      const payload = await api.adminAppointments(token, params);
+      const data = payload?.data ?? payload;
+      const meta = payload?.meta ?? null;
+      if (!Array.isArray(data)) {
+        throw new ApiError("Beklenmeyen yanıt formatı");
+      }
+      return {
+        items: data.map(normalizeAppointment).filter(Boolean),
+        meta: meta
+          ? {
+              currentPage: meta.current_page ?? 1,
+              lastPage: meta.last_page ?? 1,
+              perPage: meta.per_page ?? data.length,
+              total: meta.total ?? data.length,
+            }
+          : null,
+      };
+    },
+    enabled: options.enabled !== false && Boolean(token),
+    placeholderData: keepPreviousData,
   });
 }
 

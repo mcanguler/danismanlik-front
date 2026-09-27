@@ -242,6 +242,15 @@ export const api = {
     ).toString();
     return request(`/v1/appointments${search ? `?${search}` : ""}`, { token });
   },
+  adminAppointments(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/appointments${search ? `?${search}` : ""}`, { token });
+  },
+  customerDetail(token, id) {
+    return request(`/v1/customers/${id}/detail`, { token });
+  },
   createAppointment(token, payload) {
     return request("/v1/appointments", { method: "POST", body: payload, token });
   },

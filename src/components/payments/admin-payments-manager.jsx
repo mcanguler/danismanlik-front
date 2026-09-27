@@ -39,7 +39,7 @@ function PaymentStatusBadge({ status }) {
 
 export function AdminPaymentsManager() {
   const [filters, setFilters] = useState({
-    merchant_oid: "",
+    search: "",
     status: "",
     created_from: "",
     created_to: "",
@@ -47,7 +47,7 @@ export function AdminPaymentsManager() {
   const [page, setPage] = useState(1);
 
   const query = useAdminPaymentsQuery({
-    merchant_oid: filters.merchant_oid,
+    search: filters.search,
     status: filters.status,
     created_from: filters.created_from,
     created_to: filters.created_to,
@@ -76,11 +76,11 @@ export function AdminPaymentsManager() {
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
-            className="w-56 pl-8"
-            onChange={(event) => updateFilter("merchant_oid", event.target.value)}
-            placeholder="Merchant OID ara"
+            className="w-64 pl-8"
+            onChange={(event) => updateFilter("search", event.target.value)}
+            placeholder="Merchant OID veya müşteri ara"
             type="text"
-            value={filters.merchant_oid}
+            value={filters.search}
           />
         </div>
         <select
