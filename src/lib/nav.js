@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   ListTree,
   Mail,
+  MessageSquareQuote,
   Package,
   PackageOpen,
   ReceiptText,
@@ -127,6 +128,11 @@ export const NAV = {
       href: "/dashboard/admin/iletisim-formlari",
       icon: Mail,
       bottom: true,
+    },
+    {
+      label: "Danışan Yorumları",
+      href: "/dashboard/admin/yorumlar",
+      icon: MessageSquareQuote,
     },
     {
       label: "İçerik",

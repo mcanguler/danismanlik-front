@@ -823,4 +823,29 @@ export const api = {
       token,
     });
   },
+  adminTestimonials(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/testimonials${search ? `?${search}` : ""}`, { token });
+  },
+  createTestimonial(token, payload) {
+    return request("/v1/admin/testimonials", { method: "POST", body: payload, token });
+  },
+  adminTestimonial(token, id) {
+    return request(`/v1/admin/testimonials/${id}`, { token });
+  },
+  updateTestimonialApproval(token, id, payload) {
+    return request(`/v1/admin/testimonials/${id}/approval`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteTestimonial(token, id) {
+    return request(`/v1/admin/testimonials/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
 };
