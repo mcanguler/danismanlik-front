@@ -125,24 +125,23 @@ function SlotPicker({ availabilityQuery, slots, selectedSlot, onSelectSlot }) {
             <group.icon className="size-4 text-accent-gold" />
             <span>{group.label}</span>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
             {group.slots.map((slot) => (
-              <button
-                className={cn(
-                  "px-3.5 py-3 rounded-xl font-label-md text-label-md transition-all text-center",
-                  selectedSlot?.start === slot.start
-                    ? "bg-primary-container text-on-primary font-semibold shadow-sm"
-                    : "bg-surface-container-low text-on-surface hover:bg-blush-hover"
-                )}
-                key={slot.start}
-                onClick={() => onSelectSlot(slot)}
-                type="button"
-              >
-                {slot.label}
-              </button>
+                <button
+                    className={cn(
+                        "px-2 py-2 rounded-lg text-xs sm:text-sm transition-all text-center",
+                        selectedSlot?.start === slot.start
+                            ? "bg-primary-container text-on-primary font-semibold shadow-sm"
+                            : "bg-surface-container-low text-on-surface hover:bg-blush-hover"
+                    )}
+                    key={slot.start}
+                    onClick={() => onSelectSlot(slot)}
+                    type="button"
+                >
+                  {slot.label}
+                </button>
             ))}
-          </div>
-        </div>
+          </div>        </div>
       ))}
     </div>
   );
@@ -331,12 +330,17 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
 
   const selectedOffering =
     offerings.find(
-      (item) => String(item.consultant.slug) === String(selectedConsultantId)
+      (item) =>
+        String(item.consultant.slug ?? "") === String(selectedConsultantId) ||
+        String(item.consultant.id) === String(selectedConsultantId)
     ) ?? (offerings.length === 1 ? offerings[0] : null);
 
   const availabilityQuery = useAvailabilityQuery({
-    consultantId: selectedOffering?.consultant.slug ?? null,
-    serviceId: service?.id ?? null,
+    consultantId:
+      selectedOffering?.consultant.slug ??
+      selectedOffering?.consultant.id ??
+      null,
+    serviceId: selectedOffering?.offering.service_id ?? service?.id ?? null,
     date: date || null,
   });
   const slots = availabilityQuery.data ?? [];
@@ -747,7 +751,11 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
                           : "border-border-delicate bg-canvas-cream hover:bg-blush-surface/40"
                       )}
                       key={item.consultant.id}
-                      onClick={() => handleSelectConsultant(item.consultant.slug)}
+                      onClick={() =>
+                        handleSelectConsultant(
+                          item.consultant.slug ?? item.consultant.id
+                        )
+                      }
                       type="button"
                     >
                       <div className="w-14 h-14 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-title-md text-title-md font-semibold overflow-hidden flex-shrink-0">

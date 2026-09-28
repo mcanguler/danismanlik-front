@@ -93,17 +93,17 @@ function ServiceMedia({ src, alt }) {
         </div>
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute bottom-4 left-4 bg-canvas-pure/95 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-md flex items-center gap-3">
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-        <div className="flex flex-col">
-          <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary">
-            Canlı Birebir
-          </span>
-          <span className="font-label-md text-label-md text-primary font-semibold">
-            Aktif Randevu Takvimi
-          </span>
-        </div>
-      </div>
+      {/*<div className="absolute bottom-4 left-4 bg-canvas-pure/95 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-md flex items-center gap-3">*/}
+      {/*  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />*/}
+      {/*  <div className="flex flex-col">*/}
+      {/*    <span className="font-label-sm text-label-sm uppercase tracking-wider text-secondary">*/}
+      {/*      Canlı Birebir*/}
+      {/*    </span>*/}
+      {/*    <span className="font-label-md text-label-md text-primary font-semibold">*/}
+      {/*      Aktif Randevu Takvimi*/}
+      {/*    </span>*/}
+      {/*  </div>*/}
+      {/*</div>*/}
     </div>
   );
 }
@@ -136,10 +136,7 @@ export function ServiceDetailPage({ categorySlug, serviceSlug }) {
   const offerings = offeringsQuery.data ?? [];
   const singleOffering = offerings.length === 1 ? offerings[0] : null;
 
-  const description =
-    service?.seo_description?.trim() ||
-    service?.description?.trim() ||
-    "Uzmanınız Sümeyra Aydın ile birebir gerçekleşen, tamamen size özel hazırlanan dönüşüm seansı.";
+  const description = service?.description?.trim()
 
   return (
     <ServicesPageShell>
@@ -251,15 +248,7 @@ export function ServiceDetailPage({ categorySlug, serviceSlug }) {
                 </div>
                 <div className="space-y-4 text-on-surface-variant font-body-md text-body-md leading-relaxed">
                   <p>{description}</p>
-                  <p>
-                    Randevu gün ve saati geldiğinde uzmanınız{" "}
-                    <strong className="text-primary font-semibold">
-                      Sümeyra Aydın
-                    </strong>{" "}
-                    ile birebir görüşme gerçekleştirilmektedir. Randevu günü ve
-                    saati geldiğinde sizi arıyor ve güvenli dijital seans
-                    odasında seansı başlatıyoruz.
-                  </p>
+
                   <div className="p-4 rounded-xl bg-surface-container-low flex items-start gap-3">
                     <Info className="size-5 text-primary-container flex-shrink-0 mt-0.5" />
                     <p className="font-body-sm text-body-sm text-on-secondary-fixed-variant">
@@ -272,22 +261,22 @@ export function ServiceDetailPage({ categorySlug, serviceSlug }) {
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  {[
-                    { icon: BadgeCheck, label: "Uluslararası Etik İlkeler" },
-                    { icon: Lock, label: "%100 Danışan Gizliliği" },
-                    { icon: Video, label: "Zoom & WhatsApp Destekli" },
-                    { icon: RefreshCw, label: "24 Saat Öncesine Kadar İptal" },
-                  ].map((item) => (
-                    <div
-                      className="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface"
-                      key={item.label}
-                    >
-                      <item.icon className="size-4 text-accent-gold shrink-0" />
-                      <span>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
+                {/*<div className="grid grid-cols-2 gap-3 pt-2">*/}
+                {/*  {[*/}
+                {/*    { icon: BadgeCheck, label: "Uluslararası Etik İlkeler" },*/}
+                {/*    { icon: Lock, label: "%100 Danışan Gizliliği" },*/}
+                {/*    { icon: Video, label: "Zoom & WhatsApp Destekli" },*/}
+                {/*    { icon: RefreshCw, label: "24 Saat Öncesine Kadar İptal" },*/}
+                {/*  ].map((item) => (*/}
+                {/*    <div*/}
+                {/*      className="flex items-center gap-2.5 font-body-sm text-body-sm text-on-surface"*/}
+                {/*      key={item.label}*/}
+                {/*    >*/}
+                {/*      <item.icon className="size-4 text-accent-gold shrink-0" />*/}
+                {/*      <span>{item.label}</span>*/}
+                {/*    </div>*/}
+                {/*  ))}*/}
+                {/*</div>*/}
               </div>
             </section>
 
@@ -299,7 +288,7 @@ export function ServiceDetailPage({ categorySlug, serviceSlug }) {
           </>
         )}
 
-        <TrustBadges />
+        {/*<TrustBadges />*/}
       </div>
     </ServicesPageShell>
   );

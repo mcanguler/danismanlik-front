@@ -24,6 +24,18 @@ export function normalizeConsultant(item) {
   };
 }
 
+export function consultantKey(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === "object" && value !== null) {
+    return value.slug ? String(value.slug) : value.id ? String(value.id) : null;
+  }
+  return String(value);
+}
+
+function isNumericId(value) {
+  return /^\d+$/.test(String(value ?? ""));
+}
+
 function normalizeMediaList(value) {
   if (!Array.isArray(value)) return [];
   return value
@@ -90,12 +102,25 @@ export function useConsultantQuery(id) {
   const token = useToken();
 
   return useQuery({
-    queryKey: [...consultantsQueryKey, id],
+    queryKey: [...consultantsQueryKey, consultantKey(id)],
     queryFn: async () => {
-      const payload = await api.consultant(token, id);
+      // Single consultant detail is slug-based (`GET /v1/consultants/{slug}`);
+      // numeric ids resolve to slug via the list endpoint first.
+      let key = consultantKey(id);
+      if (key && isNumericId(key)) {
+        const list = await normalizeList(await api.consultants(token, {}));
+        const match =
+          list.find((item) => String(item.id) === key) ?? null;
+        if (match?.slug) {
+          key = match.slug;
+        } else if (!match) {
+          throw new ApiError("Danışman bulunamadı", 404);
+        }
+      }
+      const payload = await api.consultant(token, key);
       return normalizeConsultant(payload?.data ?? payload);
     },
-    enabled: Boolean(token && id),
+    enabled: Boolean(token && consultantKey(id)),
   });
 }
 

@@ -177,16 +177,16 @@ function PackagesSection({ children }) {
       id="paketler"
     >
       <div className="text-center max-w-3xl mx-auto mb-16">
-        <span className="font-label-sm text-label-sm uppercase tracking-[0.18em] text-burgundy-light font-bold">
-          KİŞİYE ÖZEL ÇÖZÜMLER
-        </span>
-        <h2 className="font-headline-lg text-headline-lg text-primary font-semibold mt-2 mb-4">
+        {/*<span className="font-label-sm text-label-sm uppercase tracking-[0.18em] text-burgundy-light font-bold">*/}
+        {/*  KİŞİYE ÖZEL ÇÖZÜMLER*/}
+        {/*</span>*/}
+        <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-4">
           Danışmanlık &amp; Seans Seçenekleri
         </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant">
-          İçinde bulunduğunuz dönemin ihtiyacına göre size en uygun seans
-          formatını seçin.
-        </p>
+        {/*<p className="font-body-md text-body-md text-on-surface-variant">*/}
+        {/*  İçinde bulunduğunuz dönemin ihtiyacına göre size en uygun seans*/}
+        {/*  formatını seçin.*/}
+        {/*</p>*/}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-[1240px] mx-auto">
         {children}
@@ -618,13 +618,7 @@ export function ServiceCategoriesPage() {
 
   return (
     <ServicesPageShell>
-      <PageHero
-        badge="Kişiselleştirilmiş Dönüşüm & Rehberlik"
-        breadcrumb={null}
-        description={DEFAULT_HERO_DESCRIPTION}
-        title="1e1 Seanslar"
-        // titleAccent="Bütüncül Seans Paketleri"
-      />
+
       <PackagesSection>
         {query.isPending && <GridSkeleton count={4} />}
         {query.isError && (
@@ -640,10 +634,10 @@ export function ServiceCategoriesPage() {
           <CategoryCard category={category} key={category.id} />
         ))}
       </PackagesSection>
-      <VoiceQuestionBanner />
-      <ProcessSection />
-      <TestimonialsSection />
-      <FaqSection />
+      {/*<VoiceQuestionBanner />*/}
+      {/*<ProcessSection />*/}
+      {/*<TestimonialsSection />*/}
+      {/*<FaqSection />*/}
     </ServicesPageShell>
   );
 }
@@ -672,13 +666,13 @@ export function CategoryServicesPage({ slug }) {
 
   return (
     <ServicesPageShell>
-      <PageHero
-        badge="Kişiselleştirilmiş Dönüşüm & Rehberlik"
-        breadcrumb={category?.name ?? null}
-        description={heroDescription}
-        title={category?.name ?? "1e1 Seanslar"}
-        titleAccent={category ? "Birebir Seans Paketleri" : undefined}
-      />
+      {/*<PageHero*/}
+      {/*  badge="Kişiselleştirilmiş Dönüşüm & Rehberlik"*/}
+      {/*  breadcrumb={category?.name ?? null}*/}
+      {/*  description={heroDescription}*/}
+      {/*  title={category?.name ?? "1e1 Seanslar"}*/}
+      {/*  titleAccent={category ? "Birebir Seans Paketleri" : undefined}*/}
+      {/*/>*/}
       <PackagesSection>
         {categoriesQuery.isPending && <GridSkeleton count={4} />}
         {categoriesQuery.isError && (
@@ -717,10 +711,10 @@ export function CategoryServicesPage({ slug }) {
           />
         ))}
       </PackagesSection>
-      <VoiceQuestionBanner />
-      <ProcessSection />
-      <TestimonialsSection />
-      <FaqSection />
+      {/*<VoiceQuestionBanner />*/}
+      {/*<ProcessSection />*/}
+      {/*<TestimonialsSection />*/}
+      {/*<FaqSection />*/}
     </ServicesPageShell>
   );
 }

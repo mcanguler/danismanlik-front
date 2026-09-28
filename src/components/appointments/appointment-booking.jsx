@@ -83,27 +83,38 @@ export function AppointmentBooking({ redirectTo = null }) {
   );
   const appointmentsQuery = useAppointmentsQuery({}, { enabled: isConsultant });
   const adminServiceOptionsQuery = useConsultantServiceOptionsQuery(
-    isAdmin && consultantId ? Number(consultantId) : null
+    isAdmin && consultantId ? consultantId : null
   );
   const myPackagesQuery = useMyServicePackagesQuery({ enabled: isCustomer });
 
+  const selectedConsultant = (consultantsQuery.data ?? []).find(
+    (item) =>
+      String(item.slug) === String(consultantId) ||
+      String(item.id) === String(consultantId)
+  ) ?? null;
+
   const resolvedConsultantId = isConsultant
     ? user?.consultant_id
-    : consultantId
-      ? Number(consultantId)
+    : selectedConsultant
+      ? Number(selectedConsultant.id)
       : null;
 
+  const resolvedConsultantKey = isConsultant
+    ? user?.consultant_id
+    : consultantId || null;
+
   const serviceOptionsQuery = useConsultantServiceOptionsQuery(
-    isCustomer && consultantId ? Number(consultantId) : null
+    isCustomer && consultantId ? consultantId : null
   );
   const consultantServiceOptionsQuery = useConsultantServiceOptionsQuery(
-    isConsultant && user?.consultant_id ? Number(user.consultant_id) : null
+    isConsultant && user?.consultant_id ? user.consultant_id : null
   );
 
   const consultantOptions = useMemo(
     () =>
       (consultantsQuery.data ?? []).map((item) => ({
         id: item.id,
+        slug: item.slug ?? "",
         name: item.name,
         title: item.title ?? "",
       })),
@@ -175,7 +186,7 @@ export function AppointmentBooking({ redirectTo = null }) {
 
   const openAvailabilityQuery = useOpenAvailabilityQuery(
     {
-      consultantId: resolvedConsultantId,
+      consultantId: resolvedConsultantKey,
       serviceId: selectedService?.serviceId ?? null,
       date: date || null,
     },
@@ -183,7 +194,7 @@ export function AppointmentBooking({ redirectTo = null }) {
   );
   const scheduleAvailabilityQuery = useAvailabilityQuery(
     {
-      consultantId: resolvedConsultantId,
+      consultantId: resolvedConsultantKey,
       serviceId: selectedService?.serviceId ?? null,
       date: date || null,
     },
@@ -291,6 +302,13 @@ export function AppointmentBooking({ redirectTo = null }) {
     if (!validate()) return;
 
     const resolvedCustomerId = isCustomer ? user?.id : Number(customerId);
+    if (!resolvedConsultantId) {
+      setErrors((current) => ({
+        ...current,
+        consultant_id: "Danışman seçin",
+      }));
+      return;
+    }
 
     create.mutate(
       {
@@ -443,7 +461,7 @@ export function AppointmentBooking({ redirectTo = null }) {
                   >
                     <option value="">Danışman seçin</option>
                     {consultantOptions.map((option) => (
-                      <option key={option.id} value={option.id}>
+                      <option key={option.slug} value={option.slug}>
                         {option.name}
                         {option.title ? ` · ${option.title}` : ""}
                       </option>

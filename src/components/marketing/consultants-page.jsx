@@ -315,11 +315,8 @@ export function ConsultantsPage() {
   return (
     <ConsultantsPageShell>
       <div className="relative w-full overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-blush-surface/60 rounded-full blur-[110px] pointer-events-none -z-10" />
-        <div className="absolute top-96 -left-36 w-[420px] h-[420px] bg-secondary-fixed/20 rounded-full blur-[130px] pointer-events-none -z-10" />
-        <div className="absolute top-[650px] -right-36 w-[480px] h-[480px] bg-tertiary-fixed/30 rounded-full blur-[140px] pointer-events-none -z-10" />
-        <section className="max-w-[1320px] mx-auto px-4 sm:px-6 pt-10 pb-8 w-full">
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+        <section className="w-full py-20 px-4 sm:px-6 max-w-[1320px] mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
             {/*<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-[0.16em] mb-4 shadow-sm">*/}
             {/*  <BadgeCheck className="size-4 text-accent-gold" />*/}
             {/*  <span>Akredite &amp; Lisanslı Kadro</span>*/}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import { consultantKey } from "./consultants";
 import { normalizeConsultant } from "./consultants";
 
 export const consultantServicesQueryKey = ["consultant-services"];
@@ -46,15 +47,16 @@ export function useConsultantServicesQuery(filters = {}, options = {}) {
   });
 }
 
-export function useConsultantServiceOptionsQuery(consultantId) {
+export function useConsultantServiceOptionsQuery(consultant) {
   const token = useToken();
+  const key = consultantKey(consultant);
 
   return useQuery({
-    queryKey: [...consultantServicesQueryKey, "by-consultant", consultantId],
+    queryKey: [...consultantServicesQueryKey, "by-consultant", key],
     queryFn: async () => {
       const payload = await api.consultantServicesForConsultant(
         token,
-        consultantId
+        key
       );
       const data = payload?.data ?? payload;
       if (!Array.isArray(data)) {
@@ -75,7 +77,7 @@ export function useConsultantServiceOptionsQuery(consultantId) {
           price: item.price ?? 0,
         }));
     },
-    enabled: Boolean(consultantId),
+    enabled: Boolean(key),
     retry: false,
   });
 }
@@ -97,7 +99,7 @@ export function useConsultantServiceOfferingsQuery(serviceId) {
           try {
             const payload = await api.consultantServicesForConsultant(
               null,
-              consultant.id
+              consultant.slug
             );
             const data = payload?.data ?? payload;
             if (!Array.isArray(data)) return null;
@@ -110,6 +112,7 @@ export function useConsultantServiceOfferingsQuery(serviceId) {
             return {
               consultant: {
                 id: consultant.id,
+                slug: consultant.slug ?? null,
                 name: consultant.name,
                 title: consultant.title ?? "",
                 profileImage: consultant.profile_image ?? null,
