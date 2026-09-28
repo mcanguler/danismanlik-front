@@ -331,11 +331,11 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
 
   const selectedOffering =
     offerings.find(
-      (item) => String(item.consultant.id) === String(selectedConsultantId)
+      (item) => String(item.consultant.slug) === String(selectedConsultantId)
     ) ?? (offerings.length === 1 ? offerings[0] : null);
 
   const availabilityQuery = useAvailabilityQuery({
-    consultantId: selectedOffering?.consultant.id ?? null,
+    consultantId: selectedOffering?.consultant.slug ?? null,
     serviceId: service?.id ?? null,
     date: date || null,
   });
@@ -747,7 +747,7 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
                           : "border-border-delicate bg-canvas-cream hover:bg-blush-surface/40"
                       )}
                       key={item.consultant.id}
-                      onClick={() => handleSelectConsultant(item.consultant.id)}
+                      onClick={() => handleSelectConsultant(item.consultant.slug)}
                       type="button"
                     >
                       <div className="w-14 h-14 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-title-md text-title-md font-semibold overflow-hidden flex-shrink-0">
