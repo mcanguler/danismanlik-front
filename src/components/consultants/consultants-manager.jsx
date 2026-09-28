@@ -176,7 +176,7 @@ export function ConsultantsManager() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() =>
-                              router.push(`${LIST_PATH}/${item.id}`)
+                              router.push(`${LIST_PATH}/${item.slug}`)
                             }
                             aria-label={`${item.name} düzenle`}
                           >
@@ -222,7 +222,7 @@ export function ConsultantsManager() {
                       size="sm"
                       variant="outline"
                       className="h-9 flex-1"
-                      onClick={() => router.push(`${LIST_PATH}/${item.id}`)}
+                      onClick={() => router.push(`${LIST_PATH}/${item.slug}`)}
                     >
                       <Pencil className="size-3.5" />
                       Düzenle
