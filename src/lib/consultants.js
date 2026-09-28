@@ -33,13 +33,16 @@ function normalizeMediaList(value) {
 
 function normalizeMediaEntry(entry) {
   if (typeof entry === "string") {
-    return entry.trim() ? { src: entry.trim(), title: null, sort_order: 0 } : null;
+    return entry.trim()
+      ? { id: null, src: entry.trim(), title: null, sort_order: 0 }
+      : null;
   }
   if (!entry || typeof entry !== "object") return null;
   const src =
     entry.image ?? entry.url ?? entry.file ?? entry.path ?? entry.image_path ?? null;
   if (!src) return null;
   return {
+    id: entry.id ?? null,
     src: String(src),
     title: entry.title ?? entry.name ?? entry.caption ?? null,
     sort_order: entry.sort_order ?? 0,

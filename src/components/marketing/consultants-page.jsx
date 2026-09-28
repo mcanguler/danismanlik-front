@@ -90,34 +90,38 @@ function ConsultantCard({ consultant }) {
             </span>
           </div>
         )}
-        <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start">
-          <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm tracking-wider uppercase shadow-md flex items-center gap-1">
-            <BadgeCheck className="size-3.5 text-accent-gold" />
-            <span>Uzman Kadro</span>
-          </span>
-        </div>
+        {/*<div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 items-start">*/}
+        {/*  <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm tracking-wider uppercase shadow-md flex items-center gap-1">*/}
+        {/*    <BadgeCheck className="size-3.5 text-accent-gold" />*/}
+        {/*    <span>Uzman Kadro</span>*/}
+        {/*  </span>*/}
+        {/*</div>*/}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-primary/30 to-transparent" />
       </div>
       <div className="p-6 flex flex-col flex-1 justify-between">
         <div>
-          <h3 className="font-headline-sm text-headline-sm text-primary tracking-tight mb-1.5">
+          <Link
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blush-surface text-primary-container hover:bg-blush-hover font-label-md text-label-md tracking-wider transition-all"
+              href={`/danisanlar/${consultant.slug}`}
+          > <h3 className="font-headline-sm text-headline-sm text-primary tracking-tight mb-1.5">
             {consultant.name}
           </h3>
+          </Link>
           {consultant.title ? (
             <p className="font-label-md text-label-md text-secondary font-medium uppercase tracking-wider mb-3">
               {consultant.title}
             </p>
           ) : null}
-          {consultant.biography ? (
-            <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 mb-4 leading-relaxed">
-              {consultant.biography}
-            </p>
-          ) : null}
+          {/*{consultant.biography ? (*/}
+          {/*  <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-3 mb-4 leading-relaxed">*/}
+          {/*    {consultant.biography}*/}
+          {/*  </p>*/}
+          {/*) : null}*/}
         </div>
         <div className="pt-4 mt-auto">
           <Link
             className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blush-surface text-primary-container hover:bg-blush-hover font-label-md text-label-md tracking-wider transition-all"
-            href={`/danisanlar/${consultant.id}`}
+            href={`/danisanlar/${consultant.slug}`}
           >
             <span>Danışmanı İncele</span>
             <ArrowRight className="size-4" />
@@ -316,24 +320,24 @@ export function ConsultantsPage() {
         <div className="absolute top-[650px] -right-36 w-[480px] h-[480px] bg-tertiary-fixed/30 rounded-full blur-[140px] pointer-events-none -z-10" />
         <section className="max-w-[1320px] mx-auto px-4 sm:px-6 pt-10 pb-8 w-full">
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-[0.16em] mb-4 shadow-sm">
-              <BadgeCheck className="size-4 text-accent-gold" />
-              <span>Akredite &amp; Lisanslı Kadro</span>
-            </div>
+            {/*<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-[0.16em] mb-4 shadow-sm">*/}
+            {/*  <BadgeCheck className="size-4 text-accent-gold" />*/}
+            {/*  <span>Akredite &amp; Lisanslı Kadro</span>*/}
+            {/*</div>*/}
             <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-4">
               Uzman Danışman Kadromuz
             </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">
-              {HERO_DESCRIPTION}
-            </p>
-            <MetricRibbon />
+            {/*<p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">*/}
+            {/*  {HERO_DESCRIPTION}*/}
+            {/*</p>*/}
+            {/*<MetricRibbon />*/}
           </div>
         </section>
-        <ListToolbar
-          onSearchChange={setSearch}
-          resultCount={consultants.length}
-          search={search}
-        />
+        {/*<ListToolbar*/}
+        {/*  onSearchChange={setSearch}*/}
+        {/*  resultCount={consultants.length}*/}
+        {/*  search={search}*/}
+        {/*/>*/}
         <section className="max-w-[1320px] mx-auto px-4 sm:px-6 mb-20 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {query.isPending && <GridSkeleton count={4} />}
@@ -367,8 +371,8 @@ export function ConsultantsPage() {
             ))}
           </div>
         </section>
-        <StandardsSection />
-        <ConciergeSection />
+        {/*<StandardsSection />*/}
+        {/*<ConciergeSection />*/}
       </div>
     </ConsultantsPageShell>
   );
@@ -507,11 +511,11 @@ export function ConsultantDetailPage({ id }) {
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/30 via-transparent to-transparent" />
                       </div>
-                      <div className="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
-                        <span className="px-3 py-1 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold tracking-wider uppercase">
-                          Uzman Kadro
-                        </span>
-                      </div>
+                      {/*<div className="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">*/}
+                      {/*  <span className="px-3 py-1 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm font-semibold tracking-wider uppercase">*/}
+                      {/*    Uzman Kadro*/}
+                      {/*  </span>*/}
+                      {/*</div>*/}
                     </div>
                     <div className="lg:col-span-8 flex flex-col">
                       <div className="border-b border-border-delicate pb-6 mb-6">
