@@ -39,7 +39,7 @@ function excerpt(text, maxLength = 150) {
 function ConsultantsPageShell({ children }) {
   return (
     <div className="theme-velvet bg-canvas-cream font-body-md text-on-surface">
-      <SiteHeader links={marketingNavLinks("/danisanlar")} />
+      <SiteHeader links={marketingNavLinks("/danismanlar")} />
       <main className="w-full pt-28 bg-canvas-cream">{children}</main>
       <SiteFooter />
     </div>
@@ -101,8 +101,8 @@ function ConsultantCard({ consultant }) {
       <div className="p-6 flex flex-col flex-1 justify-between">
         <div>
           <Link
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blush-surface text-primary-container hover:bg-blush-hover font-label-md text-label-md tracking-wider transition-all"
-              href={`/danisanlar/${consultant.slug}`}
+              className="hover:underline"
+              href={`/danismanlar/${consultant.slug}`}
           > <h3 className="font-headline-sm text-headline-sm text-primary tracking-tight mb-1.5">
             {consultant.name}
           </h3>
@@ -121,7 +121,7 @@ function ConsultantCard({ consultant }) {
         <div className="pt-4 mt-auto">
           <Link
             className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blush-surface text-primary-container hover:bg-blush-hover font-label-md text-label-md tracking-wider transition-all"
-            href={`/danisanlar/${consultant.slug}`}
+            href={`/danismanlar/${consultant.slug}`}
           >
             <span>Danışmanı İncele</span>
             <ArrowRight className="size-4" />
@@ -455,9 +455,9 @@ export function ConsultantDetailPage({ id }) {
                 </button>
                 <Link
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-blush-surface text-primary-container font-label-md text-label-md hover:bg-blush-hover transition-all"
-                  href="/danisanlar"
+                  href="/danismanlar"
                 >
-                  Danışan Kadromuza Dön
+                  Danışman Kadromuza Dön
                 </Link>
               </div>
             </div>
@@ -470,7 +470,7 @@ export function ConsultantDetailPage({ id }) {
               </p>
               <Link
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary-container text-on-primary font-label-md text-label-md shadow-md hover:bg-burgundy-light transition-all"
-                href="/danisanlar"
+                href="/danismanlar"
               >
                 Danışman Kadromuza Dön
               </Link>
@@ -484,7 +484,7 @@ export function ConsultantDetailPage({ id }) {
                   Ana Sayfa
                 </Link>
                 <ChevronRight className="size-3.5 text-outline" />
-                <Link className="hover:text-primary transition-colors" href="/danisanlar">
+                <Link className="hover:text-primary transition-colors" href="/danismanlar">
                   Danışman Kadromuz
                 </Link>
                 <ChevronRight className="size-3.5 text-outline" />

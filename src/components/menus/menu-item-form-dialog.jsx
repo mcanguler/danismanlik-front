@@ -173,7 +173,7 @@ function useSourceOptions(sourceType) {
           options: (consultantsQuery.data ?? []).map((consultant) => ({
             id: String(consultant.id),
             label: consultant.name,
-            url: `/danisanlar/${consultant.id}`,
+            url: `/danismanlar/${consultant.id}`,
           })),
         };
       case MENU_LINK_SOURCES.BLOG_CATEGORY:

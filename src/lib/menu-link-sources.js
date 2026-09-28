@@ -10,8 +10,8 @@
  * - Ürün & Ürün Listesi  → /urunler (+ /urunler/{slug}) (src/app/urunler)
  * - Kurs & Eğitim Listesi→ /egitimler (+ /egitimler/{slug}) (src/app/egitimler)
  * - Hizmet Paketi        → /paketler/{slug}           (src/app/paketler/[slug])
- * - Danışanlar (liste)   → /danisanlar                (src/app/danisanlar)
- * - Danışan              → /danisanlar/{id}           (src/app/danisanlar/[id])
+ * - Danışanlar (liste)   → /danismanlar                (src/app/danismanlar)
+ * - Danışan              → /danismanlar/{id}           (src/app/danismanlar/[id])
  * - Blog (liste)         → /blog                      (src/app/blog)
  * - Blog Kategorisi      → /blog?category={slug}      (src/app/blog — kategori filtresi)
  * - Blog Yazısı          → /blog/{slug}               (src/app/blog/[slug])
@@ -62,7 +62,7 @@ export const MENU_LINK_SOURCE_LABELS = {
   [MENU_LINK_SOURCES.MANUAL]: "Harici / Manuel URL",
 };
 
-export const CONSULTANTS_LIST_URL = "/danisanlar";
+export const CONSULTANTS_LIST_URL = "/danismanlar";
 export const BLOG_LIST_URL = "/blog";
 export const TESTIMONIALS_LIST_URL = "/danisan-yorumlari";
 export const CONTACT_PAGE_URL = "/iletisim";
