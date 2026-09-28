@@ -60,17 +60,20 @@ export function useConsultantServiceOptionsQuery(consultantId) {
       if (!Array.isArray(data)) {
         throw new ApiError("Beklenmeyen yanıt formatı");
       }
-      return data.map((item) => ({
-        id: item.id,
-        consultant_id: item.consultant_id,
-        service_id: item.service_id,
-        name:
-          item.service?.name ??
-          item.service_name ??
-          `Hizmet #${item.service_id}`,
-        duration: item.duration ?? 0,
-        price: item.price ?? 0,
-      }));
+      return data
+        .filter((item) => item.is_active === undefined || Boolean(item.is_active))
+        .map((item) => ({
+          id: item.id,
+          consultant_id: item.consultant_id,
+          service_id: item.service_id,
+          name:
+            item.service?.name ??
+            item.service_name ??
+            `Hizmet #${item.service_id}`,
+          duration: item.duration ?? 0,
+          break_duration: item.break_duration ?? 0,
+          price: item.price ?? 0,
+        }));
     },
     enabled: Boolean(consultantId),
     retry: false,

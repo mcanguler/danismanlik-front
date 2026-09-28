@@ -48,13 +48,13 @@ function normalizeList(payload) {
   return data.map(normalizeWorkingHour);
 }
 
-export function useWorkingHoursQuery(filters = {}) {
+export function useWorkingHoursQuery(filters = {}, options = {}) {
   const token = useToken();
 
   return useQuery({
     queryKey: [...workingHoursQueryKey, filters],
     queryFn: async () => normalizeList(await api.workingHours(token, filters)),
-    enabled: Boolean(token),
+    enabled: options.enabled !== false && Boolean(token),
   });
 }
 

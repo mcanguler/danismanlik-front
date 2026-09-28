@@ -10,6 +10,7 @@ import {
   List,
   LoaderCircle,
   Pencil,
+  Plus,
   Search,
 } from "lucide-react";
 import { format, isSameDay } from "date-fns";
@@ -354,6 +355,14 @@ export function AdminAppointmentsManager() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            render={<Link href="/appointments/yeni" />}
+            size="sm"
+            type="button"
+          >
+            <Plus className="size-4" />
+            Randevu Ekle
+          </Button>
           <Button
             aria-label="Takvim görünümü"
             onClick={() => setView("calendar")}

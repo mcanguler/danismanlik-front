@@ -152,7 +152,7 @@ export function AppointmentsList() {
                         type="button"
                     >
                         <Plus className="size-4"/>
-                        Yeni Randevu
+                        Randevu Ekle
                     </Button>
                 )}
             </div>

@@ -165,7 +165,7 @@ export const NAV = {
   [ROLES.CONSULTANT]: [
     { label: "Dashboard", href: "/dashboard/consultant", icon: LayoutDashboard, bottom: true },
     { label: "Takvim", href: "/takvim", icon: Calendar, bottom: true },
-    { label: "Randevular", href: "/appointments", icon: CalendarDays, bottom: true },
+    { label: "Randevular", href: "/dashboard/consultant/randevular", icon: CalendarDays, bottom: true },
     { label: "Çalışma Saatleri", href: "/dashboard/consultant/calisma-saatleri", icon: Clock },
     { label: "Molalar", href: "/dashboard/consultant/molalar", icon: Coffee },
     { label: "Kapalı Zamanlar", href: "/dashboard/consultant/kapali-zamanlar", icon: CalendarOff },

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck, CircleAlert, LoaderCircle } from "lucide-react";
+import { BadgeCheck, CircleAlert, LoaderCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,7 @@ import { ROLES, useAuthStore } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
 import { useConsultantsQuery } from "@/lib/consultants";
 import { useCustomersQuery } from "@/lib/customers";
-import {
-  useConsultantServiceOptionsQuery,
-  useConsultantServicesQuery,
-} from "@/lib/consultant-services";
+import { useConsultantServiceOptionsQuery } from "@/lib/consultant-services";
 import {
   CONFLICT_MESSAGE,
   getErrorMessage,
@@ -27,6 +24,7 @@ import {
   useAppointmentsQuery,
   useAvailabilityQuery,
   useCreateAppointment,
+  useOpenAvailabilityQuery,
 } from "@/lib/appointments";
 import {
   packageIsUsable,
@@ -68,6 +66,7 @@ export function AppointmentBooking({ redirectTo = null }) {
   const isAdmin = role === ROLES.ADMIN;
 
   const [customerId, setCustomerId] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [consultantId, setConsultantId] = useState("");
   const [consultantServiceId, setConsultantServiceId] = useState("");
   const [customerServicePackageId, setCustomerServicePackageId] = useState(null);
@@ -82,11 +81,9 @@ export function AppointmentBooking({ redirectTo = null }) {
     {},
     { enabled: isCustomer || isAdmin }
   );
-  const customersQuery = useCustomersQuery({}, { enabled: isAdmin });
   const appointmentsQuery = useAppointmentsQuery({}, { enabled: isConsultant });
-  const adminServicesQuery = useConsultantServicesQuery(
-    {},
-    { enabled: isAdmin && Boolean(consultantId) }
+  const adminServiceOptionsQuery = useConsultantServiceOptionsQuery(
+    isAdmin && consultantId ? Number(consultantId) : null
   );
   const myPackagesQuery = useMyServicePackagesQuery({ enabled: isCustomer });
 
@@ -114,62 +111,43 @@ export function AppointmentBooking({ redirectTo = null }) {
   );
 
   const customerOptions = useMemo(() => {
-    if (isAdmin) {
-      return (customersQuery.data ?? []).map((item) => ({
-        id: item.id,
-        name: item.name,
-        phone: item.phone ?? "",
-      }));
-    }
-    if (isConsultant) {
-      const seen = new Map();
-      for (const appointment of appointmentsQuery.data ?? []) {
-        if (appointment.customerId != null && !seen.has(appointment.customerId)) {
-          seen.set(appointment.customerId, {
-            id: appointment.customerId,
-            name: appointment.customerName,
-          });
-        }
+    if (!isConsultant) return [];
+    const seen = new Map();
+    for (const appointment of appointmentsQuery.data ?? []) {
+      if (appointment.customerId != null && !seen.has(appointment.customerId)) {
+        seen.set(appointment.customerId, {
+          id: appointment.customerId,
+          name: appointment.customerName,
+        });
       }
-      return [...seen.values()];
     }
-    return [];
-  }, [isAdmin, isConsultant, customersQuery.data, appointmentsQuery.data]);
+    return [...seen.values()];
+  }, [isConsultant, appointmentsQuery.data]);
 
   const serviceOptions = useMemo(() => {
-    if (isAdmin) {
-      if (!consultantId) return [];
-      return (adminServicesQuery.data ?? [])
-        .filter((item) => String(item.consultant_id) === String(consultantId))
-        .map((item) => ({
-          id: item.id,
-          serviceId: item.service_id,
-          name: item.serviceName,
-          duration: item.duration,
-          price: item.price,
-        }));
-    }
-    const source = isConsultant
-      ? consultantServiceOptionsQuery.data
-      : serviceOptionsQuery.data;
+    const source = isAdmin
+      ? adminServiceOptionsQuery.data
+      : isConsultant
+        ? consultantServiceOptionsQuery.data
+        : serviceOptionsQuery.data;
     return (source ?? []).map((item) => ({
       id: item.id,
       serviceId: item.service_id,
       name: item.name,
       duration: item.duration,
+      break_duration: item.break_duration ?? 0,
       price: item.price,
     }));
   }, [
     isAdmin,
     isConsultant,
-    consultantId,
-    adminServicesQuery.data,
+    adminServiceOptionsQuery.data,
     consultantServiceOptionsQuery.data,
     serviceOptionsQuery.data,
   ]);
 
   const servicesLoading = isAdmin
-    ? adminServicesQuery.isFetching
+    ? adminServiceOptionsQuery.isFetching
     : isConsultant
       ? consultantServiceOptionsQuery.isFetching
       : serviceOptionsQuery.isFetching;
@@ -193,11 +171,27 @@ export function AppointmentBooking({ redirectTo = null }) {
       ) ?? null)
     : null;
 
-  const availabilityQuery = useAvailabilityQuery({
-    consultantId: resolvedConsultantId,
-    serviceId: selectedService?.serviceId ?? null,
-    date: date || null,
-  });
+  const isPanelBooking = isAdmin || isConsultant;
+
+  const openAvailabilityQuery = useOpenAvailabilityQuery(
+    {
+      consultantId: resolvedConsultantId,
+      serviceId: selectedService?.serviceId ?? null,
+      date: date || null,
+    },
+    { enabled: isPanelBooking }
+  );
+  const scheduleAvailabilityQuery = useAvailabilityQuery(
+    {
+      consultantId: resolvedConsultantId,
+      serviceId: selectedService?.serviceId ?? null,
+      date: date || null,
+    },
+    { enabled: isCustomer }
+  );
+  const availabilityQuery = isPanelBooking
+    ? openAvailabilityQuery
+    : scheduleAvailabilityQuery;
   const slots = availabilityQuery.data ?? [];
 
   useEffect(() => {
@@ -235,6 +229,12 @@ export function AppointmentBooking({ redirectTo = null }) {
     setErrors({});
   };
 
+  const handleCustomerSelect = (customer) => {
+    setSelectedCustomer(customer);
+    setCustomerId(customer ? String(customer.id) : "");
+    setErrors({});
+  };
+
   const handleConsultantChange = (event) => {
     setConsultantId(event.target.value);
     setCustomerServicePackageId(null);
@@ -255,7 +255,10 @@ export function AppointmentBooking({ redirectTo = null }) {
 
   const validate = () => {
     const fieldErrors = {};
-    if ((isAdmin || isConsultant) && !customerId) {
+    if (isAdmin && !selectedCustomer) {
+      fieldErrors.customer_id = "Müşteri seçin";
+    }
+    if (isConsultant && !customerId) {
       fieldErrors.customer_id = "Müşteri seçin";
     }
     if ((isCustomer || isAdmin) && !consultantId) {
@@ -276,7 +279,7 @@ export function AppointmentBooking({ redirectTo = null }) {
     }
     if (!selectedSlot) {
       fieldErrors.start_at = "Müsait bir saat seçin";
-    } else if (!selectedSlot.end) {
+    } else if (!isPanelBooking && !selectedSlot.end) {
       fieldErrors.start_at = "Seçilen slot bilgisi eksik, lütfen yeniden deneyin";
     }
     setErrors(fieldErrors);
@@ -295,7 +298,9 @@ export function AppointmentBooking({ redirectTo = null }) {
         consultant_id: Number(resolvedConsultantId),
         consultant_service_id: Number(consultantServiceId),
         start_at: `${date} ${selectedSlot.start}:00`,
-        end_at: `${date} ${selectedSlot.end}:00`,
+        end_at: selectedSlot.end
+          ? `${date} ${selectedSlot.end}:00`
+          : `${date} ${selectedSlot.start}:00`,
         notes: notes.trim() ? notes.trim() : null,
         ...(isCustomer && selectedPackage
           ? { customer_service_package_id: Number(selectedPackage.id) }
@@ -386,24 +391,11 @@ export function AppointmentBooking({ redirectTo = null }) {
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="customer_id">{stepLabels.customer}. Müşteri</Label>
                 {isAdmin ? (
-                  customersQuery.isFetching ? (
-                    <LoadingSelect />
-                  ) : (
-                    <select
-                      id="customer_id"
-                      className={selectClassName}
-                      value={customerId}
-                      onChange={handleCustomerChange}
-                    >
-                      <option value="">Müşteri seçin</option>
-                      {customerOptions.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name}
-                          {option.phone ? ` · ${option.phone}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  )
+                  <CustomerSearchSelect
+                    error={errors.customer_id}
+                    onSelect={handleCustomerSelect}
+                    selected={selectedCustomer}
+                  />
                 ) : appointmentsQuery.isFetching ? (
                   <LoadingSelect />
                 ) : (
@@ -625,7 +617,12 @@ export function AppointmentBooking({ redirectTo = null }) {
                   Bu tarihte müsait saat yok
                 </p>
               ) : (
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <div
+                  className={cn(
+                    "grid grid-cols-2 gap-2 sm:grid-cols-3",
+                    isPanelBooking && "max-h-80 overflow-y-auto"
+                  )}
+                >
                   {slots.map((slot) => (
                     <button
                       key={slot.start}
@@ -692,6 +689,126 @@ function LoadingSelect() {
     <div className="flex h-10 items-center gap-2 rounded-lg border border-input px-3 text-sm text-muted-foreground">
       <LoaderCircle className="size-4 animate-spin" />
       Yükleniyor...
+    </div>
+  );
+}
+
+function useDebouncedValue(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+
+const CUSTOMER_PAGE_SIZE = 20;
+
+function CustomerSearchSelect({ error, onSelect, selected }) {
+  const [searchText, setSearchText] = useState("");
+  const debouncedSearch = useDebouncedValue(searchText.trim());
+
+  const query = useCustomersQuery(
+    { search: debouncedSearch || undefined, per_page: CUSTOMER_PAGE_SIZE },
+    { enabled: !selected }
+  );
+  const customers = query.data ?? [];
+
+  if (selected) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-3 rounded-lg border bg-background px-3 py-2.5">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{selected.name}</p>
+            {selected.phone ? (
+              <p className="truncate text-xs text-muted-foreground">
+                {selected.phone}
+              </p>
+            ) : null}
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-9 shrink-0"
+            onClick={() => onSelect(null)}
+          >
+            Değiştir
+          </Button>
+        </div>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          autoComplete="off"
+          className="pl-9"
+          id="customer_id"
+          placeholder="Müşteri ara (ad, soyad, telefon)"
+          type="text"
+          value={searchText}
+          onChange={(event) => setSearchText(event.target.value)}
+        />
+      </div>
+      {query.isFetching ? (
+        <div className="flex items-center gap-2 rounded-lg border border-dashed px-3 py-3 text-sm text-muted-foreground">
+          <LoaderCircle className="size-4 animate-spin" />
+          Yükleniyor...
+        </div>
+      ) : query.isError ? (
+        <div className="flex flex-col items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-4 text-center">
+          <CircleAlert className="size-5 text-destructive" />
+          <p className="text-xs text-muted-foreground">
+            {getErrorMessage(query.error)}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => query.refetch()}
+          >
+            Tekrar Dene
+          </Button>
+        </div>
+      ) : customers.length === 0 ? (
+        <p className="rounded-lg border border-dashed px-3 py-4 text-center text-sm text-muted-foreground">
+          {debouncedSearch ? "Müşteri bulunamadı" : "Henüz müşteri yok"}
+        </p>
+      ) : (
+        <div className="flex max-h-56 flex-col gap-1 overflow-y-auto rounded-lg border p-1">
+          {customers.map((customer) => (
+            <button
+              key={customer.id}
+              type="button"
+              onClick={() =>
+                onSelect({
+                  id: customer.id,
+                  name: customer.name,
+                  phone: customer.phone ?? "",
+                })
+              }
+              className="flex flex-col rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span className="truncate text-sm font-medium">
+                {customer.name}
+              </span>
+              {customer.phone ? (
+                <span className="truncate text-xs text-muted-foreground">
+                  {customer.phone}
+                </span>
+              ) : null}
+            </button>
+          ))}
+        </div>
+      )}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

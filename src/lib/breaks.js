@@ -47,13 +47,13 @@ function normalizeList(payload) {
   return data.map(normalizeBreak);
 }
 
-export function useBreaksQuery(filters = {}) {
+export function useBreaksQuery(filters = {}, options = {}) {
   const token = useToken();
 
   return useQuery({
     queryKey: [...breaksQueryKey, filters],
     queryFn: async () => normalizeList(await api.breaks(token, filters)),
-    enabled: Boolean(token),
+    enabled: options.enabled !== false && Boolean(token),
   });
 }
 

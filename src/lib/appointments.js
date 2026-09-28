@@ -106,7 +106,7 @@ function normalizeSlots(payload) {
   );
 }
 
-export function useAvailabilityQuery({ consultantId, serviceId, date }) {
+export function useAvailabilityQuery({ consultantId, serviceId, date }, options = {}) {
   const token = useToken();
 
   return useQuery({
@@ -124,7 +124,32 @@ export function useAvailabilityQuery({ consultantId, serviceId, date }) {
           date,
         })
       ),
-    enabled: Boolean(consultantId && serviceId && date),
+    enabled:
+      options.enabled !== false && Boolean(consultantId && serviceId && date),
+    staleTime: 30 * 1000,
+    retry: false,
+  });
+}
+
+export function useOpenAvailabilityQuery({ consultantId, serviceId, date }, options = {}) {
+  const token = useToken();
+
+  return useQuery({
+    queryKey: [
+      ...appointmentsQueryKey,
+      "availability-open",
+      consultantId,
+      serviceId,
+      date,
+    ],
+    queryFn: async () =>
+      normalizeSlots(
+        await api.availabilityOpen(token, consultantId, {
+          service_id: serviceId,
+          date,
+        })
+      ),
+    enabled: options.enabled !== false && Boolean(consultantId && serviceId && date),
     staleTime: 30 * 1000,
     retry: false,
   });

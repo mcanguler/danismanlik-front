@@ -36,13 +36,13 @@ function normalizeList(payload) {
   return data.map(normalizeBlockedTime);
 }
 
-export function useBlockedTimesQuery(filters = {}) {
+export function useBlockedTimesQuery(filters = {}, options = {}) {
   const token = useToken();
 
   return useQuery({
     queryKey: [...blockedTimesQueryKey, filters],
     queryFn: async () => normalizeList(await api.blockedTimes(token, filters)),
-    enabled: Boolean(token),
+    enabled: options.enabled !== false && Boolean(token),
   });
 }
 

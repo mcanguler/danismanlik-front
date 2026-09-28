@@ -236,6 +236,15 @@ export const api = {
       { token }
     );
   },
+  availabilityOpen(token, consultantId, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(
+      `/v1/consultants/${consultantId}/availability/open${search ? `?${search}` : ""}`,
+      { token }
+    );
+  },
   appointments(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
