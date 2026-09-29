@@ -35,6 +35,7 @@ import {
   usePublicProductQuery,
   usePublicProductsQuery,
 } from "@/lib/products";
+import {Textarea} from "@/components/ui/textarea";
 
 const CARD_CTA_CLASS =
   "inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-burgundy-light shadow-md transition-all";
@@ -56,7 +57,7 @@ function resolveProductFromList(products, param) {
 function FieldInput({ field, value, onChange }) {
   if (field.type === PRODUCT_FIELD_TYPES.INPUT) {
     return (
-      <Input
+      <Textarea
         id={`field_${field.key}`}
         maxLength={500}
         onChange={(event) => onChange(field, event.target.value)}
@@ -442,9 +443,14 @@ function PurchasePanel({ product, relatedCount = 0 }) {
 export function ProductStoreDetail({ slug }) {
   const listQuery = usePublicProductsQuery();
   const products = useMemo(() => listQuery.data ?? [], [listQuery.data]);
+  const isNumericId = /^\d+$/.test(String(slug ?? ""));
+  // Listed products resolve slug -> id via the public list; hidden products
+  // (show_in_listing=false) stay reachable via a numeric direct URL, since the
+  // public detail endpoint binds by id only.
   const productSummary = resolveProductFromList(products, slug);
-  const detailQuery = usePublicProductQuery(productSummary?.id, {
-    enabled: productSummary != null,
+  const directProductId = isNumericId ? slug : (productSummary?.id ?? null);
+  const detailQuery = usePublicProductQuery(directProductId, {
+    enabled: directProductId != null,
   });
   const product = detailQuery.data;
 
@@ -459,7 +465,7 @@ export function ProductStoreDetail({ slug }) {
 
   return (
     <ServicesPageShell>
-      {listQuery.isPending && (
+      {(listQuery.isPending || (isNumericId && detailQuery.isPending)) && (
         <div className="mx-auto w-full max-w-[1320px] px-4 py-20 sm:px-6">
           <div className="flex justify-center">
             <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
@@ -467,7 +473,7 @@ export function ProductStoreDetail({ slug }) {
         </div>
       )}
 
-      {listQuery.isSuccess && !productSummary && (
+      {listQuery.isSuccess && !isNumericId && !productSummary && (
         <div className="mx-auto w-full max-w-2xl px-4 py-20 sm:px-6">
           <div className="flex flex-col items-center gap-4 rounded-3xl border border-border-delicate bg-canvas-pure px-4 py-16 text-center">
             <Package className="size-8 text-accent-gold" />
@@ -484,7 +490,7 @@ export function ProductStoreDetail({ slug }) {
         </div>
       )}
 
-      {productSummary && (
+      {(productSummary || (isNumericId && product)) && (
         <div className="py-10">
           <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
             {detailQuery.isPending && (

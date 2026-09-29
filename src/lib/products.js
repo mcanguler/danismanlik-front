@@ -12,6 +12,13 @@ export const productsQueryKey = ["products"];
 export const productCategoriesQueryKey = ["product-categories"];
 export const cartQueryKey = ["cart"];
 
+export const CART_ITEM_TYPES = {
+  PRODUCT: "PRODUCT",
+  APPOINTMENT: "APPOINTMENT",
+  SERVICE_PACKAGE: "SERVICE_PACKAGE",
+  COURSE: "COURSE",
+};
+
 export const PRODUCT_TYPES = {
   PHYSICAL: "PHYSICAL",
   DIGITAL: "DIGITAL",
@@ -164,6 +171,10 @@ export function normalizeProduct(item) {
     seo_title: item.seo_title ?? "",
     seo_description: item.seo_description ?? "",
     is_active: Boolean(item.is_active),
+    show_in_listing:
+      item.show_in_listing === undefined
+        ? true
+        : Boolean(item.show_in_listing),
     product_category_id: item.product_category_id ?? null,
     category:
       item.category && typeof item.category === "object"
@@ -613,22 +624,40 @@ export function usePublicProductQuery(id, options = {}) {
   });
 }
 
+function normalizeCartCoupon(value) {
+  if (!value || typeof value !== "object") return null;
+  return {
+    code: value.code ?? "",
+    discount: Number(value.discount ?? 0),
+  };
+}
+
+export function normalizeCartPayload(payload) {
+  if (!payload || typeof payload !== "object") {
+    throw new ApiError("Beklenmeyen yanıt formatı");
+  }
+  const data = Array.isArray(payload.data)
+    ? payload.data
+    : asArray(payload.data?.items ?? payload.items);
+  const meta = payload.meta ?? payload.data?.meta ?? {};
+  return {
+    items: data.filter((item) => item && typeof item === "object"),
+    meta: {
+      count: Number(meta.count ?? data.length),
+      subtotal: Number(meta.subtotal ?? 0),
+      discount: Number(meta.discount ?? 0),
+      total: Number(meta.total ?? 0),
+      coupon: normalizeCartCoupon(meta.coupon),
+    },
+  };
+}
+
 export function useCartQuery(options = {}) {
   const token = useToken();
 
   return useQuery({
     queryKey: [...cartQueryKey],
-    queryFn: async () => {
-      const payload = await api.publicCart(token);
-      const data = payload?.data ?? payload;
-      if (!data || typeof data !== "object") {
-        throw new ApiError("Beklenmeyen yanıt formatı");
-      }
-      return {
-        ...data,
-        items: asArray(data.items),
-      };
-    },
+    queryFn: async () => normalizeCartPayload(await api.publicCart(token)),
     enabled: options.enabled !== false && Boolean(token),
   });
 }
@@ -645,13 +674,75 @@ export function useAddCartItem() {
   });
 }
 
-export function useCheckoutCart() {
+export function useUpdateCartItem() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: ({ id, quantity }) =>
+      api.updateCartItem(token, id, { quantity }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cartQueryKey });
+    },
+  });
+}
+
+export function useDeleteCartItem() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: (id) => api.deleteCartItem(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cartQueryKey });
+    },
+  });
+}
+
+export function useApplyCartCoupon() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: async (code) => {
+      const normalized = String(code ?? "").trim().toUpperCase();
+      if (!normalized) {
+        throw new ApiError("Kupon kodu girin");
+      }
+      return normalizeCartPayload(await api.applyCartCoupon(token, normalized));
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(cartQueryKey, data);
+      queryClient.invalidateQueries({ queryKey: cartQueryKey });
+    },
+  });
+}
+
+export function useRemoveCartCoupon() {
   const queryClient = useQueryClient();
   const token = useToken();
 
   return useMutation({
     mutationFn: async () =>
-      normalizeProductDetail(await api.checkoutCart(token)),
+      normalizeCartPayload(await api.removeCartCoupon(token)),
+    onSuccess: (data) => {
+      queryClient.setQueryData(cartQueryKey, data);
+      queryClient.invalidateQueries({ queryKey: cartQueryKey });
+    },
+  });
+}
+
+export function useCheckoutCart() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: async () => {
+      const payload = await api.checkoutCart(token);
+      const normalized = normalizeOrder(payload?.data ?? payload);
+      if (!normalized) throw new ApiError("Beklenmeyen yanıt formatı");
+      return normalized;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
       queryClient.invalidateQueries({ queryKey: ordersQueryKey });

@@ -8,7 +8,7 @@ export const adminMenusQueryKey = ["admin-menus"];
 export const publicMenusQueryKey = ["public-menus"];
 
 /** Menü slug'ı site header'ında kullanılır. */
-export const HEADER_MENU_SLUG = "header-main";
+export const HEADER_MENU_SLUG = "ana-menu";
 
 function useToken() {
   return useAuthStore((state) => state.token);

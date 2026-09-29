@@ -376,6 +376,28 @@ export const api = {
     ).toString();
     return request(`/v1/admin/payments${search ? `?${search}` : ""}`, { token });
   },
+  adminCoupons(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(`/v1/admin/coupons${search ? `?${search}` : ""}`, { token });
+  },
+  adminCoupon(token, id) {
+    return request(`/v1/admin/coupons/${id}`, { token });
+  },
+  createCoupon(token, payload) {
+    return request("/v1/admin/coupons", { method: "POST", body: payload, token });
+  },
+  updateCoupon(token, id, payload) {
+    return request(`/v1/admin/coupons/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteCoupon(token, id) {
+    return request(`/v1/admin/coupons/${id}`, { method: "DELETE", token });
+  },
   adminPayment(token, id) {
     return request(`/v1/admin/payments/${id}`, { token });
   },
@@ -726,6 +748,25 @@ export const api = {
   },
   createCartItem(token, payload) {
     return request("/v1/cart/items", { method: "POST", body: payload, token });
+  },
+  updateCartItem(token, id, payload) {
+    return request(`/v1/cart/items/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+  deleteCartItem(token, id) {
+    return request(`/v1/cart/items/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+  applyCartCoupon(token, code) {
+    return request("/v1/cart/coupon", { method: "POST", body: { code }, token });
+  },
+  removeCartCoupon(token) {
+    return request("/v1/cart/coupon", { method: "DELETE", token });
   },
   checkoutCart(token) {
     return request("/v1/cart/checkout", { method: "POST", token });

@@ -5,6 +5,8 @@ import Link from "next/link";
 import {
   CircleAlert,
   CloudDownload,
+  Eye,
+  EyeOff,
   Image as ImageIcon,
   LoaderCircle,
   Package,
@@ -100,11 +102,26 @@ function ProductPrice({ product }) {
   );
 }
 
+function ListingBadge({ listed }) {
+  return listed ? (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+      <Eye className="size-3" />
+      Listeleniyor
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+      <EyeOff className="size-3" />
+      Gizli
+    </span>
+  );
+}
+
 export function ProductsManager() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [showInListing, setShowInListing] = useState("");
   const [deleting, setDeleting] = useState(null);
   const deleteMutation = useDeleteProduct();
 
@@ -116,6 +133,7 @@ export function ProductsManager() {
     ...(search ? { search } : {}),
     ...(type ? { type } : {}),
     ...(categoryId ? { category_id: categoryId } : {}),
+    ...(showInListing !== "" ? { show_in_listing: showInListing } : {}),
   });
   const products = query.data?.items ?? [];
   const meta = query.data?.meta;
@@ -198,6 +216,18 @@ export function ProductsManager() {
             </option>
           ))}
         </select>
+        <select
+          className="h-8 rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+          onChange={(event) => {
+            setShowInListing(event.target.value);
+            setPage(1);
+          }}
+          value={showInListing}
+        >
+          <option value="">Listeleme: Tümü</option>
+          <option value="1">Listeleniyor</option>
+          <option value="0">Gizli</option>
+        </select>
       </div>
 
       <div className="mt-4">
@@ -249,6 +279,7 @@ export function ProductsManager() {
                     <TableHead>Fiyat</TableHead>
                     <TableHead>Stok</TableHead>
                     <TableHead>Durum</TableHead>
+                    <TableHead>Listeleme</TableHead>
                     <TableHead className="pr-4 text-right">İşlemler</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -283,6 +314,9 @@ export function ProductsManager() {
                       </TableCell>
                       <TableCell>
                         <StatusBadge active={product.is_active} />
+                      </TableCell>
+                      <TableCell>
+                        <ListingBadge listed={product.show_in_listing} />
                       </TableCell>
                       <TableCell className="pr-4">
                         <div className="flex items-center justify-end gap-1">
@@ -335,6 +369,9 @@ export function ProductsManager() {
                       </p>
                     </div>
                     <StatusBadge active={product.is_active} />
+                  </div>
+                  <div className="mt-2">
+                    <ListingBadge listed={product.show_in_listing} />
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <ProductPrice product={product} />

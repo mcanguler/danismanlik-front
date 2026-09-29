@@ -180,56 +180,11 @@ const FEATURES = [
 export function EducationCoursesPage() {
   const query = usePublicCoursesQuery();
   const courses = query.data ?? [];
-  const [featured, ...rest] = courses;
 
   return (
     <ServicesPageShell>
-      <section className="w-full relative overflow-hidden py-14 lg:py-20 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -left-32 w-80 h-80 rounded-full bg-accent-gold/10 blur-3xl pointer-events-none" />
-        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 relative z-10">
-          <nav className="flex flex-wrap items-center gap-2 font-label-md text-label-md text-on-surface-variant mb-8">
-            <Link className="transition-colors hover:text-primary-container" href="/">
-              Anasayfa
-            </Link>
-            <ChevronRight className="size-3.5 text-outline-variant" />
-            <span className="font-semibold text-primary-container">Eğitimler &amp; Kamplar</span>
-          </nav>
-          <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-blush-surface px-4 py-1.5 font-label-sm text-label-sm font-bold uppercase tracking-[0.14em] text-primary shadow-sm">
-              <GraduationCap className="size-4 text-accent-gold" />
-              <span>Akademi &amp; Dönüşümcü Programlar</span>
-            </div>
-            <h1 className="mb-6 font-headline-lg text-headline-lg font-medium tracking-tight text-primary">
-              Bilinçaltı &amp; Dişil{" "}
-              <span className="italic font-normal text-burgundy-light">Dönüşüm Eğitimleri</span>
-            </h1>
-            <p className="max-w-2xl font-body-lg text-body-lg leading-relaxed text-on-surface-variant">
-              İçsel yaraların, dişil enerjinin ve ruh arınmasının hedeflendiği özel
-              atölyeler; canlı seanslarla desteklenen dönemsel programlar ve
-              kişisel gelişiminize özel tasarlanmış özgün içerikler bir arada.
-            </p>
-          </div>
-          <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {FEATURES.map((feature) => (
-              <div
-                className="flex flex-col items-center gap-2 rounded-2xl border border-border-delicate bg-canvas-pure/80 px-4 py-5 text-center shadow-sm"
-                key={feature.title}
-              >
-                <feature.icon className="size-5 text-primary-container" />
-                <p className="font-title-sm text-title-sm font-semibold text-primary">
-                  {feature.title}
-                </p>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  {feature.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <div className="w-full space-y-16 py-16">
+        <div className="w-full space-y-16 py-20">
         {query.isPending && (
           <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((index) => (
@@ -273,18 +228,23 @@ export function EducationCoursesPage() {
 
         {courses.length > 0 && (
           <>
-            {featured && <FeaturedCourse course={featured} />}
-            <section className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
-              <SectionHeading
-                align="center"
-                description="Her biri özel çalışma kitapları, canlı veya arşiv ders kayıtları ve akademi sertifikası içeren dönüştürücü eğitim yolculukları."
-                eyebrow="Kapsamlı Akademi Programları &amp; Atölyeler"
-                icon={GraduationCap}
-                pill
-                title="Tüm Eğitimler &amp; Atölyeler"
-              />
+            {/*{featured && <FeaturedCourse course={featured} />}*/}
+            <section className="mx-auto w-full max-w-330 px-4 sm:px-6">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                {/*<span className="font-label-sm text-label-sm uppercase tracking-[0.18em] text-burgundy-light font-bold">*/}
+                {/*  KİŞİYE ÖZEL ÇÖZÜMLER*/}
+                {/*</span>*/}
+                <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-4">
+                  Eğitimler
+                </h2>
+                {/*<p className="font-body-md text-body-md text-on-surface-variant">*/}
+                {/*  İçinde bulunduğunuz dönemin ihtiyacına göre size en uygun seans*/}
+                {/*  formatını seçin.*/}
+                {/*</p>*/}
+              </div>
+
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {rest.map((course) => (
+                {courses.map((course) => (
                   <CourseGridCard course={course} key={course.id} />
                 ))}
               </div>

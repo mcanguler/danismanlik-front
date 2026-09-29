@@ -446,10 +446,6 @@ export function EducationCourseDetail({ slug }) {
                 </span>
               </nav>
               <div className="max-w-3xl">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blush-surface px-4 py-1.5 font-label-sm text-label-sm font-bold uppercase tracking-[0.14em] text-primary shadow-sm">
-                  <Sparkles className="size-4 text-accent-gold" />
-                  <span>Online Eğitim</span>
-                </div>
                 <h1 className="mb-4 font-headline-lg text-headline-lg font-medium tracking-tight text-primary">
                   {course.title}
                 </h1>
@@ -458,17 +454,11 @@ export function EducationCourseDetail({ slug }) {
                     course.seo_description ||
                     "Dönüşüm yolculuğunuz için özel olarak tasarlanmış akademi programı."}
                 </p>
-                {course.has_discount && (
-                  <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent-gold px-4 py-1.5 font-label-sm text-label-sm font-bold text-primary shadow-sm">
-                    <Sparkles className="size-3.5" />
-                    <span>Kampanyalı Fiyat</span>
-                  </div>
-                )}
               </div>
             </div>
           </section>
 
-          <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 pt-10 sm:px-6">
+          <div className="mx-auto w-full max-w-[1320px] px-4 pb-20 sm:px-6">
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
               <div className="flex flex-col gap-8 lg:col-span-2">
                 {course.image && (
@@ -490,11 +480,6 @@ export function EducationCourseDetail({ slug }) {
                       <GraduationCap className="size-4" />
                       <span>Eğitim Hakkında</span>
                     </div>
-                    {course.short_description && (
-                      <p className="mb-4 font-body-lg text-body-lg text-on-surface">
-                        {course.short_description}
-                      </p>
-                    )}
                     <div
                       className="prose prose-sm max-w-none font-body-md text-body-md text-on-surface-variant [&_h2]:text-primary [&_strong]:text-primary"
                       dangerouslySetInnerHTML={{
@@ -507,9 +492,6 @@ export function EducationCourseDetail({ slug }) {
 
               <div className="lg:col-span-1">
                 <div className="flex flex-col gap-4 lg:sticky lg:top-32">
-                  <h1 className="font-headline-md text-headline-md font-semibold leading-snug text-primary">
-                    {course.title}
-                  </h1>
                   <div className="flex items-center gap-2 rounded-2xl border border-border-delicate bg-canvas-pure px-4 py-3 font-body-sm text-body-sm text-on-surface-variant">
                     <CalendarCheck className="size-4 shrink-0 text-primary-container" />
                     <span>
@@ -523,21 +505,21 @@ export function EducationCourseDetail({ slug }) {
               </div>
             </div>
 
-            <section className="mt-16">
-              <div className="mx-auto max-w-3xl text-center">
-                <p className="font-label-md text-label-md font-semibold uppercase tracking-[0.08em] text-secondary">
-                  Merak Edilenler
-                </p>
-                <h2 className="mt-2 font-headline-md text-headline-md font-semibold text-primary">
-                  Sıkça Sorulan Sorular
-                </h2>
-              </div>
-              <div className="mx-auto mt-8 flex max-w-3xl flex-col gap-3">
-                {FAQS.map((faq) => (
-                  <FaqItem answer={faq.answer} key={faq.question} question={faq.question} />
-                ))}
-              </div>
-            </section>
+            {/*<section className="mt-16">*/}
+            {/*  <div className="mx-auto max-w-3xl text-center">*/}
+            {/*    <p className="font-label-md text-label-md font-semibold uppercase tracking-[0.08em] text-secondary">*/}
+            {/*      Merak Edilenler*/}
+            {/*    </p>*/}
+            {/*    <h2 className="mt-2 font-headline-md text-headline-md font-semibold text-primary">*/}
+            {/*      Sıkça Sorulan Sorular*/}
+            {/*    </h2>*/}
+            {/*  </div>*/}
+            {/*  <div className="mx-auto mt-8 flex max-w-3xl flex-col gap-3">*/}
+            {/*    {FAQS.map((faq) => (*/}
+            {/*      <FaqItem answer={faq.answer} key={faq.question} question={faq.question} />*/}
+            {/*    ))}*/}
+            {/*  </div>*/}
+            {/*</section>*/}
           </div>
         </>
       )}

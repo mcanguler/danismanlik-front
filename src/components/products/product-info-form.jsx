@@ -63,6 +63,7 @@ const productInfoSchema = z
       .min(0, "Stok 0 veya daha büyük olmalıdır"),
     product_category_id: z.union([z.literal(""), z.coerce.number().int().min(1)]),
     is_active: z.boolean(),
+    show_in_listing: z.boolean(),
   })
   .superRefine((values, ctx) => {
     if (values.discount_price === "" || values.discount_price == null) return;
@@ -89,6 +90,9 @@ function toFormValues(product) {
       ? String(product.product_category_id)
       : "",
     is_active: product ? Boolean(product.is_active) : true,
+    show_in_listing: product?.show_in_listing === undefined
+      ? true
+      : Boolean(product.show_in_listing),
   };
 }
 
@@ -145,6 +149,7 @@ export function ProductInfoForm({ product, onCreated }) {
       ...(isDigital ? {} : { stock: rest.stock }),
       ...(categoryId != null ? { product_category_id: categoryId } : {}),
       is_active: rest.is_active,
+      show_in_listing: rest.show_in_listing,
     };
     const hasNewImage =
       typeof File !== "undefined" && thumbnail instanceof File;
@@ -420,6 +425,26 @@ export function ProductInfoForm({ product, onCreated }) {
             <Switch
               checked={field.value}
               id="product_is_active"
+              onCheckedChange={field.onChange}
+            />
+          )}
+        />
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5">
+          <Label htmlFor="product_show_in_listing">Listelemede Göster</Label>
+          <p className="text-xs text-muted-foreground">
+            Kapalıyken ürün public listede görünmez; detay bağlantısıyla
+            erişilebilir
+          </p>
+        </div>
+        <Controller
+          control={form.control}
+          name="show_in_listing"
+          render={({ field }) => (
+            <Switch
+              checked={field.value}
+              id="product_show_in_listing"
               onCheckedChange={field.onChange}
             />
           )}

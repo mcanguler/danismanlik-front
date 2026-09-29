@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   BadgeCheck,
   ChevronRight,
@@ -176,13 +176,29 @@ const TRUST_CHIPS = [
 
 export function ProductStorePage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { status, user } = useAuth();
   const addCartItem = useAddCartItem();
   const [addingId, setAddingId] = useState(null);
   const [search, setSearch] = useState("");
-  const [categoryId, setCategoryId] = useState("");
   const [sort, setSort] = useState("default");
   const [page, setPage] = useState(1);
+
+  const categorySlug = searchParams.get("category") ?? "";
+
+  const buildHref = (changes) => {
+    const next = { category: categorySlug, ...changes };
+    const params = new URLSearchParams();
+    if (next.category) params.set("category", next.category);
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname;
+  };
+
+  const selectCategory = (value) => {
+    setPage(1);
+    router.push(buildHref({ category: value || null }), { scroll: false });
+  };
 
   const onAddToCart = (product) => {
     if (status === "unauthenticated") {
@@ -225,29 +241,15 @@ export function ProductStorePage() {
     );
   };
 
-  const productsQuery = usePublicProductsQuery();
+  const productsQuery = usePublicProductsQuery(
+    categorySlug ? { category: categorySlug } : {}
+  );
   const categoriesQuery = usePublicProductCategoriesQuery();
   const products = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
 
-  const counts = useMemo(() => {
-    const map = new Map();
-    for (const product of products) {
-      const key = product.product_category_id ?? "other";
-      map.set(key, (map.get(key) ?? 0) + 1);
-    }
-    return map;
-  }, [products]);
-
   const visible = useMemo(() => {
     let list = products;
-    if (categoryId === "other") {
-      list = list.filter((product) => product.product_category_id == null);
-    } else if (categoryId) {
-      list = list.filter(
-        (product) => String(product.product_category_id) === String(categoryId)
-      );
-    }
     const query = search.trim().toLowerCase();
     if (query) {
       list = list.filter(
@@ -266,7 +268,7 @@ export function ProductStorePage() {
       );
     }
     return list;
-  }, [products, search, categoryId, sort]);
+  }, [products, search, sort]);
 
   const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -277,14 +279,11 @@ export function ProductStorePage() {
 
   const clearAll = () => {
     setSearch("");
-    setCategoryId("");
     setSort("default");
     setPage(1);
-  };
-
-  const selectCategory = (value) => {
-    setCategoryId(value);
-    setPage(1);
+    if (categorySlug) {
+      router.push(pathname, { scroll: false });
+    }
   };
 
   return (
@@ -378,54 +377,38 @@ export function ProductStorePage() {
             <button
               className={cn(
                 "rounded-full px-4 py-1.5 font-label-md text-label-md font-semibold transition-colors",
-                categoryId === ""
+                categorySlug === ""
                   ? "bg-primary-container text-on-primary shadow-sm"
                   : "bg-blush-surface text-primary hover:bg-blush-hover"
               )}
               onClick={() => selectCategory("")}
               type="button"
             >
-              Tümü ({products.length})
+              Tümü
             </button>
             {categories.map((category) => (
               <button
                 className={cn(
                   "rounded-full px-4 py-1.5 font-label-md text-label-md font-semibold transition-colors",
-                  categoryId === String(category.id)
+                  categorySlug === category.slug
                     ? "bg-primary-container text-on-primary shadow-sm"
                     : "bg-blush-surface text-primary hover:bg-blush-hover"
                 )}
                 key={category.id}
-                onClick={() => selectCategory(String(category.id))}
+                onClick={() => selectCategory(category.slug)}
                 type="button"
               >
-                {category.name} ({counts.get(category.id) ?? 0})
+                {category.name}
               </button>
             ))}
-            {(counts.get("other") ?? 0) > 0 && (
-              <button
-                className={cn(
-                  "rounded-full px-4 py-1.5 font-label-md text-label-md font-semibold transition-colors",
-                  categoryId === "other"
-                    ? "bg-primary-container text-on-primary shadow-sm"
-                    : "bg-blush-surface text-primary hover:bg-blush-hover"
-                )}
-                onClick={() => selectCategory("other")}
-                type="button"
-              >
-                Kategorisiz ({counts.get("other") ?? 0})
-              </button>
-            )}
           </div>
-          {(categoryId || search.trim() || sort !== "default") && (
+          {(categorySlug || search.trim() || sort !== "default") && (
             <div className="mt-3 flex flex-wrap items-center gap-2 font-label-sm text-label-sm text-muted-foreground">
               <span>Aktif Seçim:</span>
-              {categoryId && (
+              {categorySlug && (
                 <span className="rounded-full bg-primary-container px-2.5 py-0.5 font-medium text-on-primary">
                   Kategori:{" "}
-                  {categoryId === "other"
-                    ? "Kategorisiz"
-                    : categories.find((c) => String(c.id) === String(categoryId))?.name ?? "—"}
+                  {categories.find((c) => c.slug === categorySlug)?.name ?? "—"}
                 </span>
               )}
               {search.trim() && (

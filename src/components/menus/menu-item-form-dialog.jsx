@@ -137,7 +137,7 @@ function useSourceOptions(sourceType) {
           options: (productCategoriesQuery.data ?? []).map((category) => ({
             id: String(category.id),
             label: category.name,
-            url: `/urunler?category_id=${category.id}`,
+            url: `/urunler?category=${category.slug}`,
           })),
         };
       case MENU_LINK_SOURCES.PRODUCT:
@@ -173,7 +173,7 @@ function useSourceOptions(sourceType) {
           options: (consultantsQuery.data ?? []).map((consultant) => ({
             id: String(consultant.id),
             label: consultant.name,
-            url: `/danismanlar/${consultant.id}`,
+            url: `/danismanlar/${consultant.slug}`,
           })),
         };
       case MENU_LINK_SOURCES.BLOG_CATEGORY:

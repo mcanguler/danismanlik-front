@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { LoaderCircle } from "lucide-react";
 import { ProductStorePage } from "@/components/products/product-store-page";
 
 export const metadata = {
@@ -7,5 +9,15 @@ export const metadata = {
 };
 
 export default function ProductStoreRoute() {
-  return <ProductStorePage />;
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-24">
+          <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <ProductStorePage />
+    </Suspense>
+  );
 }
