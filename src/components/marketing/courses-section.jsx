@@ -33,10 +33,10 @@ export function CoursesSection({ courses, loading = false }) {
         <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
           <SectionHeading
             align="center"
-            description="Bilinçaltı kalıplarınızı dönüştüren, canlı seanslarla desteklenen kapsamlı akademi modülleri."
-            eyebrow="Akademi Programları"
-            icon={GraduationCap}
-            pill
+            // description="Bilinçaltı kalıplarınızı dönüştüren, canlı seanslarla desteklenen kapsamlı akademi modülleri."
+            // eyebrow="Akademi Programları"
+            // icon={GraduationCap}
+            // pill
             title="Eğitimler"
           />
           <CoursesGridSkeleton count={3} />
@@ -52,10 +52,10 @@ export function CoursesSection({ courses, loading = false }) {
       <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
         <SectionHeading
           align="center"
-          description="Bilinçaltı kalıplarınızı dönüştüren, canlı seanslarla desteklenen kapsamlı akademi modülleri."
-          eyebrow="Akademi Programları"
-          icon={GraduationCap}
-          pill
+          // description="Bilinçaltı kalıplarınızı dönüştüren, canlı seanslarla desteklenen kapsamlı akademi modülleri."
+          // eyebrow="Akademi Programları"
+          // icon={GraduationCap}
+          // pill
           title="Eğitimler"
         />
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

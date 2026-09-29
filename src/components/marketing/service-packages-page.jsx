@@ -50,7 +50,7 @@ function excerpt(text, maxLength = 140) {
 function PageHero({breadcrumb, badge, title, titleAccent, description}) {
     return (
         <section
-            className="w-full relative overflow-hidden py-14 lg:py-20 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
+            className="w-full space-y-16 pt-16 pb-16">
             <div
                 className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none"/>
             <div
@@ -82,7 +82,7 @@ function PageHero({breadcrumb, badge, title, titleAccent, description}) {
                             <span>{badge}</span>
                         </div>
                     )}
-                    <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight font-medium mb-6 leading-tight">
+                    <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight font-medium mb-6 leading-tight">
                         {title}
                         {titleAccent && (
                             <>
@@ -91,7 +91,7 @@ function PageHero({breadcrumb, badge, title, titleAccent, description}) {
                                 <span className="italic font-normal text-burgundy-light">{titleAccent}</span>
                             </>
                         )}
-                    </h1>
+                    </h2>
                     <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
                         {description}
                     </p>
@@ -468,7 +468,7 @@ export function ServicePackageDetailPage({slug}) {
 
     return (
         <ServicesPageShell>
-          <section className="w-full relative overflow-hidden py-10 lg:py-14 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
+          <section className="w-full relative overflow-hidden pt-16 pb-16 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
             <div className="max-w-[1320px] mx-auto px-4 sm:px-6 relative z-10">
               <nav className="flex flex-wrap items-center gap-2 font-label-md text-label-md text-on-surface-variant mb-8">
                 <Link className="transition-colors hover:text-primary-container" href="/">
@@ -484,9 +484,9 @@ export function ServicePackageDetailPage({slug}) {
                 </span>
               </nav>
               <div className="max-w-3xl">
-                <h1 className="mb-4 font-headline-lg text-headline-lg font-medium tracking-tight text-primary">
+                <h2 className="mb-4 font-headline-lg text-headline-lg font-medium tracking-tight text-primary">
                   {servicePackage?.name}
-                </h1>
+                </h2>
               </div>
             </div>
           </section>

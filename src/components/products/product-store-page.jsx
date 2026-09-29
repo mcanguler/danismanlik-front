@@ -5,17 +5,14 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
-  BadgeCheck,
-  ChevronRight,
   CircleAlert,
   LoaderCircle,
   Package,
   Search,
-  ShieldCheck,
   Store,
-  Tags,
 } from "lucide-react";
 import { ServicesPageShell } from "@/components/marketing/services-page";
+import { PageTitleSection } from "@/components/marketing/page-title-section";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -151,28 +148,29 @@ function ProductCard({ product, onAddToCart, adding }) {
   );
 }
 
-const TRUST_CHIPS = [
-  {
-    icon: ShieldCheck,
-    title: "256-Bit SSL",
-    description: "Güvenli ödeme altyapısı",
-  },
-  {
-    icon: Tags,
-    title: "Boutique Seçki",
-    description: "Özenle seçilmiş ürünler",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Web & Mobil",
-    description: "7/24 sipariş takibi",
-  },
-  {
-    icon: Package,
-    title: "Hızlı Teslimat",
-    description: "Onaylı satıcı seçkisi",
-  },
-];
+// Sadeleştirme: güven çipleri devre dışı bırakıldı (gerekirse geri açılır)
+// const TRUST_CHIPS = [
+//   {
+//     icon: ShieldCheck,
+//     title: "256-Bit SSL",
+//     description: "Güvenli ödeme altyapısı",
+//   },
+//   {
+//     icon: Tags,
+//     title: "Boutique Seçki",
+//     description: "Özenle seçilmiş ürünler",
+//   },
+//   {
+//     icon: BadgeCheck,
+//     title: "Web & Mobil",
+//     description: "7/24 sipariş takibi",
+//   },
+//   {
+//     icon: Package,
+//     title: "Hızlı Teslimat",
+//     description: "Onaylı satıcı seçkisi",
+//   },
+// ];
 
 export function ProductStorePage() {
   const router = useRouter();
@@ -288,53 +286,7 @@ export function ProductStorePage() {
 
   return (
     <ServicesPageShell>
-      <section className="w-full relative overflow-hidden py-14 lg:py-20 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
-        <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none" />
-        <div className="max-w-[1320px] mx-auto px-4 sm:px-6 relative z-10">
-          <nav className="mb-8 flex flex-wrap items-center gap-2 font-label-md text-label-md text-on-surface-variant">
-            <Link className="transition-colors hover:text-primary-container" href="/">
-              Anasayfa
-            </Link>
-            <ChevronRight className="size-3.5 text-outline-variant" />
-            <span className="font-semibold text-primary-container">Ürünler</span>
-          </nav>
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blush-surface px-4 py-1.5 font-label-sm text-label-sm font-bold uppercase tracking-[0.14em] text-primary shadow-sm">
-                <Store className="size-4 text-accent-gold" />
-                <span>Ürünler &amp; Çalışma Kitapları</span>
-              </div>
-              <h1 className="mb-4 font-headline-lg text-headline-lg font-medium tracking-tight text-primary">
-                Ürün{" "}
-                <span className="font-normal italic text-burgundy-light">Koleksiyonu</span>
-              </h1>
-              <p className="font-body-lg text-body-lg leading-relaxed text-on-surface-variant">
-                Dönüşüm yolculuğunuza eşlik edecek, özenle seçilmiş boutique
-                ürünleri keşfedin; siparişleriniz güvenli ödeme altyapısıyla
-                hızla size ulaşır.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3 lg:w-96">
-              {TRUST_CHIPS.map((chip) => (
-                <div
-                  className="flex items-start gap-2 rounded-2xl border border-border-delicate bg-canvas-pure/80 px-3.5 py-3"
-                  key={chip.title}
-                >
-                  <chip.icon className="mt-0.5 size-4 shrink-0 text-accent-gold" />
-                  <span className="flex flex-col">
-                    <span className="font-label-md text-label-md font-bold text-primary">
-                      {chip.title}
-                    </span>
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">
-                      {chip.description}
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageTitleSection title="Ürünler" />
 
       <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
         <div className="rounded-3xl border border-border-delicate bg-canvas-pure p-4 shadow-sm sm:p-5">
@@ -402,7 +354,8 @@ export function ProductStorePage() {
               </button>
             ))}
           </div>
-          {(categorySlug || search.trim() || sort !== "default") && (
+          {/* Sadeleştirme: aktif seçim etiketleri kaldırıldı */}
+          {/* {(categorySlug || search.trim() || sort !== "default") && (
             <div className="mt-3 flex flex-wrap items-center gap-2 font-label-sm text-label-sm text-muted-foreground">
               <span>Aktif Seçim:</span>
               {categorySlug && (
@@ -417,7 +370,7 @@ export function ProductStorePage() {
                 </span>
               )}
             </div>
-          )}
+          )} */}
         </div>
       </div>
 

@@ -66,19 +66,19 @@ function QuickLinksSection() {
     <section className="w-full bg-surface-container-low py-20">
       <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
         <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface shadow-sm mb-6">
-            <Sparkles className="size-4 text-accent-gold" />
-            <span className="font-label-sm text-label-sm font-bold uppercase tracking-[0.14em] text-primary-container">
-              Hizmetlerimiz
-            </span>
-          </div>
-          <h2 className="font-headline-md text-headline-md text-primary font-medium tracking-tight mb-4">
-            Size Nasıl Yardımcı Olabiliriz?
-          </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mb-10">
-            Dönüşüm yolculuğunuza uygun olan hizmeti seçin; detaylı bilgi için
-            ekibimiz size yardımcı olsun.
-          </p>
+          {/*<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface shadow-sm mb-6">*/}
+          {/*  <Sparkles className="size-4 text-accent-gold" />*/}
+          {/*  <span className="font-label-sm text-label-sm font-bold uppercase tracking-[0.14em] text-primary-container">*/}
+          {/*    Hizmetlerimiz*/}
+          {/*  </span>*/}
+          {/*</div>*/}
+          {/*<h2 className="font-headline-md text-headline-md text-primary font-medium tracking-tight mb-4">*/}
+          {/*  Size Nasıl Yardımcı Olabiliriz?*/}
+          {/*</h2>*/}
+          {/*<p className="font-body-md text-body-md text-on-surface-variant max-w-xl mb-10">*/}
+          {/*  Dönüşüm yolculuğunuza uygun olan hizmeti seçin; detaylı bilgi için*/}
+          {/*  ekibimiz size yardımcı olsun.*/}
+          {/*</p>*/}
           <div className="flex w-full max-w-2xl flex-col gap-4">
             {links.map((link) => {
               const inner = (

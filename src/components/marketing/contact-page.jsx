@@ -4,57 +4,49 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  Building2,
   CalendarClock,
-  CalendarRange,
   Camera,
-  Check,
   ChevronDown,
   CircleAlert,
   CircleCheck,
   Clock,
-  CreditCard,
-  Info,
   LoaderCircle,
   Lock,
   MailCheck,
-  MapPin,
   MessageCircle,
-  Music2,
-  Navigation,
   PenLine,
-  PlayCircle,
   Send,
   ShieldCheck,
-  Sparkles,
   Timer,
-  Video,
 } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 import { marketingNavLinks } from "@/lib/marketing-nav";
+import { useContactInfo } from "@/lib/contact";
 import {
   CONTACT_PREFERENCE_LABELS,
   CONTACT_SUBJECT_OPTIONS,
   useSubmitContactMessage,
 } from "@/lib/contact";
 
-const WHATSAPP_URL = "https://wa.me/905061151010";
-const WHATSAPP_DISPLAY = "+90 (506) 115 10 10";
-const EMAILS = [
-  { label: "Seans & Randevu Talebi", address: "randevu@sumeyraaydin.com" },
-  { label: "Genel Destek & Akademi", address: "iletisim@sumeyraaydin.com" },
-];
-const SOCIALS = [
-  { icon: Camera, label: "Instagram" },
-  { icon: PlayCircle, label: "YouTube" },
-  { icon: Music2, label: "Spotify" },
-];
+// Sadeleştirme: iletişim bilgileri artık ayarlardaki contact.* key'lerinden okunuyor
+// const WHATSAPP_URL = "https://wa.me/905061151010";
+// const WHATSAPP_DISPLAY = "+90 (506) 115 10 10";
+// const EMAILS = [
+//   { label: "Seans & Randevu Talebi", address: "randevu@sumeyraaydin.com" },
+//   { label: "Genel Destek & Akademi", address: "iletisim@sumeyraaydin.com" },
+// ];
+// Sadeleştirme: sosyal medya kanalları devre dışı bırakıldı
+// const SOCIALS = [
+//   { icon: Camera, label: "Instagram" },
+//   { icon: PlayCircle, label: "YouTube" },
+//   { icon: Music2, label: "Spotify" },
+// ];
 
 function ContactPageShell({ children }) {
   return (
-    <div className="theme-velvet bg-canvas-cream font-body-md text-on-surface">
+    <div className="theme-velvet bg-canvas-cream flex min-h-dvh flex-col">
       <SiteHeader links={marketingNavLinks("/iletisim")} />
       <main className="w-full pt-28 bg-canvas-cream">{children}</main>
       <SiteFooter />
@@ -63,46 +55,37 @@ function ContactPageShell({ children }) {
 }
 
 function ContactHero() {
-  const trustPills = [
-    {
-      color: "bg-accent-gold",
-      label: "Ortalama 15 Dakika İçinde WhatsApp Dönüşü",
-    },
-    { color: "bg-primary-container", label: "%100 Gizlilik ve Etik Standartlar" },
-    { color: "bg-burgundy-light", label: "Online & Yüz Yüze Görüşme" },
-  ];
+  // Sadeleştirme: güven pilleri devre dışı bırakıldı
+  // const trustPills = [
+  //   {
+  //     color: "bg-accent-gold",
+  //     label: "Ortalama 15 Dakika İçinde WhatsApp Dönüşü",
+  //   },
+  //   { color: "bg-primary-container", label: "%100 Gizlilik ve Etik Standartlar" },
+  //   { color: "bg-burgundy-light", label: "Online & Yüz Yüze Görüşme" },
+  // ];
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-b from-blush-surface/60 via-canvas-cream to-canvas-cream py-14 lg:py-20 px-4 sm:px-6">
-      <div className="absolute -top-24 right-10 w-96 h-96 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none" />
-      <div className="absolute top-1/2 -left-20 w-80 h-80 rounded-full bg-accent-gold/10 blur-3xl pointer-events-none" />
-      <div className="max-w-[1320px] mx-auto relative z-10 flex flex-col items-center text-center">
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-[0.14em] shadow-sm mb-6">
-          <Sparkles className="size-4 text-accent-gold" />
-          <span>Bize Ulaşın &amp; İletişim</span>
+      <section className="mx-auto w-full max-w-330 px-4 sm:px-6">
+        <div className="text-center max-w-3xl mx-auto">
+          {/*<span className="font-label-sm text-label-sm uppercase tracking-[0.18em] text-burgundy-light font-bold">*/}
+          {/*  KİŞİYE ÖZEL ÇÖZÜMLER*/}
+          {/*</span>*/}
+          <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">
+            İletişim
+          </h2>
+          {/*<p className="font-body-md text-body-md text-on-surface-variant">*/}
+          {/*  İçinde bulunduğunuz dönemin ihtiyacına göre size en uygun seans*/}
+          {/*  formatını seçin.*/}
+          {/*</p>*/}
         </div>
-        <h1 className="font-headline-lg text-headline-lg lg:text-display text-primary max-w-4xl tracking-tight mb-6">
-          İçsel Dönüşüm Yolculuğunuz İçin Buradayız
-        </h1>
-        <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
-          Seans paketleri, online eğitimler, kurumsal atölyeler veya randevu
-          süreçleri hakkında her türlü soru ve danışma talebiniz için ekibimizle
-          iletişime geçebilirsiniz.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-on-surface-variant font-label-md text-label-md">
-          {trustPills.map((pill) => (
-            <div className="flex items-center gap-2" key={pill.label}>
-              <span className={cn("w-2 h-2 rounded-full", pill.color)} />
-              <span>{pill.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      </section>
   );
 }
 
 function WhatsAppCard() {
+  const contact = useContactInfo();
+
   return (
     <div className="rounded-xl bg-primary text-on-primary p-7 lg:p-9 shadow-xl relative overflow-hidden group">
       <div className="absolute -right-8 -bottom-8 w-44 h-44 rounded-full bg-burgundy-light/40 blur-2xl pointer-events-none" />
@@ -127,7 +110,7 @@ function WhatsAppCard() {
               <Clock className="size-4 text-accent-gold" />
               <span>Çalışma Saatleri:</span>
             </span>
-            <span className="font-semibold">09:30 - 18:30</span>
+            <span className="font-semibold">{contact.workingHours}</span>
           </div>
           <div className="flex items-center justify-between font-label-md text-label-md text-canvas-cream">
             <span className="flex items-center gap-2">
@@ -139,12 +122,12 @@ function WhatsAppCard() {
         </div>
         <a
           className="inline-flex items-center justify-center gap-3 w-full py-3.5 px-6 rounded-full bg-accent-gold text-tertiary font-label-lg text-label-lg font-bold shadow-md hover:bg-tertiary-fixed transition-all group-hover:shadow-lg"
-          href={WHATSAPP_URL}
+          href={contact.whatsappUrl}
           rel="noopener noreferrer"
           target="_blank"
         >
           <MessageCircle className="size-5" />
-          <span>{WHATSAPP_DISPLAY}</span>
+          <span>{contact.phone}</span>
           <ArrowRight />
         </a>
       </div>
@@ -153,6 +136,8 @@ function WhatsAppCard() {
 }
 
 function EmailCard() {
+  const contact = useContactInfo();
+
   return (
     <div className="rounded-xl bg-canvas-pure p-7 lg:p-8 shadow-sm">
       <div className="flex items-center gap-3 mb-6">
@@ -169,28 +154,56 @@ function EmailCard() {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        {EMAILS.map((email) => (
-          <a
-            className="p-4 rounded-lg bg-surface-container-low hover:bg-blush-surface/50 transition-colors flex items-center justify-between group"
-            href={`mailto:${email.address}`}
-            key={email.address}
-          >
-            <div className="flex flex-col min-w-0">
-              <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">
-                {email.label}
-              </span>
-              <span className="font-title-md text-title-md text-primary font-semibold truncate">
-                {email.address}
-              </span>
-            </div>
-            <ArrowRight className="size-4 text-on-surface-variant group-hover:text-primary-container shrink-0 transition-transform group-hover:translate-x-1" />
-          </a>
-        ))}
+        <a
+          className="p-4 rounded-lg bg-surface-container-low hover:bg-blush-surface/50 transition-colors flex items-center justify-between group"
+          href={`mailto:${contact.email}`}
+        >
+          <div className="flex flex-col min-w-0">
+            <span className="font-label-sm text-label-sm text-secondary uppercase tracking-wider">
+              E-Posta Adresi
+            </span>
+            <span className="font-title-md text-title-md text-primary font-semibold truncate">
+              {contact.email}
+            </span>
+          </div>
+          <ArrowRight className="size-4 text-on-surface-variant group-hover:text-primary-container shrink-0 transition-transform group-hover:translate-x-1" />
+        </a>
       </div>
     </div>
   );
 }
 
+function InstagramCard() {
+  const contact = useContactInfo();
+
+  if (!contact.instagramHref) return null;
+
+  return (
+    <a
+      className="rounded-xl bg-canvas-pure p-5 shadow-sm flex items-center gap-4 group"
+      href={contact.instagramHref}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <div className="w-10 h-10 rounded-full bg-blush-surface text-primary-container flex items-center justify-center flex-shrink-0">
+        <Camera className="size-5" />
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="font-title-md text-title-md text-primary font-semibold">
+          Instagram
+        </span>
+        <span className="font-body-sm text-body-sm text-on-surface-variant truncate">
+          {contact.instagramUsername
+            ? `@${contact.instagramUsername}`
+            : contact.instagramHref}
+        </span>
+      </div>
+      <ArrowRight className="size-4 text-on-surface-variant group-hover:text-primary-container shrink-0 transition-transform group-hover:translate-x-1" />
+    </a>
+  );
+}
+
+/* Sadeleştirme: ofis kartı devre dışı bırakıldı (gerekirse geri açılır)
 function OfficeCard() {
   return (
     <div className="rounded-xl bg-canvas-pure p-7 lg:p-8 shadow-sm">
@@ -239,7 +252,9 @@ function OfficeCard() {
     </div>
   );
 }
+*/
 
+/* Sadeleştirme: gizlilik kartı devre dışı bırakıldı (form içindeki KVKK onayı yeterli)
 function PrivacyCard() {
   return (
     <div className="rounded-xl bg-surface-container-low p-5 flex items-center gap-4">
@@ -258,6 +273,7 @@ function PrivacyCard() {
     </div>
   );
 }
+*/
 
 const INPUT_CLASS =
   "w-full h-12 px-4 rounded-lg bg-canvas-cream text-on-surface font-body-md text-body-md focus:outline-none focus:bg-canvas-pure shadow-inner transition-colors";
@@ -449,31 +465,6 @@ function ContactForm() {
             <p className="text-xs text-error">{fieldErrors.message}</p>
           )}
         </div>
-        <div className="flex flex-col gap-3">
-          <span className="font-label-lg text-label-lg text-on-surface font-medium">
-            Size Hangi Kanaldan Dönüş Yapmamızı İstersiniz?
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {Object.entries(CONTACT_PREFERENCE_LABELS).map(([value, label]) => (
-              <label
-                className="flex items-center gap-3 p-3.5 rounded-lg bg-surface-container-low cursor-pointer hover:bg-blush-surface/50 transition-colors"
-                key={value}
-              >
-                <input
-                  checked={contactPref === value}
-                  className="w-4 h-4 text-primary-container focus:ring-0 accent-primary-container"
-                  name="contact_pref"
-                  onChange={(event) => setContactPref(event.target.value)}
-                  type="radio"
-                  value={value}
-                />
-                <span className="font-body-sm text-body-sm text-on-surface font-medium">
-                  {label}
-                </span>
-              </label>
-            ))}
-          </div>
-        </div>
         <div className="flex items-start gap-3 mt-2">
           <input
             checked={kvkkAccepted}
@@ -527,32 +518,11 @@ function ContactForm() {
           </div>
         </div>
       </form>
-      <div className="mt-8 rounded-xl bg-blush-surface/70 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center flex-shrink-0">
-            <CalendarClock className="size-6" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-title-md text-title-md text-primary font-semibold">
-              Doğrudan Takvimden Gün ve Saat Seçmek İster misiniz?
-            </span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant">
-              Form doldurmadan doğrudan uygun seans aralıklarını
-              listeleyebilirsiniz.
-            </span>
-          </div>
-        </div>
-        <Link
-          className="whitespace-nowrap px-6 py-2.5 rounded-full bg-canvas-pure text-primary-container font-label-md text-label-md font-semibold shadow-sm hover:bg-blush-hover transition-colors"
-          href="/dashboard/randevu-al"
-        >
-          Online Takvim
-        </Link>
-      </div>
     </div>
   );
 }
 
+/* Sadeleştirme: SSS bölümü devre dışı bırakıldı (gerekirse geri açılır)
 function FaqSection() {
   const faqs = [
     {
@@ -621,7 +591,9 @@ function FaqSection() {
     </div>
   );
 }
+*/
 
+/* Sadeleştirme: harita banner'ı devre dışı bırakıldı (gerekirse geri açılır)
 function MapBanner() {
   return (
     <div className="max-w-[1320px] mx-auto px-4 sm:px-6 py-16 w-full">
@@ -657,26 +629,33 @@ function MapBanner() {
     </div>
   );
 }
+*/
 
 export default function ContactPage() {
   return (
     <ContactPageShell>
-      <ContactHero />
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 -mt-4 mb-20 w-full relative z-20">
+      <div className="w-full space-y-16 pt-16 pb-16">
+
+        <ContactHero />
+      </div>
+      <div className="max-w-[1320px] mx-auto px-4 sm:px-6 mb-20 w-full relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           <div className="lg:col-span-5 flex flex-col gap-6">
             <WhatsAppCard />
             <EmailCard />
-            <OfficeCard />
-            <PrivacyCard />
+            <InstagramCard />
+            {/* Sadeleştirme: ofis ve gizlilik kartları kaldırıldı */}
+            {/* <OfficeCard /> */}
+            {/* <PrivacyCard /> */}
           </div>
           <div className="lg:col-span-7">
             <ContactForm />
           </div>
         </div>
       </div>
-      <FaqSection />
-      <MapBanner />
+      {/* Sadeleştirme: SSS ve harita bölümleri kaldırıldı */}
+      {/* <FaqSection /> */}
+      {/* <MapBanner /> */}
     </ContactPageShell>
   );
 }

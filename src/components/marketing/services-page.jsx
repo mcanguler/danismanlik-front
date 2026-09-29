@@ -33,6 +33,7 @@ import {
 } from "@/lib/service-categories";
 import { usePublicServicesQuery } from "@/lib/services";
 import { marketingNavLinks } from "@/lib/marketing-nav";
+import { useContactInfo } from "@/lib/contact";
 
 const PORTRAIT_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuA8tjFifK4v-U1Zh_nHOOtS__aE0NScREXl24jV6FOtRbCSopSiBDhYALBLO-XluzXBnBwtXjCMoGhY7yRcYxCOPYCfUoNcxzZUY9vbTY7B2qpLavrrrFoooCMs64z5if6cvzOLICUOeD__jZfOxlHNLovE8EiuhwDCYvNwLb2yMuG03ocdjaIsmZ55faCSnsMtDxy_LP2iMQLz_PY1pjgertu5cFnn64mK3u93Aah0OgYBZG77VAGx";
@@ -66,7 +67,7 @@ function PageHero({
   description,
 }) {
   return (
-    <section className="w-full relative overflow-hidden py-14 lg:py-20 bg-gradient-to-b from-canvas-pure via-blush-surface/30 to-canvas-cream">
+    <section className="w-full space-y-16 pt-16 pb-16">
       <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-secondary-container/20 blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 -left-32 w-80 h-80 rounded-full bg-accent-gold/10 blur-3xl pointer-events-none" />
       <div className="max-w-[1320px] mx-auto px-4 sm:px-6 relative z-10">
@@ -93,7 +94,7 @@ function PageHero({
               <Sparkles className="size-4 text-accent-gold" />
               <span>{badge}</span>
             </div>
-            <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight font-medium mb-6 leading-tight">
+            <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight font-medium mb-6 leading-tight">
               {title}
               {titleAccent && (
                 <>
@@ -104,7 +105,7 @@ function PageHero({
                   </span>
                 </>
               )}
-            </h1>
+            </h2>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed mb-8">
               {description}
             </p>
@@ -173,7 +174,7 @@ function TrustPillars() {
 function PackagesSection({ children }) {
   return (
     <section
-      className="w-full py-20 px-4 sm:px-6 max-w-[1320px] mx-auto"
+      className="w-full py-16 px-4 sm:px-6 max-w-[1320px] mx-auto"
       id="paketler"
     >
       <div className="text-center max-w-3xl mx-auto mb-16">
@@ -296,6 +297,11 @@ function ServiceCard({ categoryHref, service }) {
 }
 
 function VoiceQuestionBanner() {
+  const contact = useContactInfo();
+  const whatsappHref = contact.whatsappUrl.startsWith("http")
+    ? `${contact.whatsappUrl}?text=Merhaba,%20Sesli%20Soru%20Dan%C4%B1%C5%9Fmanl%C4%B1%C4%9F%C4%B1%20hakk%C4%B1nda%20bilgi%20ve%20soru%20g%C3%B6ndermek%20istiyorum.`
+    : contact.whatsappUrl;
+
   return (
     <section
       className="w-full py-12 px-4 sm:px-6 max-w-[1320px] mx-auto"
@@ -352,7 +358,7 @@ function VoiceQuestionBanner() {
               </p>
               <a
                 className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-accent-gold text-tertiary font-label-lg text-label-lg font-bold hover:brightness-105 shadow-md transition-all"
-                href="https://wa.me/905061151010?text=Merhaba,%20Sesli%20Soru%20Dan%C4%B1%C5%9Fmanl%C4%B1%C4%9F%C4%B1%20hakk%C4%B1nda%20bilgi%20ve%20soru%20g%C3%B6ndermek%20istiyorum."
+                href={whatsappHref}
                 target="_blank"
                 rel="noreferrer"
               >

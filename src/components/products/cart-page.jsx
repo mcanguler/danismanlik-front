@@ -360,7 +360,7 @@ export function CartPage() {
           ) : (
             <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
               <div className="flex flex-col gap-4 lg:col-span-7">
-                <div className="rounded-2xl bg-blush-surface p-4 text-sm text-on-secondary-container"><strong className="text-primary">Güvenli alışveriş:</strong> Ödeme ve dijital teslimat işlemleriniz güvenli altyapıyla korunur.</div>
+                {/*<div className="rounded-2xl bg-blush-surface p-4 text-sm text-on-secondary-container"><strong className="text-primary">Güvenli alışveriş:</strong> Ödeme ve dijital teslimat işlemleriniz güvenli altyapıyla korunur.</div>*/}
                 {items.map((item) => <CartItem busy={busyId === item.id} item={item} key={item.id} onQuantityChange={handleQuantityChange} onRemove={handleRemove} />)}
                 <Link className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-primary-container hover:text-burgundy-light" href="/urunler"><ArrowLeft className="size-4" /> Alışverişe devam et</Link>
               </div>

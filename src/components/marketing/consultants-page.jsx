@@ -23,9 +23,11 @@ import {
   usePublicConsultantQuery,
   usePublicConsultantsQuery,
 } from "@/lib/consultants";
+import { useContactInfo } from "@/lib/contact";
 
-const WHATSAPP_URL =
-  "https://wa.me/905061151010?text=Merhaba,%20dan%C4%B1%C5%9Fman%20se%C3%A7imi%20hakk%C4%B1nda%20bilgi%20ve%20destek%20almak%20istiyorum.";
+// Sadeleştirme: WhatsApp hattı artık contact.phone ayarından geliyor
+// const WHATSAPP_URL =
+//   "https://wa.me/905061151010?text=Merhaba,%20dan%C4%B1%C5%9Fman%20se%C3%A7imi%20hakk%C4%B1nda%20bilgi%20ve%20destek%20almak%20istiyorum.";
 
 const HERO_DESCRIPTION =
   "Alanında yetkin, etik değerlere bağlı ve bütüncül yaklaşıma sahip lisanslı uzmanlarımızla içsel dönüşüm yolculuğunuzda yanınızdayız.";
@@ -203,6 +205,11 @@ function StandardsSection() {
 }
 
 function ConciergeSection() {
+  const contact = useContactInfo();
+  const whatsappHref = contact.whatsappUrl.startsWith("http")
+    ? `${contact.whatsappUrl}?text=Merhaba,%20dan%C4%B1%C5%9Fman%20se%C3%A7imi%20hakk%C4%B1nda%20bilgi%20ve%20destek%20almak%20istiyorum.`
+    : contact.whatsappUrl;
+
   return (
     <section className="max-w-[1320px] mx-auto px-4 sm:px-6 mb-24 w-full">
       <div className="rounded-3xl bg-gradient-to-r from-primary-container via-burgundy-light to-primary p-8 md:p-12 text-on-primary shadow-xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
@@ -223,7 +230,7 @@ function ConciergeSection() {
         <div className="flex flex-col sm:flex-row items-center gap-4 relative z-10 w-full lg:w-auto flex-shrink-0">
           <a
             className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-accent-gold text-tertiary font-label-lg text-label-lg font-bold shadow-lg hover:bg-tertiary-fixed transition-all hover:scale-105"
-            href={WHATSAPP_URL}
+            href={whatsappHref}
             rel="noopener noreferrer"
             target="_blank"
           >
@@ -232,7 +239,7 @@ function ConciergeSection() {
           </a>
           <a
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full bg-on-primary/15 hover:bg-on-primary/25 text-on-primary font-label-md text-label-md transition-colors"
-            href="tel:+905061151010"
+            href={`tel:${contact.phone.replace(/\s/g, "")}`}
           >
             <Phone className="size-4" />
             <span>Hemen Ara</span>
@@ -315,15 +322,15 @@ export function ConsultantsPage() {
   return (
     <ConsultantsPageShell>
       <div className="relative w-full overflow-hidden">
-        <section className="w-full py-20 px-4 sm:px-6 max-w-[1320px] mx-auto">
+        <section className="w-full pt-16 pb-16 px-4 sm:px-6 max-w-[1320px] mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             {/*<div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface text-primary-container font-label-sm text-label-sm uppercase tracking-[0.16em] mb-4 shadow-sm">*/}
             {/*  <BadgeCheck className="size-4 text-accent-gold" />*/}
             {/*  <span>Akredite &amp; Lisanslı Kadro</span>*/}
             {/*</div>*/}
-            <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-4">
+            <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">
               Uzman Danışman Kadromuz
-            </h1>
+            </h2>
             {/*<p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed mb-8">*/}
             {/*  {HERO_DESCRIPTION}*/}
             {/*</p>*/}

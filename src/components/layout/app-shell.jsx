@@ -55,7 +55,11 @@ export function AppShell({ children }) {
           links={marketingNavLinks(pathname)}
           onAccountLogout={handleLogout}
         />
-        <main className="w-full flex-1 pt-28">{children}</main>
+        <main className="w-full flex-1 pt-28">
+          <div className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col">
+            {children}
+          </div>
+        </main>
         <SiteFooter />
       </div>
     );
@@ -231,7 +235,11 @@ export function AppShell({ children }) {
           </div>
         )}
 
-        <main className="flex flex-1 flex-col pb-16 md:pb-0">{children}</main>
+        <main className="flex flex-1 flex-col pb-16 md:pb-0">
+          <div className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col">
+            {children}
+          </div>
+        </main>
       </div>
 
       <BottomNav items={bottomItems} variant={navVariant} />

@@ -25,8 +25,10 @@ import {
 import { formatPrice } from "@/lib/format";
 import { ServicesPageShell } from "@/components/marketing/services-page";
 import { ServiceBookingWizard } from "@/components/marketing/service-booking-wizard";
+import { useContactInfo } from "@/lib/contact";
 
 function TrustBadges() {
+  const contact = useContactInfo();
   const badges = [
     {
       icon: ShieldCheck,
@@ -49,8 +51,7 @@ function TrustBadges() {
     {
       icon: Headset,
       title: "Canlı Danışan Destek",
-      description:
-        "Sorularınız için WhatsApp destek hattımız (+90 506 115 10 10) randevunuz boyunca yanınızda.",
+      description: `Sorularınız için WhatsApp destek hattımız (${contact.phone}) randevunuz boyunca yanınızda.`,
     },
   ];
   return (

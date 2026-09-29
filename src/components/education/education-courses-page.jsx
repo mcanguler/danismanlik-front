@@ -184,7 +184,7 @@ export function EducationCoursesPage() {
   return (
     <ServicesPageShell>
 
-        <div className="w-full space-y-16 py-20">
+        <div className="w-full space-y-16 pt-16 pb-16">
         {query.isPending && (
           <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((index) => (
@@ -234,7 +234,7 @@ export function EducationCoursesPage() {
                 {/*<span className="font-label-sm text-label-sm uppercase tracking-[0.18em] text-burgundy-light font-bold">*/}
                 {/*  KİŞİYE ÖZEL ÇÖZÜMLER*/}
                 {/*</span>*/}
-                <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-4">
+                <h2 className="font-headline-lg text-headline-lg text-primary tracking-tight">
                   Eğitimler
                 </h2>
                 {/*<p className="font-body-md text-body-md text-on-surface-variant">*/}

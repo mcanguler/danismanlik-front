@@ -43,21 +43,33 @@ export const ROLE_SLUGS = {
 export const NAV = {
   [ROLES.ADMIN]: [
     { label: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard, bottom: true },
-    { label: "Randevular", href: "/appointments", icon: CalendarDays, bottom: true },
     {
-      label: "Danışmanlık Sistemleri",
-      icon: HeartHandshake,
+      label: "Randevular & Takvim",
+      icon: Calendar,
       children: [
         {
-          label: "Danışmanlar",
-          href: "/dashboard/admin/danismanlar",
-          icon: UserCog,
+          label: "Randevular",
+          href: "/dashboard/admin/randevular",
+          icon: CalendarDays,
+          bottom: true,
         },
+        { label: "Takvim", href: "/takvim", icon: Calendar },
+      ],
+    },
+    {
+      label: "Danışanlar & Hizmetler",
+      icon: HeartHandshake,
+      children: [
         {
           label: "Müşteriler",
           href: "/dashboard/admin/musteriler",
           icon: Users,
           bottom: true,
+        },
+        {
+          label: "Danışmanlar",
+          href: "/dashboard/admin/danismanlar",
+          icon: UserCog,
         },
         { label: "Hizmetler", href: "/dashboard/admin/hizmetler", icon: Briefcase },
         {
@@ -73,10 +85,9 @@ export const NAV = {
       ],
     },
     {
-      label: "Takvim & Zaman",
-      icon: Calendar,
+      label: "Zaman Yönetimi",
+      icon: Clock,
       children: [
-        { label: "Takvim", href: "/takvim", icon: CalendarDays },
         {
           label: "Çalışma Saatleri",
           href: "/dashboard/admin/calisma-saatleri",
@@ -132,23 +143,7 @@ export const NAV = {
     },
     { label: "Ödemeler", href: "/dashboard/admin/odemeler", icon: CreditCard },
     {
-      label: "İletişim Formları",
-      href: "/dashboard/admin/iletisim-formlari",
-      icon: Mail,
-      bottom: true,
-    },
-    {
-      label: "Danışan Yorumları",
-      href: "/dashboard/admin/yorumlar",
-      icon: MessageSquareQuote,
-    },
-    {
-      label: "Randevular",
-      href: "/dashboard/admin/randevular",
-      icon: CalendarDays,
-    },
-    {
-      label: "İçerik",
+      label: "İçerik & Topluluk",
       icon: FileText,
       children: [
         { label: "Sayfalar", href: "/dashboard/admin/sayfalar", icon: FileText },
@@ -163,6 +158,17 @@ export const NAV = {
           label: "Blog Yorumları",
           href: "/dashboard/admin/blog-yorumlari",
           icon: MessageSquareText,
+        },
+        {
+          label: "Danışan Yorumları",
+          href: "/dashboard/admin/yorumlar",
+          icon: MessageSquareQuote,
+        },
+        {
+          label: "İletişim Formları",
+          href: "/dashboard/admin/iletisim-formlari",
+          icon: Mail,
+          bottom: true,
         },
       ],
     },

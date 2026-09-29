@@ -60,9 +60,9 @@ const LEGAL_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: "Instagram", icon: Camera, settingKey: "social.instagram" },
-  { label: "YouTube", icon: CirclePlay, settingKey: "social.youtube" },
-  { label: "Podcast", icon: Podcast, settingKey: "social.podcast" },
+  { label: "Instagram", icon: Camera, settingKey: "contact.instagram_url" },
+  // { label: "YouTube", icon: CirclePlay, settingKey: "social.youtube" },
+  // { label: "Podcast", icon: Podcast, settingKey: "social.podcast" },
 ];
 
 function whatsappUrl(phone) {

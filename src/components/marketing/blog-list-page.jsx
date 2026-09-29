@@ -106,7 +106,7 @@ export function BlogListHero() {
           />
         </div>
       </section>
-      <section className="w-full pb-8">
+      <section className="w-full pt-12 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blush-surface shadow-sm mb-6">
             <Sparkles className="size-4 text-accent-gold" />
@@ -114,10 +114,10 @@ export function BlogListHero() {
               Bilinçli Farkındalık &amp; Dönüşüm Rehberi
             </span>
           </div>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[54px] text-primary max-w-4xl tracking-tight leading-[1.15] mb-5 font-semibold">
+          <h2 className="font-headline-lg text-headline-lg text-primary max-w-4xl tracking-tight leading-[1.15] font-semibold">
             Ruhunuza, İlişkilerinize ve Dişil Özünüze Dair Makaleler
-          </h1>
-          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+          </h2>
+          <p className="mt-4 font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
             Klinik psikoloji temelli yaklaşımlar, dişil enerji dengesi, sağlıklı
             sınırlar ve ilişki dinamikleri üzerine derinleşen rehber yazılarımız.
           </p>
