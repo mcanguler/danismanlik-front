@@ -3,70 +3,33 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import {
+  fetchPublicMenu,
+  flattenMenuItems,
+  HEADER_MENU_SLUG,
+  MENU_SETTING_SOURCES,
+  normalizeMenu,
+  normalizeMenuItem,
+  publicMenusQueryKey,
+  resolveMenuSlug,
+} from "./menu-shared";
+import { SETTINGS_STALE_TIME, useSettingsQuery } from "./settings";
 
 export const adminMenusQueryKey = ["admin-menus"];
-export const publicMenusQueryKey = ["public-menus"];
 
-/** Menü slug'ı site header'ında kullanılır. */
-export const HEADER_MENU_SLUG = "ana-menu";
+export {
+  fetchPublicMenu,
+  flattenMenuItems,
+  HEADER_MENU_SLUG,
+  MENU_SETTING_SOURCES,
+  normalizeMenuItem,
+  normalizeMenu,
+  publicMenusQueryKey,
+  resolveMenuSlug,
+};
 
 function useToken() {
   return useAuthStore((state) => state.token);
-}
-
-function asArray(value) {
-  return Array.isArray(value) ? value : [];
-}
-
-export function normalizeMenuItem(item) {
-  if (!item || typeof item !== "object") return null;
-  const children = asArray(item.children)
-    .map(normalizeMenuItem)
-    .filter(Boolean);
-  return {
-    ...item,
-    title: item.title ?? "",
-    url: item.url ?? null,
-    target: item.target ?? null,
-    sort_order: item.sort_order ?? 0,
-    is_active: Boolean(item.is_active),
-    parent_id: item.parent_id ?? null,
-    page_id: item.page_id ?? null,
-    page: item.page && typeof item.page === "object" ? item.page : null,
-    children,
-  };
-}
-
-export function normalizeMenu(item) {
-  if (!item || typeof item !== "object") return null;
-  return {
-    ...item,
-    name: item.name ?? "",
-    slug: item.slug ?? "",
-    is_active: Boolean(item.is_active),
-    items: asArray(item.items).map(normalizeMenuItem).filter(Boolean),
-  };
-}
-
-/** Backend'in döndürdüğü items ağacını editor'ün kullandığı düz listeye çevirir. */
-export function flattenMenuItems(items, parentId = null) {
-  const result = [];
-  for (const raw of asArray(items)) {
-    const item = normalizeMenuItem({ ...raw, parent_id: raw.parent_id ?? parentId });
-    if (!item) continue;
-    const { children, ...rest } = item;
-    result.push(rest);
-    if (children.length > 0) {
-      result.push(...flattenMenuItems(children, item.id));
-    }
-  }
-  return result;
-}
-
-function normalizeMenuDetail(payload) {
-  const menu = normalizeMenu(payload?.data ?? payload);
-  if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
-  return menu;
 }
 
 function normalizeMenuItemList(payload) {
@@ -212,26 +175,50 @@ export function usePublicMenusQuery(options = {}) {
       return data.map(normalizeMenu).filter(Boolean);
     },
     enabled: options.enabled !== false,
+    staleTime: SETTINGS_STALE_TIME,
   });
 }
 
 export function usePublicMenuQuery(slug, options = {}) {
   return useQuery({
     queryKey: [...publicMenusQueryKey, "detail", String(slug)],
-    queryFn: async () =>
-      normalizeMenuDetail(await api.publicMenu(slug)),
+    queryFn: async () => fetchPublicMenu(slug),
     enabled: (options.enabled ?? true) !== false && Boolean(slug),
     retry: false,
+    staleTime: SETTINGS_STALE_TIME,
   });
 }
 
 /**
- * Public header menüsü: `header-main` slug'lı menü varsa ağacı link modeline
- * çevirir; yoksa/erişilemezse statik fallback linkleri döndürür.
+ * Ayarlardaki bir menü key'ine (`menu_header`, `menu_footer-1`,
+ * `menu_footer-2`, `menu_homepage`) göre menü öğelerini getirir.
+ */
+export function useSettingMenuItems(source) {
+  const settingsQuery = useSettingsQuery();
+  const slug = resolveMenuSlug(settingsQuery.data, source);
+  const query = usePublicMenuQuery(slug);
+
+  const items = query.data?.items ?? [];
+
+  return {
+    items,
+    menuName: query.data?.name ?? null,
+    hasItems: items.length > 0,
+    isPending: query.isPending,
+  };
+}
+
+/**
+ * Public header menüsü: ayarlardaki `menu_header` key'inin gösterdiği
+ * menüyü link modeline çevirir; ayar/menu yoksa veya öğe yoksa statik
+ * fallback linkleri döndürür.
  */
 export function useHeaderMenuLinks(fallbackLinks) {
   const pathname = usePathname();
-  const query = usePublicMenuQuery(HEADER_MENU_SLUG);
+  const settingsQuery = useSettingsQuery();
+  const query = usePublicMenuQuery(
+    resolveMenuSlug(settingsQuery.data, MENU_SETTING_SOURCES.header)
+  );
 
   const links = useMemo(() => {
     const items = query.data?.items ?? [];

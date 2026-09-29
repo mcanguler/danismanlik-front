@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   CirclePlay,
 } from "lucide-react";
+import { MENU_SETTING_SOURCES, useSettingMenuItems } from "@/lib/menus";
 import { useSettingsQuery } from "@/lib/settings";
 
 const LOGO_URL =
@@ -37,22 +38,22 @@ const QUICK_LINKS = [
 const LEGAL_LINKS = [
   {
     label: "KVKK Aydınlatma Metni",
-    slug: "kvkk-aydinlatma-metni",
+    href: "/kvkk-aydinlatma-metni",
     icon: Gavel,
   },
   {
     label: "Mesafeli Satış Sözleşmesi",
-    slug: "mesafeli-satis-sozlesmesi",
+    href: "/mesafeli-satis-sozlesmesi",
     icon: FileText,
   },
   {
     label: "Gizlilik & Çerez Politikası",
-    slug: "gizlilik-cerez-politikasi",
+    href: "/gizlilik-cerez-politikasi",
     icon: ShieldCheck,
   },
   {
     label: "İptal ve İade Koşulları",
-    slug: "iptal-ve-iade-kosullari",
+    href: "/iptal-ve-iade-kosullari",
     icon: RotateCcw,
   },
 ];
@@ -67,6 +68,45 @@ function whatsappUrl(phone) {
   const digits = String(phone ?? "").replace(/\D/g, "");
   if (!digits) return "#";
   return `https://wa.me/${digits}`;
+}
+
+function FooterMenuColumn({ title, source, fallbackLinks }) {
+  const { items, menuName, hasItems } = useSettingMenuItems(source);
+
+  const links = hasItems
+    ? items.map((item) => ({
+        label: item.title,
+        href: item.url ?? "#",
+        target: item.target && item.target !== "_self" ? item.target : undefined,
+        icon: null,
+      }))
+    : fallbackLinks;
+
+  return (
+    <div className="flex flex-col">
+      <h3 className="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">
+        {menuName || title}
+      </h3>
+      <ul className="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant">
+        {links.map((link) => {
+          const Icon = link.icon ?? ChevronRight;
+          return (
+            <li key={link.label} className="flex items-center gap-2">
+              <Icon className="text-accent-gold size-4 shrink-0" />
+              <a
+                className="hover:text-primary-container transition-colors"
+                href={link.href}
+                target={link.target}
+                rel={link.target === "_blank" ? "noopener noreferrer" : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 export function SiteFooter() {
@@ -106,39 +146,16 @@ export function SiteFooter() {
               ))}
             </div>
           </div>
-          <div className="flex flex-col">
-            <h3 className="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">
-              Hızlı Erişim
-            </h3>
-            <ul className="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant">
-              {QUICK_LINKS.map((link) => (
-                <li key={link.label} className="flex items-center gap-2">
-                  <ChevronRight className="text-accent-gold size-4 shrink-0" />
-                  <a className="hover:text-primary-container transition-colors" href={link.href}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">
-              Kurumsal &amp; Yasal
-            </h3>
-            <ul className="flex flex-col gap-2.5 font-body-sm text-body-sm text-on-surface-variant">
-              {LEGAL_LINKS.map(({ icon: Icon, label, slug }) => (
-                <li key={label} className="flex items-center gap-2">
-                  <Icon className="text-accent-gold size-4 shrink-0" />
-                  <a
-                    className="hover:text-primary-container transition-colors"
-                    href={`/${slug}`}
-                  >
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterMenuColumn
+            fallbackLinks={QUICK_LINKS}
+            source={MENU_SETTING_SOURCES["footer-1"]}
+            title="Hızlı Erişim"
+          />
+          <FooterMenuColumn
+            fallbackLinks={LEGAL_LINKS}
+            source={MENU_SETTING_SOURCES["footer-2"]}
+            title="Kurumsal &amp; Yasal"
+          />
           <div className="flex flex-col">
             <h3 className="font-title-md text-title-md text-primary font-semibold mb-4 tracking-tight">
               İletişim &amp; Destek

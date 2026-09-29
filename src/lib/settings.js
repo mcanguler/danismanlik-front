@@ -10,6 +10,8 @@ import { useAuthStore } from "./auth";
 export const settingsQueryKey = ["settings"];
 export const adminSettingsQueryKey = ["admin-settings"];
 
+export const SETTINGS_STALE_TIME = 5 * 60 * 1000;
+
 function useToken() {
   return useAuthStore((state) => state.token);
 }
@@ -72,10 +74,15 @@ function normalizeSettingList(payload) {
 export function useSettingsQuery(options = {}) {
   return useQuery({
     queryKey: settingsQueryKey,
-    queryFn: async () => normalizeSettingsMap(await api.settings()),
+    queryFn: fetchSettingsMap,
     enabled: options.enabled !== false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: SETTINGS_STALE_TIME,
   });
+}
+
+/** Ayarları harita olarak getirir; sunucu tarafında da kullanılabilir. */
+export async function fetchSettingsMap() {
+  return normalizeSettingsMap(await api.settings());
 }
 
 export function useAdminSettingsQuery(params = {}, options = {}) {

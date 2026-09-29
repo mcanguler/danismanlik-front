@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
@@ -8,6 +9,7 @@ import { HeroSection } from "@/components/marketing/hero-section";
 import { EbooksSection } from "@/components/marketing/ebooks-section";
 import { CoursesSection } from "@/components/marketing/courses-section";
 import { marketingNavLinks } from "@/lib/marketing-nav";
+import { MENU_SETTING_SOURCES, useSettingMenuItems } from "@/lib/menus";
 import { usePublicProductsQuery } from "@/lib/products";
 import { usePublicCoursesQuery } from "@/lib/courses";
 import { formatPrice } from "@/lib/format";
@@ -45,8 +47,20 @@ function GridSkeleton({ count = 3 }) {
   );
 }
 
+const FALLBACK_QUICK_LINKS = [
+  { label: "1e1 Seanslar", href: null },
+  { label: "Atölyeler", href: null },
+  { label: "Soru Danışmanlığı", href: null },
+];
+
 function QuickLinksSection() {
-  const items = ["1e1 Seanslar", "Atölyeler", "Soru Danışmanlığı"];
+  const { items, hasItems } = useSettingMenuItems(
+    MENU_SETTING_SOURCES.homepage
+  );
+
+  const links = hasItems
+    ? items.map((item) => ({ label: item.title, href: item.url ?? "#" }))
+    : FALLBACK_QUICK_LINKS;
 
   return (
     <section className="w-full bg-surface-container-low py-20">
@@ -66,21 +80,46 @@ function QuickLinksSection() {
             ekibimiz size yardımcı olsun.
           </p>
           <div className="flex w-full max-w-2xl flex-col gap-4">
-            {items.map((label) => (
-              <button
-                className="group flex w-full items-center justify-between rounded-2xl bg-canvas-pure px-6 py-5 shadow-[0_8px_30px_rgba(92,29,36,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:bg-blush-surface sm:px-8"
-                key={label}
-                type="button"
-              >
-                <span className="font-title-md text-title-md font-semibold text-primary">
-                  {label}
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-blush-surface px-4 py-1.5 font-label-sm text-label-sm font-semibold text-primary-container transition-colors group-hover:bg-canvas-pure">
-                  <span>Detaylı Bilgi</span>
-                  <ArrowIcon />
-                </span>
-              </button>
-            ))}
+            {links.map((link) => {
+              const inner = (
+                <>
+                  <span className="font-title-md text-title-md font-semibold text-primary">
+                    {link.label}
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-blush-surface px-4 py-1.5 font-label-sm text-label-sm font-semibold text-primary-container transition-colors group-hover:bg-canvas-pure">
+                    <span>Detaylı Bilgi</span>
+                    <ArrowIcon />
+                  </span>
+                </>
+              );
+              const className =
+                "group flex w-full items-center justify-between rounded-2xl bg-canvas-pure px-6 py-5 shadow-[0_8px_30px_rgba(92,29,36,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:bg-blush-surface sm:px-8";
+
+              if (link.href) {
+                const isExternal = /^https?:\/\//i.test(link.href);
+                return isExternal ? (
+                  <a
+                    className={className}
+                    href={link.href}
+                    key={link.label}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <Link className={className} href={link.href} key={link.label}>
+                    {inner}
+                  </Link>
+                );
+              }
+
+              return (
+                <button className={className} key={link.label} type="button">
+                  {inner}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
