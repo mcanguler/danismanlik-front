@@ -77,7 +77,11 @@ export function flattenMenuItems(items, parentId = null) {
 }
 
 export async function fetchPublicMenu(slug) {
-  const menu = normalizeMenu((await api.publicMenu(slug))?.data ?? null);
+  return normalizeMenuDetail(await api.publicMenu(slug));
+}
+
+export function normalizeMenuDetail(payload) {
+  const menu = normalizeMenu(payload?.data ?? payload);
   if (!menu) throw new ApiError("Beklenmeyen yanıt formatı");
   return menu;
 }

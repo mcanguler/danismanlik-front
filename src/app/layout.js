@@ -22,6 +22,11 @@ import {
   SETTINGS_STALE_TIME,
   settingsQueryKey,
 } from "@/lib/settings";
+import {
+  fetchPublicPages,
+  publicPagesQueryKey,
+  PUBLIC_PAGES_STALE_TIME,
+} from "@/lib/pages";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -63,8 +68,14 @@ export default async function RootLayout({ children }) {
   });
 
   const settings = queryClient.getQueryData(settingsQueryKey) ?? {};
-  await Promise.all(
-    Object.values(MENU_SETTING_SOURCES).map((source) => {
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: [...publicPagesQueryKey],
+      queryFn: fetchPublicPages,
+      staleTime: PUBLIC_PAGES_STALE_TIME,
+      retry: 1,
+    }),
+    ...Object.values(MENU_SETTING_SOURCES).map((source) => {
       const slug = resolveMenuSlug(settings, source);
       if (!slug) return Promise.resolve();
       return queryClient.prefetchQuery({
@@ -73,8 +84,8 @@ export default async function RootLayout({ children }) {
         staleTime: SETTINGS_STALE_TIME,
         retry: 1,
       });
-    })
-  );
+    }),
+  ]);
 
   return (
     <html

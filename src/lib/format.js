@@ -37,6 +37,17 @@ export function formatDateTrLong(iso) {
   return `${date.getDate()} ${TR_MONTHS[date.getMonth()]} ${date.getFullYear()} ${TR_WEEKDAYS_LONG[date.getDay()]}`;
 }
 
+export function formatPageDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleDateString("tr-TR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export function formatPrice(price) {
   const num = Number(price);
   if (price === null || price === undefined || price === "" || Number.isNaN(num)) {

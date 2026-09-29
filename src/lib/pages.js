@@ -5,6 +5,8 @@ import { useAuthStore } from "./auth";
 export const adminPagesQueryKey = ["admin-pages"];
 export const publicPagesQueryKey = ["public-pages"];
 
+export const PUBLIC_PAGES_STALE_TIME = 5 * 60 * 1000;
+
 function useToken() {
   return useAuthStore((state) => state.token);
 }
@@ -81,18 +83,33 @@ export function useAdminPageQuery(id, options = {}) {
 export function usePublicPagesQuery(options = {}) {
   return useQuery({
     queryKey: [...publicPagesQueryKey],
-    queryFn: async () => normalizePageList(await api.publicPages()),
+    queryFn: fetchPublicPages,
     enabled: options.enabled !== false,
+    staleTime: PUBLIC_PAGES_STALE_TIME,
   });
 }
 
 export function usePublicPageQuery(slug, options = {}) {
   return useQuery({
     queryKey: [...publicPagesQueryKey, "detail", String(slug)],
-    queryFn: async () => normalizePageDetail(await api.publicPage(slug)),
+    queryFn: async () => fetchPublicPage(slug),
     enabled: (options.enabled ?? true) !== false && Boolean(slug),
     retry: false,
+    staleTime: PUBLIC_PAGES_STALE_TIME,
   });
+}
+
+/**
+ * Public CMS sayfa listesini getirir; sunucuda da kullanılabilir.
+ * Pasif sayfalar backend'e göre zaten hariç tutulur.
+ */
+export async function fetchPublicPages() {
+  return normalizePageList(await api.publicPages());
+}
+
+/** Public CMS sayfasını slug ile getirir; sunucuda da kullanılabilir. */
+export async function fetchPublicPage(slug) {
+  return normalizePageDetail(await api.publicPage(slug));
 }
 
 export function useCreatePage() {
