@@ -376,6 +376,9 @@ export const api = {
     ).toString();
     return request(`/v1/admin/payments${search ? `?${search}` : ""}`, { token });
   },
+  adminDashboard(token) {
+    return request("/v1/admin/dashboard", { token });
+  },
   adminCoupons(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")

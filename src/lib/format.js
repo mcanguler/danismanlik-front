@@ -79,3 +79,13 @@ export function formatDateTimeTr(value) {
     minute: "2-digit",
   });
 }
+
+export function formatTimeTr(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleTimeString("tr-TR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}

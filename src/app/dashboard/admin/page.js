@@ -1,18 +1,12 @@
 "use client";
 
 import { RequireRole } from "@/components/require-role";
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 
 export default function AdminDashboardPage() {
   return (
     <RequireRole role="ADMIN">
-      <div className="w-full flex-1 px-4 py-6">
-        <h1 className="text-xl font-semibold tracking-tight">
-          Yönetici Panosu
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Bu alan yalnızca ADMIN rolündeki kullanıcılar tarafından görülebilir.
-        </p>
-      </div>
+      <AdminDashboard />
     </RequireRole>
   );
 }
