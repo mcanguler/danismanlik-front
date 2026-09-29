@@ -10,7 +10,7 @@ import { EbooksSection } from "@/components/marketing/ebooks-section";
 import { CoursesSection } from "@/components/marketing/courses-section";
 import { marketingNavLinks } from "@/lib/marketing-nav";
 import { MENU_SETTING_SOURCES, useSettingMenuItems } from "@/lib/menus";
-import { usePublicProductsQuery } from "@/lib/products";
+import { PRODUCT_TYPES, usePublicProductsQuery } from "@/lib/products";
 import { usePublicCoursesQuery } from "@/lib/courses";
 import { formatPrice } from "@/lib/format";
 
@@ -153,12 +153,23 @@ export function HomePage() {
     const products = productsQuery.data ?? [];
     return products
       .filter((product) => product.is_active && isEbook(product))
-      .map((product) => ({
-        id: product.id,
-        title: product.title,
-        image: product.thumbnail,
-        ...toCardPricing(product),
-      }));
+      .map((product) => {
+        const hasVariations = (product.variations ?? []).length > 0;
+        const hasRequiredFields = (product.fields ?? []).some(
+          (field) => field.is_required
+        );
+        const outOfStock =
+          product.type === PRODUCT_TYPES.PHYSICAL && (product.stock ?? 0) <= 0;
+        return {
+          id: product.id,
+          title: product.title,
+          image: product.thumbnail,
+          slug: product.slug,
+          canQuickAdd: !hasVariations && !hasRequiredFields,
+          outOfStock,
+          ...toCardPricing(product),
+        };
+      });
   }, [productsQuery.data]);
 
   const courses = useMemo(() => {
@@ -169,6 +180,7 @@ export function HomePage() {
         id: course.id,
         title: course.title,
         image: course.image,
+        slug: course.slug,
         ...toCardPricing(course),
       }));
   }, [coursesQuery.data]);

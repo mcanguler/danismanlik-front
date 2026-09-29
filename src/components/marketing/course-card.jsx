@@ -1,10 +1,29 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
-import { SectionHeading } from "@/components/marketing/section-heading";
+import { LoaderCircle } from "lucide-react";
+import { useAddToCart } from "@/components/marketing/use-add-to-cart";
 
 export function CourseCard({ course }) {
+  const router = useRouter();
+  const { addToCart, isPending } = useAddToCart();
+  const href = `/egitimler/${course.slug || course.id}`;
+
+  const handleJoin = () => {
+    addToCart(
+      { item_type: "COURSE", item_id: course.id },
+      { title: course.title, successDescription: `${course.title} sepetinize eklendi. Ödemeyi tamamladığınızda eğitime erişebileceksiniz.` }
+    );
+  };
+
   return (
     <div className="group flex flex-col rounded-3xl bg-canvas-pure overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300">
-      <div className="relative h-60 w-full overflow-hidden bg-surface-container">
+      <Link
+        className="relative block h-60 w-full overflow-hidden bg-surface-container"
+        href={href}
+      >
         <Image
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -20,11 +39,13 @@ export function CourseCard({ course }) {
             </span>
           )}
         </div>
-      </div>
+      </Link>
       <div className="p-7 flex flex-col flex-grow justify-between">
-        <h3 className="font-title-lg text-title-lg text-primary font-semibold mb-6 leading-snug">
-          {course.title}
-        </h3>
+        <Link href={href}>
+          <h3 className="font-title-lg text-title-lg text-primary font-semibold mb-6 leading-snug transition-colors hover:text-burgundy-light">
+            {course.title}
+          </h3>
+        </Link>
         <div className="pt-6 border-t border-surface-container flex items-center justify-between">
           <div>
             {course.oldPrice && (
@@ -37,9 +58,14 @@ export function CourseCard({ course }) {
             </span>
           </div>
           <button
-            className="px-6 py-3 rounded-full bg-primary-container text-on-primary font-label-md text-label-md shadow-md hover:bg-burgundy-light transition-all"
+            className="px-6 py-3 rounded-full bg-primary-container text-on-primary font-label-md text-label-md shadow-md hover:bg-burgundy-light transition-all disabled:opacity-60"
+            disabled={isPending}
             type="button"
+            onClick={handleJoin}
           >
+            {isPending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : null}
             Eğitime Katıl
           </button>
         </div>

@@ -14,6 +14,7 @@ import {
   CirclePlay,
 } from "lucide-react";
 import { MENU_SETTING_SOURCES, useSettingMenuItems } from "@/lib/menus";
+import { resolveMenuItemHref } from "@/lib/menu-link-sources";
 import { useSettingsQuery } from "@/lib/settings";
 
 const LOGO_URL =
@@ -28,11 +29,11 @@ const DEFAULT_COPYRIGHT =
   "© 2026 Sümeyra Aydın Danışmanlık & Akademi. Tüm Hakları Saklıdır.";
 
 const QUICK_LINKS = [
-  { label: "1e1 Seanslar", href: "#seanslar" },
-  { label: "Soru Danışmanlığı", href: "#soru-danismanligi" },
-  { label: "E-Kitaplar", href: "#e-kitaplar" },
-  { label: "Online Eğitimler", href: "#egitimler" },
-  { label: "Sümeyra Aydın Kimdir?", href: "#hakkimda" },
+  { label: "1e1 Seanslar", href: "/hizmetler" },
+  { label: "Soru Danışmanlığı", href: "/urunler/soru-danismanligi" },
+  { label: "E-Kitaplar", href: "/urunler?category=e-kitaplar" },
+  { label: "Online Eğitimler", href: "/egitimler" },
+  { label: "Sümeyra Aydın Kimdir?", href: "/danismanlar/sumeyra-aydin" },
 ];
 
 const LEGAL_LINKS = [
@@ -76,7 +77,7 @@ function FooterMenuColumn({ title, source, fallbackLinks }) {
   const links = hasItems
     ? items.map((item) => ({
         label: item.title,
-        href: item.url ?? "#",
+        href: resolveMenuItemHref(item),
         target: item.target && item.target !== "_self" ? item.target : undefined,
         icon: null,
       }))
