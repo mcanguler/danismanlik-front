@@ -22,7 +22,11 @@ import {
   imageFileError,
 } from "@/lib/image-upload";
 import { ImageUploadField } from "@/components/ui/image-upload-field";
-import { useCreateConsultant, useUpdateConsultant } from "@/lib/consultants";
+import {
+  useCreateConsultant,
+  useUpdateConsultant,
+} from "@/lib/consultants";
+import { ConsultantCertificatesManager } from "@/components/consultants/consultant-certificates-manager";
 import { AdminFormPage } from "@/components/admin/admin-form-page";
 
 const slugRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -167,6 +171,18 @@ export function ConsultantEditPage({ id, query }) {
       cardTitle="Danışman Bilgileri"
     >
       <ConsultantForm key={consultant.id} isEdit consultant={consultant} />
+      <div className="mt-8 rounded-2xl bg-surface-container-lowest p-6 shadow-sm sm:p-8">
+        <div className="mb-6 border-b border-surface-container-high pb-4">
+          <h2 className="font-title-lg text-title-lg text-primary">
+            Sertifika Galerisi
+          </h2>
+          <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+            Danışmanın sertifika ve belgelerini yükleyin, sıralayın; genel
+            danışman sayfasında görüntülenir.
+          </p>
+        </div>
+        <ConsultantCertificatesManager consultant={consultant} />
+      </div>
     </AdminFormPage>
   );
 }

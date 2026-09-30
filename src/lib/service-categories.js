@@ -27,6 +27,11 @@ function normalizeList(payload) {
   return data.map(normalizeServiceCategory);
 }
 
+/** Sunucu tarafında (RSC / generateMetadata) kullanılabilir veri çekici. */
+export async function fetchPublicServiceCategories(filters = {}) {
+  return normalizeList(await api.serviceCategories(null, filters));
+}
+
 export function useServiceCategoriesQuery(filters = {}, options = {}) {
   const token = useToken();
 
@@ -40,9 +45,10 @@ export function useServiceCategoriesQuery(filters = {}, options = {}) {
 export function usePublicServiceCategoriesQuery(filters = {}, options = {}) {
   return useQuery({
     queryKey: [...serviceCategoriesQueryKey, "public", filters],
-    queryFn: async () =>
-      normalizeList(await api.serviceCategories(null, filters)),
+    queryFn: () => fetchPublicServiceCategories(filters),
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 

@@ -17,7 +17,9 @@ export function normalizeConsultant(item) {
     ...item,
     name,
     is_active: Boolean(item.is_active),
-    certificates: normalizeMediaList(item.certificates),
+    certificates: normalizeMediaList(item.certificates).sort(
+      (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+    ),
     images: normalizeMediaList(item.images).sort(
       (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
     ),
@@ -46,7 +48,7 @@ function normalizeMediaList(value) {
 function normalizeMediaEntry(entry) {
   if (typeof entry === "string") {
     return entry.trim()
-      ? { id: null, src: entry.trim(), title: null, sort_order: 0 }
+      ? { id: null, consultant_id: null, src: entry.trim(), title: null, sort_order: 0 }
       : null;
   }
   if (!entry || typeof entry !== "object") return null;
@@ -55,6 +57,8 @@ function normalizeMediaEntry(entry) {
   if (!src) return null;
   return {
     id: entry.id ?? null,
+    consultant_id: entry.consultant_id ?? null,
+    image_path: entry.image_path ?? null,
     src: String(src),
     title: entry.title ?? entry.name ?? entry.caption ?? null,
     sort_order: entry.sort_order ?? 0,
@@ -67,6 +71,11 @@ function normalizeList(payload) {
     throw new ApiError("Beklenmeyen yanıt formatı");
   }
   return data.map(normalizeConsultant);
+}
+
+/** Sunucu tarafında (RSC / generateMetadata) kullanılabilir veri çekici. */
+export async function fetchPublicConsultants(filters = {}) {
+  return normalizeList(await api.consultants(null, filters));
 }
 
 export function useConsultantsQuery(filters = {}, options = {}) {
@@ -82,8 +91,10 @@ export function useConsultantsQuery(filters = {}, options = {}) {
 export function usePublicConsultantsQuery(filters = {}, options = {}) {
   return useQuery({
     queryKey: [...consultantsQueryKey, "public", filters],
-    queryFn: async () => normalizeList(await api.consultants(null, filters)),
+    queryFn: () => fetchPublicConsultants(filters),
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
@@ -95,6 +106,8 @@ export function usePublicConsultantQuery(id, options = {}) {
       return normalizeConsultant(payload?.data ?? payload);
     },
     enabled: (options.enabled ?? true) !== false && Boolean(id),
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
@@ -154,6 +167,44 @@ export function useDeleteConsultant() {
 
   return useMutation({
     mutationFn: (id) => api.deleteConsultant(token, id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: consultantsQueryKey });
+    },
+  });
+}
+
+export function useAddConsultantCertificate(consultantId) {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: (formData) =>
+      api.addConsultantCertificate(token, consultantId, formData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: consultantsQueryKey });
+    },
+  });
+}
+
+export function useUpdateConsultantCertificate() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: ({ id, payload }) =>
+      api.updateConsultantCertificate(token, id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: consultantsQueryKey });
+    },
+  });
+}
+
+export function useDeleteConsultantCertificate() {
+  const queryClient = useQueryClient();
+  const token = useToken();
+
+  return useMutation({
+    mutationFn: (id) => api.deleteConsultantCertificate(token, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: consultantsQueryKey });
     },

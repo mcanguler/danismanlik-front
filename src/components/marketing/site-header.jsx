@@ -3,9 +3,10 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  CalendarPlus,
   ChevronDown,
+  LoaderCircle,
   LogOut,
   MessageCircle,
   Search,
@@ -19,7 +20,8 @@ import { useCartQuery } from "@/lib/products";
 import { usePublicServiceCategoriesQuery } from "@/lib/service-categories";
 import { useHeaderMenuLinks } from "@/lib/menus";
 import { useSettingsQuery } from "@/lib/settings";
-import { useAuth } from "@/lib/auth-hooks";
+import { roleHomePath } from "@/lib/auth";
+import { useAuth, useLogout } from "@/lib/auth-hooks";
 
 const LOGO_URL =
   "https://lh3.googleusercontent.com/aida/AEtjO1WmgOiNUjaiKAyx9E7v0c1TiacEOf9Ez9UIoiWtd_wu5jvZxJQkt8tgqP_1af1X7-Dq0EwBfRcJN1dVN4feUAM4OLHX21QPzTrembPsErT974fcokn2vtB79K9-ykrYd6AqJJDHa0STeq52b_josAFx-YABLqEprjUcJFEgNZ7WPTHG_XrOPUggI1lMcTBFl29nh55qk4MnTXdlVybvkd-PPE97N01i9a5AgA7WLKsp_pYadDtSCgI8oJ4";
@@ -61,8 +63,12 @@ export function SiteHeader({
   onAccountLogout,
 }) {
 const [mobileOpen, setMobileOpen] = useState(false);
-const { status } = useAuth();
-  const cartQuery = useCartQuery({ enabled: status === "authenticated" });
+const router = useRouter();
+const { status, user } = useAuth();
+  const logout = useLogout();
+  const isAuthenticated = status === "authenticated";
+  const accountLinkHref = isAuthenticated ? roleHomePath(user?.role) : accountHref;
+  const cartQuery = useCartQuery({ enabled: status !== "loading" });
   const cartCount = Number(
     cartQuery.data?.meta?.count ??
       (cartQuery.data?.items ?? []).reduce(
@@ -97,6 +103,19 @@ const { status } = useAuth();
 
   const categoryHref = (category) =>
     `/hizmetler/${category.slug || category.id}`;
+
+  const handleAccountLogout = () => {
+    setMobileOpen(false);
+    if (onAccountLogout) {
+      onAccountLogout();
+      return;
+    }
+    logout.mutate(undefined, {
+      onSuccess: () => router.replace("/"),
+    });
+  };
+
+  const logoutPending = !onAccountLogout && logout.isPending;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
@@ -256,8 +275,8 @@ const { status } = useAuth();
       </Link>
             <Link
                 className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-burgundy-light transition-colors"
-                href={accountHref}
-                aria-label="Giriş Yap"
+                href={accountLinkHref}
+                aria-label={isAuthenticated ? "Hesabım" : "Giriş Yap"}
             >
               <User className="size-4" />
             </Link>
@@ -359,22 +378,30 @@ const { status } = useAuth();
               })}
             </nav>
             <div className="mt-4 flex flex-col gap-2">
-              <a
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg hover:bg-burgundy-light transition-all"
-                href="#seanslar"
-                onClick={() => setMobileOpen(false)}
-              >
-                <CalendarPlus className="size-4" />
-                <span>Randevu Al</span>
-              </a>
-              <Link
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-blush-surface text-primary-container font-label-lg text-label-lg hover:bg-blush-hover transition-colors"
+              {isAuthenticated ? (
+                <button
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-60"
+                  disabled={logoutPending}
+                  onClick={handleAccountLogout}
+                  type="button"
+                >
+                  {logoutPending ? (
+                    <LoaderCircle className="size-4 animate-spin" />
+                  ) : (
+                    <LogOut className="size-4" />
+                  )}
+                  <span>{logoutPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}</span>
+                </button>
+              ) : (
+                <Link
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover"
                   href={accountHref}
                   onClick={() => setMobileOpen(false)}
-              >
-                <User className="size-4" />
-                <span>Giriş Yap</span>
-              </Link>
+                >
+                  <User className="size-4" />
+                  <span>Giriş Yap</span>
+                </Link>
+              )}
             </div>
           </div>
         )}

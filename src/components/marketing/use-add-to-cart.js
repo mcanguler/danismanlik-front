@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { ApiError } from "@/lib/api";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
@@ -11,28 +10,21 @@ function getErrorMessage(error) {
 }
 
 /**
- * Anasayfa kartlarındaki hızlı sepete ekleme akışı: giriş/rol kontrolü,
- * cart API çağrısı ve toast yönetimi tek yerde toplanır.
+ * Anasayfa kartlarındaki hızlı sepete ekleme akışı: rol kontrolü,
+ * cart API çağrısı (misafirler için localStorage sepeti) ve toast
+ * yönetimi tek yerde toplanır.
  */
 export function useAddToCart() {
-  const router = useRouter();
   const { status, user } = useAuth();
   const addCartItem = useAddCartItem();
 
-  const addToCart = async (payload, { title, successDescription } = {}) => {
+  const addToCart = async (
+    payload,
+    { title, successDescription, snapshot } = {}
+  ) => {
     if (status === "loading") return false;
 
-    if (status === "unauthenticated") {
-      toast.add({
-        title: "Giriş gerekli",
-        description: "Sepete eklemek için lütfen giriş yapın.",
-        type: "info",
-      });
-      router.push("/login");
-      return false;
-    }
-
-    if (user?.role !== ROLES.CUSTOMER) {
+    if (status === "authenticated" && user?.role !== ROLES.CUSTOMER) {
       toast.add({
         title: "Sepete eklenemedi",
         description: "Sepete eklemek için müşteri hesabıyla giriş yapmalısınız.",
@@ -42,7 +34,7 @@ export function useAddToCart() {
     }
 
     try {
-      await addCartItem.mutateAsync(payload);
+      await addCartItem.mutateAsync({ ...payload, _snapshot: snapshot });
       toast.add({
         title: "Sepete eklendi",
         description:

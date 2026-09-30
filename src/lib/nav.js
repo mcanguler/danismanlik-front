@@ -31,6 +31,7 @@ import {
   UserCog,
   Users,
   FileText,
+  ScrollText,
 } from "lucide-react";
 import { ROLES, ROLE_HOME } from "./auth";
 
@@ -137,6 +138,11 @@ export const NAV = {
           label: "Kuponlar",
           href: "/dashboard/admin/kuponlar",
           icon: Ticket,
+        },
+        {
+          label: "Sözleşmeler",
+          href: "/dashboard/admin/sozlesmeler",
+          icon: ScrollText,
         },
         { label: "Kurslar", href: "/dashboard/admin/kurslar", icon: GraduationCap },
       ],

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { KvkkModalLink } from "@/components/kvkk-modal";
 import {
   ArrowRight,
   CalendarClock,
@@ -475,12 +475,7 @@ function ContactForm() {
           />
           <label className="font-body-sm text-body-sm text-on-surface-variant cursor-pointer" htmlFor="contact_kvkk">
             <span>Kişisel verilerimin işlenmesine ilişkin </span>
-            <Link
-              className="text-primary-container font-semibold underline underline-offset-2 hover:text-burgundy-light"
-              href="/kvkk-aydinlatma-metni"
-            >
-              KVKK Aydınlatma Metni
-            </Link>
+            <KvkkModalLink className="text-primary-container font-semibold underline underline-offset-2 hover:text-burgundy-light" />
             <span>
               &apos;ni okudum, iletişim talebimin yerine getirilmesi amacıyla
               kaydedilmesini onaylıyorum.

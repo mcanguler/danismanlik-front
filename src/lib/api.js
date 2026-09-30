@@ -104,6 +104,30 @@ export const api = {
   deleteConsultant(token, id) {
     return request(`/v1/consultants/${id}`, { method: "DELETE", token });
   },
+
+  addConsultantCertificate(token, consultantId, formData) {
+    return request(`/v1/consultants/${consultantId}/certificates`, {
+      method: "POST",
+      body: formData,
+      token,
+      headers: { Accept: "application/json" },
+    });
+  },
+
+  updateConsultantCertificate(token, id, payload) {
+    return request(`/v1/consultant-certificates/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+
+  deleteConsultantCertificate(token, id) {
+    return request(`/v1/consultant-certificates/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
   customers(token, params = {}) {
     const search = new URLSearchParams(
       Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -771,8 +795,51 @@ export const api = {
   removeCartCoupon(token) {
     return request("/v1/cart/coupon", { method: "DELETE", token });
   },
-  checkoutCart(token) {
-    return request("/v1/cart/checkout", { method: "POST", token });
+  checkoutCart(token, payload) {
+    return request("/v1/cart/checkout", {
+      method: "POST",
+      token,
+      body: payload,
+    });
+  },
+
+  orderContract(token, orderId) {
+    return request(`/v1/orders/${orderId}/contract`, { token });
+  },
+
+  contractTemplates(token) {
+    return request("/v1/admin/contract-templates", { token });
+  },
+
+  contractTemplate(token, id) {
+    return request(`/v1/admin/contract-templates/${id}`, { token });
+  },
+
+  createContractTemplate(token, payload) {
+    return request("/v1/admin/contract-templates", {
+      method: "POST",
+      body: payload,
+      token,
+    });
+  },
+
+  updateContractTemplate(token, id, payload) {
+    return request(`/v1/admin/contract-templates/${id}`, {
+      method: "PATCH",
+      body: payload,
+      token,
+    });
+  },
+
+  deleteContractTemplate(token, id) {
+    return request(`/v1/admin/contract-templates/${id}`, {
+      method: "DELETE",
+      token,
+    });
+  },
+
+  contractTemplatePreview(token, id) {
+    return request(`/v1/admin/contract-templates/${id}/preview`, { token });
   },
   publicCourses(params = {}) {
     const search = new URLSearchParams(

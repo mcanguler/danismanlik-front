@@ -21,6 +21,7 @@ function toCardPricing(item) {
       )} İndirim`
     : null;
   return {
+    effectivePrice: Number(item.effective_price ?? item.price ?? 0),
     price: formatPrice(item.effective_price ?? item.price),
     oldPrice: item.has_discount ? formatPrice(item.price) : null,
     discount,

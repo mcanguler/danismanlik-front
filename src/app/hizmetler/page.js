@@ -1,11 +1,28 @@
+import { cache } from "react";
 import { ServiceCategoriesPage } from "@/components/marketing/services-page";
+import { fetchPublicServiceCategories } from "@/lib/service-categories";
+import { buildMetadata, getSeoSettings } from "@/lib/seo";
 
-export const metadata = {
-  title: "1e1 Seanslar | Sümeyra Aydın Akademi & Danışmanlık",
-  description:
-    "Bireysel danışmanlık, çift ve aile seansları başta olmak üzere kişiselleştirilmiş 1e1 danışmanlık kategorilerini keşfedin.",
-};
+const loadCatalogData = cache(async () => {
+  const [categories, seo] = await Promise.all([
+    fetchPublicServiceCategories().catch(() => []),
+    getSeoSettings(),
+  ]);
+  return { categories, seo };
+});
 
-export default function ServicesPage() {
-  return <ServiceCategoriesPage />;
+export async function generateMetadata() {
+  const { seo } = await loadCatalogData();
+  return buildMetadata({
+    title: seo.servicesTitle || "1e1 Seanslar",
+    description:
+      seo.servicesDescription ||
+      "Birebir online danışmanlık seans kategorilerini keşfedin; size uygun kategoride hemen randevunuzu oluşturun.",
+    path: "/hizmetler",
+  });
+}
+
+export default async function ServicesCatalogRoute() {
+  const { categories } = await loadCatalogData();
+  return <ServiceCategoriesPage initialCategories={categories} />;
 }

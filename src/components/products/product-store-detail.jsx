@@ -21,7 +21,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ApiError } from "@/lib/api";
+import { isApiError } from "@/lib/query-errors";
+import {
+  getContractRequiredMessage,
+  isContractRequiredError,
+} from "@/lib/contracts";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
 import { toast } from "@/components/ui/toast";
@@ -41,7 +45,7 @@ const CARD_CTA_CLASS =
   "inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-burgundy-light shadow-md transition-all";
 
 function getErrorMessage(error) {
-  if (error instanceof ApiError) return error.message;
+  if (isApiError(error)) return error.message || "Beklenmeyen bir hata oluştu";
   return "Beklenmeyen bir hata oluştu";
 }
 
@@ -224,30 +228,44 @@ function PurchasePanel({ product, relatedCount = 0 }) {
     return payload;
   };
 
+  const buildSnapshot = () => ({
+    unitPrice: Number(
+      selectedVariation ? selectedVariation.effective_price : product.effective_price
+    ),
+    product: {
+      id: product.id,
+      title: product.title,
+      slug: product.slug,
+      thumbnail: product.thumbnail,
+    },
+    variation: selectedVariation
+      ? { id: selectedVariation.id, sku: selectedVariation.sku }
+      : null,
+  });
+
   const addToCart = async () => {
     const payload = buildPayload();
-    const item = await addCartItem.mutateAsync(payload);
+    const item = await addCartItem.mutateAsync({
+      ...payload,
+      _snapshot: buildSnapshot(),
+    });
     return item;
   };
 
-  const handleAddToCart = () => {
-    if (status === "unauthenticated") {
-      toast.add({
-        title: "Giriş gerekli",
-        description: "Sipariş oluşturmak için lütfen giriş yapın.",
-        type: "info",
-      });
-      router.push("/login");
-      return;
-    }
-    if (user?.role !== ROLES.CUSTOMER) {
+  const ensureCustomerRole = () => {
+    if (status === "authenticated" && user?.role !== ROLES.CUSTOMER) {
       toast.add({
         title: "Sipariş oluşturulamaz",
         description: "Sipariş oluşturmak için müşteri hesabı gereklidir.",
         type: "error",
       });
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (!ensureCustomerRole()) return;
     if (requiredMissing) {
       toast.add({
         title: "Eksik alanlar var",
@@ -275,24 +293,8 @@ function PurchasePanel({ product, relatedCount = 0 }) {
       .finally(() => setPending(false));
   };
 
-  const handleBuyNow = () => {
-    if (status === "unauthenticated") {
-      toast.add({
-        title: "Giriş gerekli",
-        description: "Sipariş oluşturmak için lütfen giriş yapın.",
-        type: "info",
-      });
-      router.push("/login");
-      return;
-    }
-    if (user?.role !== ROLES.CUSTOMER) {
-      toast.add({
-        title: "Sipariş oluşturulamaz",
-        description: "Sipariş oluşturmak için müşteri hesabı gereklidir.",
-        type: "error",
-      });
-      return;
-    }
+  const handleBuyNow = async () => {
+    if (!ensureCustomerRole()) return;
     if (requiredMissing) {
       toast.add({
         title: "Eksik alanlar var",
@@ -302,19 +304,62 @@ function PurchasePanel({ product, relatedCount = 0 }) {
       return;
     }
     setPending(true);
-    addToCart()
-      .then(() => checkoutCart.mutateAsync())
-      .then((order) => {
-        router.push(`/odeme/${order.id}`);
-      })
-      .catch((error) => {
+
+    try {
+      await addToCart();
+    } catch (error) {
+      toast.add({
+        title: "Sepete eklenemedi",
+        description: getErrorMessage(error),
+        type: "error",
+      });
+      setPending(false);
+      return;
+    }
+
+    if (status === "unauthenticated") {
+      toast.add({
+        title: "Giriş gerekli",
+        description: "Ödeme için giriş yapın; sepetiniz hesabınıza aktarılacak.",
+        type: "info",
+      });
+      setPending(false);
+      router.push("/login?redirect=/sepet");
+      return;
+    }
+
+    let order;
+    try {
+      // Aktif mesafeli satış sözleşmesi varsa backend 422 döndürür;
+      // onayın sepeti geçişiyle alınması için alan gönderilmez.
+      order = await checkoutCart.mutateAsync();
+    } catch (error) {
+      if (isContractRequiredError(error)) {
         toast.add({
-          title: "Sipariş oluşturulamadı",
-          description: getErrorMessage(error),
-          type: "error",
+          title: "Satış sözleşmesi onayı gerekli",
+          description:
+            "Ürün sepetinize eklendi; onayı sepet sayfasından tamamlayabilirsiniz.",
+          type: "info",
         });
         setPending(false);
+        router.push("/sepet");
+        return;
+      }
+      toast.add({
+        title: "Sipariş oluşturulamadı",
+        description: getErrorMessage(error),
+        type: "error",
       });
+      setPending(false);
+      return;
+    }
+
+    setPending(false);
+    try {
+      router.push(`/odeme/${order.id}`);
+    } catch (error) {
+      console.error("Ödeme sayfasına yönlendirilemedi", error);
+    }
   };
 
   return (
@@ -440,8 +485,10 @@ function PurchasePanel({ product, relatedCount = 0 }) {
   );
 }
 
-export function ProductStoreDetail({ slug }) {
-  const listQuery = usePublicProductsQuery();
+export function ProductStoreDetail({ slug, initialProduct, initialProducts = [] }) {
+  const listQuery = usePublicProductsQuery({}, {
+    initialData: initialProducts.length > 0 ? initialProducts : undefined,
+  });
   const products = useMemo(() => listQuery.data ?? [], [listQuery.data]);
   const isNumericId = /^\d+$/.test(String(slug ?? ""));
   // Listed products resolve slug -> id via the public list; hidden products
@@ -449,8 +496,13 @@ export function ProductStoreDetail({ slug }) {
   // public detail endpoint binds by id only.
   const productSummary = resolveProductFromList(products, slug);
   const directProductId = isNumericId ? slug : (productSummary?.id ?? null);
+  const initialDetailMatches =
+    initialProduct != null &&
+    directProductId != null &&
+    String(initialProduct.id) === String(directProductId);
   const detailQuery = usePublicProductQuery(directProductId, {
     enabled: directProductId != null,
+    initialData: initialDetailMatches ? initialProduct : undefined,
   });
   const product = detailQuery.data;
 

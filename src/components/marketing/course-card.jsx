@@ -13,8 +13,19 @@ export function CourseCard({ course }) {
 
   const handleJoin = () => {
     addToCart(
-      { item_type: "COURSE", item_id: course.id },
-      { title: course.title, successDescription: `${course.title} sepetinize eklendi. Ödemeyi tamamladığınızda eğitime erişebileceksiniz.` }
+      { item_type: "COURSE", item_id: course.id, quantity: 1 },
+      {
+        title: course.title,
+        successDescription: `${course.title} sepetinize eklendi. Ödemeyi tamamladığınızda eğitime erişebileceksiniz.`,
+        snapshot: {
+          unitPrice: Number(course.effectivePrice ?? 0),
+          item: {
+            id: course.id,
+            title: course.title,
+            slug: course.slug,
+          },
+        },
+      }
     );
   };
 

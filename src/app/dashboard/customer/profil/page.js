@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
@@ -13,6 +14,7 @@ import {
   Clock,
   Hourglass,
   LoaderCircle,
+  LogOut,
   Mail,
   Phone,
   Save,
@@ -36,7 +38,7 @@ import {
   packageIsUsable,
   useMyServicePackagesQuery,
 } from "@/lib/service-packages";
-import { useAuth, useUpdateProfile } from "@/lib/auth-hooks";
+import { useAuth, useLogout, useUpdateProfile } from "@/lib/auth-hooks";
 
 const phoneRegex = /^\+\d{8,15}$/;
 
@@ -83,6 +85,14 @@ export default function CustomerProfilePage() {
 function CustomerProfile() {
   const { user } = useAuth();
   const updateProfile = useUpdateProfile();
+  const logout = useLogout();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess: () => router.replace("/login"),
+    });
+  };
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
@@ -274,6 +284,19 @@ function CustomerProfile() {
                 </span>
               </div>
             </div>
+            <button
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-destructive/30 px-4 py-3 font-label-md text-label-md font-semibold text-destructive transition-colors hover:bg-destructive/10 disabled:pointer-events-none disabled:opacity-60"
+              disabled={logout.isPending}
+              onClick={handleLogout}
+              type="button"
+            >
+              {logout.isPending ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <LogOut className="size-4" />
+              )}
+              <span>{logout.isPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}</span>
+            </button>
           </div>
         </div>
 

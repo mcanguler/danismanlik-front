@@ -172,7 +172,7 @@ function ProductCard({ product, onAddToCart, adding }) {
 //   },
 // ];
 
-export function ProductStorePage() {
+export function ProductStorePage({ initialProducts = [], initialCategories = [] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -184,6 +184,12 @@ export function ProductStorePage() {
   const [page, setPage] = useState(1);
 
   const categorySlug = searchParams.get("category") ?? "";
+  // Sunucuda çekilen veri yalnızca aynı kategori filtresiyle eşleşen
+  // sorguya başlangıç verisi olarak verilir; filtre değişince taze çekilir.
+  const [serverParams] = useState(categorySlug ? { category: categorySlug } : {});
+  const currentParams = categorySlug ? { category: categorySlug } : {};
+  const paramsMatchServer =
+    JSON.stringify(currentParams) === JSON.stringify(serverParams);
 
   const buildHref = (changes) => {
     const next = { category: categorySlug, ...changes };
@@ -199,16 +205,7 @@ export function ProductStorePage() {
   };
 
   const onAddToCart = (product) => {
-    if (status === "unauthenticated") {
-      toast.add({
-        title: "Giriş gerekli",
-        description: "Ürünleri sepete eklemek için lütfen giriş yapın.",
-        type: "info",
-      });
-      router.push("/login");
-      return;
-    }
-    if (user?.role !== ROLES.CUSTOMER) {
+    if (status === "authenticated" && user?.role !== ROLES.CUSTOMER) {
       toast.add({
         title: "Sepete eklenemez",
         description: "Sipariş oluşturmak için müşteri hesabı gereklidir.",
@@ -218,7 +215,19 @@ export function ProductStorePage() {
     }
     setAddingId(product.id);
     addCartItem.mutate(
-      { product_id: product.id, quantity: 1 },
+      {
+        product_id: product.id,
+        quantity: 1,
+        _snapshot: {
+          unitPrice: Number(product.effective_price ?? 0),
+          product: {
+            id: product.id,
+            title: product.title,
+            slug: product.slug,
+            thumbnail: product.thumbnail,
+          },
+        },
+      },
       {
         onSuccess: () => {
           toast.add({
@@ -239,10 +248,12 @@ export function ProductStorePage() {
     );
   };
 
-  const productsQuery = usePublicProductsQuery(
-    categorySlug ? { category: categorySlug } : {}
-  );
-  const categoriesQuery = usePublicProductCategoriesQuery();
+  const productsQuery = usePublicProductsQuery(currentParams, {
+    initialData: paramsMatchServer && initialProducts.length > 0 ? initialProducts : undefined,
+  });
+  const categoriesQuery = usePublicProductCategoriesQuery({}, {
+    initialData: initialCategories.length > 0 ? initialCategories : undefined,
+  });
   const products = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
   const categories = useMemo(() => categoriesQuery.data ?? [], [categoriesQuery.data]);
 

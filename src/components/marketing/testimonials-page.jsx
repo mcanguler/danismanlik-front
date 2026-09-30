@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import Link from "next/link";
+import {KvkkModalLink} from "@/components/kvkk-modal";
 import {
     ArrowRight,
     BadgeCheck,
@@ -413,12 +413,7 @@ function TestimonialForm() {
                                         type="checkbox"
                                     />
                                     <span className="font-body-sm text-body-sm leading-tight text-on-surface-variant">
-                    <Link
-                        className="font-medium text-primary underline hover:text-burgundy-light"
-                        href="/kvkk-aydinlatma-metni"
-                    >
-                      KVKK Aydınlatma Metni
-                    </Link>{" "}
+                    <KvkkModalLink className="font-medium text-primary underline hover:text-burgundy-light" />{" "}
                                         ve Gizlilik Sözleşmesi uyarınca, paylaştığım deneyim ve
                     rumuzun sitede yayımlanmasına izin veriyorum.
                   </span>

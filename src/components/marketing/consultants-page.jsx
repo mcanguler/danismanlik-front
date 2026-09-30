@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
+  ChevronLeft,
   ChevronRight,
   ClipboardList,
   Lock,
@@ -16,6 +17,11 @@ import {
   Sparkles,
   ZoomIn,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { marketingNavLinks } from "@/lib/marketing-nav";
@@ -393,13 +399,65 @@ function SectionOverline({ children }) {
   );
 }
 
-function MediaCard({ entry }) {
+function MediaLightbox({ entries, index, onClose, onNavigate }) {
+  const entry = entries[index] ?? null;
+
   return (
-    <a
-      className="group relative rounded-2xl overflow-hidden bg-canvas-cream border border-border-delicate shadow-sm hover:shadow-md transition-all"
-      href={entry.src}
-      rel="noopener noreferrer"
-      target="_blank"
+    <Dialog
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+      open={entry != null}
+    >
+      <DialogContent className="max-w-3xl border-border-delicate bg-canvas-cream p-3 sm:p-4">
+        <DialogTitle className="sr-only">
+          {entry?.title ?? "Görsel"}
+        </DialogTitle>
+        {entry ? (
+          <div className="flex flex-col gap-3">
+            <img
+              alt={entry.title ?? "Görsel"}
+              className="max-h-[70vh] w-full rounded-xl bg-canvas-cream object-contain"
+              src={entry.src}
+            />
+            {entries.length > 1 ? (
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  className="inline-flex size-9 items-center justify-center rounded-full bg-blush-surface text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-40"
+                  disabled={index <= 0}
+                  onClick={() => onNavigate(index - 1)}
+                  type="button"
+                >
+                  <ChevronLeft className="size-5" />
+                  <span className="sr-only">Önceki görsel</span>
+                </button>
+                <span className="font-label-sm text-label-sm text-on-surface-variant">
+                  {index + 1} / {entries.length}
+                </span>
+                <button
+                  className="inline-flex size-9 items-center justify-center rounded-full bg-blush-surface text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-40"
+                  disabled={index >= entries.length - 1}
+                  onClick={() => onNavigate(index + 1)}
+                  type="button"
+                >
+                  <ChevronRight className="size-5" />
+                  <span className="sr-only">Sonraki görsel</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function MediaCard({ entry, onOpen }) {
+  return (
+    <button
+      className="group relative rounded-2xl overflow-hidden bg-canvas-cream border border-border-delicate shadow-sm hover:shadow-md transition-all text-left"
+      onClick={() => onOpen(entry)}
+      type="button"
     >
       <div className="aspect-[4/3] bg-blush-surface relative overflow-hidden">
         <img
@@ -421,16 +479,28 @@ function MediaCard({ entry }) {
           </h4>
         </div>
       ) : null}
-    </a>
+    </button>
   );
 }
 
-export function ConsultantDetailPage({ id }) {
-  const query = usePublicConsultantQuery(id);
+export function ConsultantDetailPage({ id, initialConsultant }) {
+  const initialMatches =
+    initialConsultant != null &&
+    (String(initialConsultant.slug) === String(id) ||
+      String(initialConsultant.id) === String(id));
+  const query = usePublicConsultantQuery(id, {
+    initialData: initialMatches ? initialConsultant : undefined,
+  });
   const consultant = query.data;
+  const [lightbox, setLightbox] = useState(null);
 
   const certificates = consultant?.certificates ?? [];
   const gallery = consultant?.images ?? [];
+
+  const openLightbox = (entries, entry) => {
+    const index = entries.findIndex((item) => item.src === entry.src);
+    setLightbox({ entries, index: index < 0 ? 0 : index });
+  };
 
   return (
     <ConsultantsPageShell>
@@ -595,7 +665,11 @@ export function ConsultantDetailPage({ id }) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                       {certificates.map((entry, index) => (
-                        <MediaCard entry={entry} key={`${entry.src}-${index}`} />
+                        <MediaCard
+                          entry={entry}
+                          key={`${entry.src}-${index}`}
+                          onOpen={() => openLightbox(certificates, entry)}
+                        />
                       ))}
                     </div>
                   </article>
@@ -613,7 +687,11 @@ export function ConsultantDetailPage({ id }) {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {gallery.map((entry, index) => (
-                        <MediaCard entry={entry} key={`${entry.src}-${index}`} />
+                        <MediaCard
+                          entry={entry}
+                          key={`${entry.src}-${index}`}
+                          onOpen={() => openLightbox(gallery, entry)}
+                        />
                       ))}
                     </div>
                   </article>
@@ -623,6 +701,14 @@ export function ConsultantDetailPage({ id }) {
           )}
         </div>
       </div>
+      <MediaLightbox
+        entries={lightbox?.entries ?? []}
+        index={lightbox?.index ?? 0}
+        onClose={() => setLightbox(null)}
+        onNavigate={(index) =>
+          setLightbox((current) => ({ ...current, index }))
+        }
+      />
     </ConsultantsPageShell>
   );
 }

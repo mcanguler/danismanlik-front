@@ -1,33 +1,62 @@
+import { cache } from "react";
+import { notFound } from "next/navigation";
 import { CategoryServicesPage } from "@/components/marketing/services-page";
 import {
-  cleanMetaText,
   fetchPublicServiceCategories,
-  findPublicItem,
-} from "@/lib/marketing-seo";
+} from "@/lib/service-categories";
+import { fetchPublicServices } from "@/lib/services";
+import { buildMetadata } from "@/lib/seo";
 
-const BRAND_SUFFIX = "Sümeyra Aydın Akademi & Danışmanlık";
-const DEFAULT_TITLE = `1e1 Seanslar | ${BRAND_SUFFIX}`;
-const DEFAULT_DESCRIPTION =
-  "Birebir online danışmanlık seans kategorilerini keşfedin; size uygun kategoride hemen randevunuzu oluşturun.";
+function findItem(items, key) {
+  const value = String(key ?? "");
+  return (
+    items.find((item) => item.is_active && item.slug === value) ??
+    items.find(
+      (item) => item.is_active && String(item.id) === String(value)
+    ) ??
+    null
+  );
+}
+
+// generateMetadata ve sayfa aynı isteği paylaşır (istek başına tek fetch).
+const loadCategoryPage = cache(async (slug) => {
+  const [categories, services] = await Promise.all([
+    fetchPublicServiceCategories().catch(() => []),
+    fetchPublicServices().catch(() => []),
+  ]);
+  const category = findItem(categories, slug);
+  if (!category) return null;
+  return { category, categories, services };
+});
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const categories = await fetchPublicServiceCategories();
-  const category = findPublicItem(categories, slug);
-
-  const name = cleanMetaText(category?.name);
-  return {
-    title:
-      cleanMetaText(category?.seo_title) ||
-      (name ? `${name} | ${BRAND_SUFFIX}` : DEFAULT_TITLE),
+  const data = await loadCategoryPage(slug);
+  const category = data?.category;
+  if (!category) {
+    return buildMetadata({ title: "1e1 Seanslar", path: `/hizmetler/${slug}` });
+  }
+  return buildMetadata({
+    title: category.seo_title || category.name,
     description:
-      cleanMetaText(category?.seo_description) ||
-      cleanMetaText(category?.short_description) ||
-      DEFAULT_DESCRIPTION,
-  };
+      category.seo_description ||
+      category.short_description ||
+      undefined,
+    image: category.image || undefined,
+    path: `/hizmetler/${category.slug || category.id}`,
+  });
 }
 
 export default async function ServiceCategoryPage({ params }) {
   const { slug } = await params;
-  return <CategoryServicesPage slug={slug} />;
+  const data = await loadCategoryPage(slug);
+  if (!data) notFound();
+
+  return (
+    <CategoryServicesPage
+      initialCategories={data.categories}
+      initialServices={data.services}
+      slug={slug}
+    />
+  );
 }

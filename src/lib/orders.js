@@ -87,8 +87,12 @@ function useToken() {
   return useAuthStore((state) => state.token);
 }
 
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 export function normalizeOrder(item) {
-  if (!item || typeof item !== "object") return null;
+  if (!item || typeof item !== "object" || Array.isArray(item)) return null;
   return {
     ...item,
     orderNo: item.order_no ?? null,
@@ -96,12 +100,12 @@ export function normalizeOrder(item) {
     currency: item.currency ?? "TRY",
     status: item.status ?? ORDER_STATUSES.PENDING,
     createdAt: item.created_at ?? null,
-    items: (item.items ?? []).map((orderItem) => ({
+    items: asArray(item.items).map((orderItem) => ({
       ...orderItem,
       itemType: orderItem.item_type ?? null,
       metadata: orderItem.metadata ?? null,
     })),
-    payments: (item.payments ?? []).map((payment) => ({
+    payments: asArray(item.payments).map((payment) => ({
       ...payment,
       status: payment.status ?? PAYMENT_STATUSES.PENDING,
     })),

@@ -25,7 +25,12 @@ import {
 import { ServicesPageShell } from "@/components/marketing/services-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ApiError } from "@/lib/api";
+import { ContractAcceptance } from "@/components/contract/contract-acceptance";
+import {
+  getContractRequiredMessage,
+  isContractRequiredError,
+} from "@/lib/contracts";
+import { isApiError } from "@/lib/query-errors";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
 import { formatDateTimeTr, formatPrice } from "@/lib/format";
@@ -41,7 +46,9 @@ import {
 import { toast } from "@/components/ui/toast";
 
 function errorMessage(error) {
-  return error instanceof ApiError ? error.message : "Beklenmeyen bir hata oluştu";
+  return isApiError(error)
+    ? error.message || "Beklenmeyen bir hata oluştu"
+    : "Beklenmeyen bir hata oluştu";
 }
 
 const CART_ITEM_TYPE_META = {
@@ -207,7 +214,10 @@ function CartItem({ item, onQuantityChange, onRemove, busy }) {
 export function CartPage() {
   const router = useRouter();
   const { status, user } = useAuth();
-  const cartQuery = useCartQuery({ enabled: status === "authenticated" });
+  const isGuest = status !== "authenticated";
+  const cartQuery = useCartQuery({ enabled: status !== "loading" });
+  const [contractAccepted, setContractAccepted] = useState(false);
+  const [contractRequired, setContractRequired] = useState(false);
   const updateItem = useUpdateCartItem();
   const deleteItem = useDeleteCartItem();
   const checkout = useCheckoutCart();
@@ -281,19 +291,72 @@ export function CartPage() {
     });
   };
 
-  const handleCheckout = () => {
-    if (user?.role !== ROLES.CUSTOMER) {
-      toast.add({ title: "Giriş gerekli", description: "Ödeme için müşteri hesabıyla giriş yapmalısınız.", type: "info" });
-      router.push("/login");
+  const handleCheckout = async () => {
+    if (status !== "authenticated") {
+      toast.add({
+        title: "Giriş gerekli",
+        description:
+          "Ödeme için giriş yapmanız gerekiyor; sepetiniz hesabınıza aktarılacak.",
+        type: "info",
+      });
+      router.push("/login?redirect=/sepet");
       return;
     }
-    checkout.mutate(undefined, {
-      onSuccess: (order) => {
-        toast.add({ title: "Sipariş oluşturuldu", type: "success" });
-        router.push(`/odeme/${order.id}`);
-      },
-      onError: (error) => toast.add({ title: "Sipariş oluşturulamadı", description: errorMessage(error), type: "error" }),
-    });
+    if (items.length === 0) {
+      toast.add({
+        title: "Sepetiniz boş",
+        description: "Ödeme yapmak için önce sepetinize ürün ekleyin.",
+        type: "info",
+      });
+      cartQuery.refetch();
+      return;
+    }
+    if (user?.role !== ROLES.CUSTOMER) {
+      toast.add({
+        title: "Giriş gerekli",
+        description: "Ödeme için müşteri hesabıyla giriş yapmalısınız.",
+        type: "info",
+      });
+      return;
+    }
+
+    // Sipariş oluşturma dışındaki adımlar (navigasyon vb.) hata verse bile
+    // "sipariş oluşturulamadı" mesajı gösterilmemesi için kapsam daraltıldı.
+    let order;
+    try {
+      order = await checkout.mutateAsync({
+        contract_accepted: contractAccepted ? true : undefined,
+      });
+    } catch (error) {
+      if (isContractRequiredError(error)) {
+        setContractRequired(true);
+        setContractAccepted(false);
+        toast.add({
+          title: "Satış sözleşmesi onayı gerekli",
+          description: getContractRequiredMessage(error),
+          type: "info",
+        });
+        return;
+      }
+      toast.add({
+        title: "Sipariş oluşturulamadı",
+        description: errorMessage(error),
+        type: "error",
+      });
+      return;
+    }
+
+    toast.add({ title: "Sipariş oluşturuldu", type: "success" });
+    try {
+      router.push(`/odeme/${order.id}`);
+    } catch (error) {
+      console.error("Ödeme sayfasına yönlendirilemedi", error);
+      toast.add({
+        title: "Sipariş oluşturuldu",
+        description: "Siparişiniz oluşturuldu, ödeme sayfasına buradan ulaşabilirsiniz.",
+        type: "info",
+      });
+    }
   };
 
   if (status === "loading" || cartQuery.isPending) {
@@ -301,19 +364,6 @@ export function CartPage() {
       <ServicesPageShell>
         <div className="flex min-h-[50vh] items-center justify-center">
           <LoaderCircle className="size-7 animate-spin text-muted-foreground" />
-        </div>
-      </ServicesPageShell>
-    );
-  }
-
-  if (status !== "authenticated") {
-    return (
-      <ServicesPageShell>
-        <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-24 text-center">
-          <ShoppingBag className="size-12 text-accent-gold" />
-          <h1 className="font-headline-md text-headline-md font-semibold text-primary">Sepetinizi görüntüleyin</h1>
-          <p className="text-sm text-muted-foreground">Sepetinize erişmek için giriş yapmanız gerekiyor.</p>
-          <Button onClick={() => router.push("/login")}>Giriş Yap</Button>
         </div>
       </ServicesPageShell>
     );
@@ -368,7 +418,12 @@ export function CartPage() {
                 <div className="rounded-2xl bg-canvas-pure p-5 shadow-md sm:p-7">
                   <div className="mb-5 flex items-center justify-between rounded-lg bg-surface-container-low px-3 py-3"><div className="flex items-center gap-2"><ShoppingBag className="size-5 text-primary-container" /><h2 className="font-title-lg text-title-lg font-bold text-primary">Sipariş Özeti</h2></div><span className="rounded-full bg-blush-surface px-2.5 py-0.5 text-xs font-semibold text-primary-container">{itemCount} Öğe</span></div>
 
-                  {appliedCoupon ? (
+                  {isGuest ? (
+                    <p className="mb-5 flex items-center gap-1.5 rounded-lg bg-surface-container-low px-3 py-2.5 text-xs text-muted-foreground">
+                      <LockKeyhole className="size-3.5 shrink-0" />
+                      Kupon kullanmak için giriş yapmalısınız.
+                    </p>
+                  ) : appliedCoupon ? (
                     <div className="mb-5 flex items-center justify-between gap-2 rounded-lg bg-blush-surface px-3 py-2.5">
                       <div className="flex min-w-0 items-center gap-2">
                         <Tag className="size-4 shrink-0 text-primary-container" />
@@ -409,7 +464,20 @@ export function CartPage() {
                     <div className="flex justify-between text-muted-foreground"><span>Kargo</span><span className="font-semibold text-secondary">Ücretsiz</span></div>
                     <div className="flex items-end justify-between border-t border-border-delicate pt-4"><div><span className="block font-title-md font-bold text-primary">Toplam Tutar</span><span className="text-xs text-muted-foreground">Güvenli ödeme</span></div><span className="font-headline-md font-bold text-primary-container">{formatPrice(total)}</span></div>
                   </div>
-                  <Button className="mt-6 h-12 w-full text-base" disabled={checkout.isPending} onClick={handleCheckout}><LockKeyhole className="size-4" />{checkout.isPending ? "Hazırlanıyor..." : "Güvenle Öde ve Devam Et"}</Button>
+                  {contractRequired && !isGuest && (
+                    <div className="mt-5">
+                      <ContractAcceptance
+                        checked={contractAccepted}
+                        onCheckedChange={setContractAccepted}
+                      />
+                    </div>
+                  )}
+                  <Button className="mt-6 h-12 w-full text-base" disabled={checkout.isPending || (contractRequired && !isGuest && !contractAccepted)} onClick={handleCheckout}><LockKeyhole className="size-4" />{checkout.isPending ? "Hazırlanıyor..." : "Güvenle Öde ve Devam Et"}</Button>
+                  {isGuest && (
+                    <p className="mt-3 text-center text-xs text-muted-foreground">
+                      Ödeme için giriş yapmanız gerekiyor; sepetiniz giriş sonrası hesabınıza aktarılır.
+                    </p>
+                  )}
                   <div className="mt-5 flex flex-wrap justify-center gap-4 text-xs text-muted-foreground"><span className="flex items-center gap-1"><ShieldCheck className="size-4 text-accent-gold" /> Güvenli ödeme</span><span className="flex items-center gap-1"><CreditCard className="size-4 text-primary-container" /> 3D Secure</span><span className="flex items-center gap-1"><Truck className="size-4 text-secondary" /> Hızlı teslimat</span></div>
                 </div>
               </aside>

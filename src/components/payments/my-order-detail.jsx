@@ -1,15 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   CalendarDays,
   CircleAlert,
   CreditCard,
+  FileText,
   LoaderCircle,
   Package,
+  Printer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   ORDER_ITEM_TYPE_LABELS,
   ORDER_STATUS_BADGE_CLASSES,
@@ -18,6 +22,8 @@ import {
   PAYMENT_STATUS_LABELS,
   useOrderQuery,
 } from "@/lib/orders";
+import { useOrderContractQuery } from "@/lib/contracts";
+import { printContract } from "@/components/contract/contract-acceptance";
 import { formatDateTimeTr, formatPrice } from "@/lib/format";
 import { getQueryErrorMessage } from "@/lib/query-errors";
 import { cn } from "@/lib/utils";
@@ -60,6 +66,11 @@ function OrderStatusBadge({ status }) {
 export function MyOrderDetail({ orderId }) {
   const query = useOrderQuery(orderId);
   const order = query.data;
+  const contractQuery = useOrderContractQuery(orderId, {
+    enabled: query.isSuccess && Boolean(orderId),
+  });
+  const contract = contractQuery.data ?? null;
+  const [contractOpen, setContractOpen] = useState(false);
 
   if (query.isPending) {
     return (
@@ -180,6 +191,41 @@ export function MyOrderDetail({ orderId }) {
           </CardContent>
         </Card>
 
+        {contract && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Satış Sözleşmesi</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                {contract.title}
+                {contract.version ? ` · v${contract.version}` : ""}
+                {contract.accepted_at
+                  ? ` · Kabul: ${formatDateTimeTr(contract.accepted_at)}`
+                  : ""}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => setContractOpen(true)}
+                  type="button"
+                  variant="outline"
+                >
+                  <FileText className="size-4" />
+                  Sözleşmeyi Görüntüle
+                </Button>
+                <Button
+                  onClick={() => printContract(contract)}
+                  type="button"
+                  variant="ghost"
+                >
+                  <Printer className="size-4" />
+                  Yazdır
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle>Ödeme Durumu</CardTitle>
@@ -220,6 +266,20 @@ export function MyOrderDetail({ orderId }) {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog onOpenChange={setContractOpen} open={contractOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogTitle className="pr-6 font-title-lg text-title-lg font-semibold text-primary">
+            {contract?.title || "Satış Sözleşmesi"}
+            {contract?.version ? ` (v${contract.version})` : ""}
+          </DialogTitle>
+          <div className="max-h-[60vh] overflow-y-auto pr-2">
+            <div className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground">
+              {contract?.content}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

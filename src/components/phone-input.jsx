@@ -47,6 +47,11 @@ export function PhoneInput({
   const dropdownRef = useRef(null);
   const searchInputRef = useRef(null);
 
+  const closeMenu = () => {
+    setIsOpen(false);
+    setSearchQuery("");
+  };
+
   // react-international-phone hook'u
   const {
     inputValue,
@@ -85,7 +90,7 @@ export function PhoneInput({
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+        closeMenu();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -96,14 +101,12 @@ export function PhoneInput({
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => searchInputRef.current?.focus(), 50);
-    } else {
-      setSearchQuery("");
     }
   }, [isOpen]);
 
   const handleSelectCountry = (iso2) => {
     setCountry(iso2);
-    setIsOpen(false);
+    closeMenu();
   };
 
   return (
@@ -112,7 +115,7 @@ export function PhoneInput({
         <div className="relative shrink-0" ref={dropdownRef}>
           <button
               type="button"
-              onClick={() => setIsOpen((prev) => !prev)}
+              onClick={() => (isOpen ? closeMenu() : setIsOpen(true))}
               className={cn(
                   "flex h-8 items-center gap-1.5 rounded-lg border border-input bg-transparent px-2.5 text-sm h-full outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30",
                   selectClassName

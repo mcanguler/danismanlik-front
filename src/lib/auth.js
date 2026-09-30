@@ -25,6 +25,13 @@ export function roleHomePath(role) {
   return "/";
 }
 
+export function readRedirectParam() {
+  if (typeof window === "undefined") return null;
+  const value = new URLSearchParams(window.location.search).get("redirect");
+  if (value && value.startsWith("/") && !value.startsWith("//")) return value;
+  return null;
+}
+
 export function readToken() {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(TOKEN_KEY);

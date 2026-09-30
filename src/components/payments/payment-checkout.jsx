@@ -91,7 +91,7 @@ function OrderSummaryCard({ order }) {
         <div className="flex justify-between border-t pt-2 font-medium text-foreground">
           <span>Toplam</span>
           <span className="font-semibold">
-            {total ? `${total} ${order.currency}` : "—"}
+            {total ? `${total}` : "—"}
           </span>
         </div>
       </div>
@@ -265,27 +265,28 @@ export function PaymentCheckout({ orderId }) {
       (item) => item.status === PAYMENT_STATUSES.FAILED
     );
 
-    const handleRetry = () => {
-      createOrder.mutate(
-        {
+    const handleRetry = async () => {
+      let newOrder;
+      try {
+        newOrder = await createOrder.mutateAsync({
           items: (order.items ?? []).map((item) => ({
             item_type: item.itemType,
             item_id: item.item_id,
           })),
-        },
-        {
-          onSuccess: (newOrder) => {
-            router.push(`/odeme/${newOrder.id}`);
-          },
-          onError: (error) => {
-            toast.add({
-              title: "Yeni sipariş oluşturulamadı",
-              description: getQueryErrorMessage(error),
-              type: "error",
-            });
-          },
-        }
-      );
+        });
+      } catch (error) {
+        toast.add({
+          title: "Yeni sipariş oluşturulamadı",
+          description: getQueryErrorMessage(error),
+          type: "error",
+        });
+        return;
+      }
+      try {
+        router.push(`/odeme/${newOrder.id}`);
+      } catch (error) {
+        console.error("Ödeme sayfasına yönlendirilemedi", error);
+      }
     };
 
     return (

@@ -27,6 +27,7 @@ import {
   publicPagesQueryKey,
   PUBLIC_PAGES_STALE_TIME,
 } from "@/lib/pages";
+import { getSeoSettings, siteUrl } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -49,11 +50,15 @@ const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Sümeyra Aydın | Akademi & Danışmanlık",
-  description:
-    "İlişki ve aile danışmanlığı, dönüşüm programları ve dişil enerji üzerine rehberlik",
-};
+export async function generateMetadata() {
+  const seo = await getSeoSettings();
+  const base = siteUrl();
+  return {
+    metadataBase: base ? new URL(base) : undefined,
+    title: seo.homeTitle || seo.siteTitle,
+    description: seo.homeDescription || seo.siteDescription || undefined,
+  };
+}
 
 export const dynamic = "force-dynamic";
 

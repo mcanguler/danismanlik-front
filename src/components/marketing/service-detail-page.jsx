@@ -109,9 +109,18 @@ function ServiceMedia({ src, alt }) {
   );
 }
 
-export function ServiceDetailPage({ categorySlug, serviceSlug }) {
-  const categoriesQuery = usePublicServiceCategoriesQuery();
-  const servicesQuery = usePublicServicesQuery();
+export function ServiceDetailPage({
+  categorySlug,
+  serviceSlug,
+  initialCategories = [],
+  initialServices = [],
+}) {
+  const categoriesQuery = usePublicServiceCategoriesQuery({}, {
+    initialData: initialCategories.length > 0 ? initialCategories : undefined,
+  });
+  const servicesQuery = usePublicServicesQuery({}, {
+    initialData: initialServices.length > 0 ? initialServices : undefined,
+  });
 
   const category = useMemo(
     () =>

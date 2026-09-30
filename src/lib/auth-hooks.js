@@ -3,6 +3,7 @@ import { useShallow } from "zustand/react/shallow";
 import { api, ApiError } from "./api";
 import { extractToken, normalizeUser, useAuthStore } from "./auth";
 import { appointmentsQueryKey } from "./appointments";
+import { cartQueryKey } from "./products";
 
 export const userQueryKey = ["auth", "user"];
 
@@ -93,6 +94,7 @@ export function useLogout() {
       endSession();
       queryClient.removeQueries({ queryKey: userQueryKey });
       queryClient.removeQueries({ queryKey: appointmentsQueryKey });
+      queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
   });
 }

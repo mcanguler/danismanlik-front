@@ -18,7 +18,6 @@ import { z } from "zod";
 import { PhoneInput, normalizePhoneToE164 } from "@/components/phone-input";
 import { ApiError } from "@/lib/api";
 import { toast } from "@/components/ui/toast";
-import { ConsultantCertificates } from "@/components/consultant/consultant-certificates";
 import { useMyConsultant } from "@/lib/consultant-scope";
 import { useAuth, useUpdateProfile } from "@/lib/auth-hooks";
 import { useConsultantQuery } from "@/lib/consultants";
@@ -378,12 +377,6 @@ export function ConsultantProfilePage() {
           </div>
         </div>
       </div>
-
-      {hasConsultant && (
-        <div className="mt-8 w-full">
-          <ConsultantCertificates />
-        </div>
-      )}
     </div>
   );
 }

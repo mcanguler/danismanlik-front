@@ -17,7 +17,21 @@ export function EbookCard({ ebook }) {
       router.push(href);
       return;
     }
-    addToCart({ product_id: ebook.id, quantity: 1 }, { title: ebook.title });
+    addToCart(
+      { product_id: ebook.id, quantity: 1 },
+      {
+        title: ebook.title,
+        snapshot: {
+          unitPrice: Number(ebook.effectivePrice ?? 0),
+          product: {
+            id: ebook.id,
+            title: ebook.title,
+            slug: ebook.slug,
+            thumbnail: ebook.image,
+          },
+        },
+      }
+    );
   };
 
   return (

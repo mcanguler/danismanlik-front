@@ -1,10 +1,14 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-hooks";
-import { roleHomePath } from "@/lib/auth";
 import { HomePage } from "@/components/marketing/home-page";
+import { buildMetadata, getSeoSettings } from "@/lib/seo";
+
+export async function generateMetadata() {
+  const seo = await getSeoSettings();
+  return buildMetadata({
+    title: seo.homeTitle || undefined,
+    description: seo.homeDescription || undefined,
+    path: "/",
+  });
+}
 
 export default function Page() {
   return <HomePage />;

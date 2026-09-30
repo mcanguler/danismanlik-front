@@ -39,11 +39,18 @@ export function useServicesQuery(filters = {}, options = {}) {
   });
 }
 
+/** Sunucu tarafında (RSC / generateMetadata) kullanılabilir veri çekici. */
+export async function fetchPublicServices(filters = {}) {
+  return normalizeList(await api.services(null, filters));
+}
+
 export function usePublicServicesQuery(filters = {}, options = {}) {
   return useQuery({
     queryKey: [...servicesQueryKey, "public", filters],
-    queryFn: async () => normalizeList(await api.services(null, filters)),
+    queryFn: () => fetchPublicServices(filters),
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 

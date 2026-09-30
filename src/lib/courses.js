@@ -213,8 +213,7 @@ export function lessonVideoKey(lessonId) {
   return ["lesson-video", String(lessonId)];
 }
 
-export function useMyCoursesQuery(options = {}) {
-  const token = useToken();
+export function useMyCoursesQuery(options = {}) {  const token = useToken();
 
   return useQuery({
     queryKey: [...myCoursesQueryKey],
@@ -224,18 +223,23 @@ export function useMyCoursesQuery(options = {}) {
   });
 }
 
+/** Sunucu tarafında (RSC / generateMetadata) kullanılabilir veri çekici. */
+export async function fetchPublicCourses() {
+  const payload = await api.publicCourses();
+  const data = payload?.data;
+  if (!Array.isArray(data)) {
+    throw new ApiError("Beklenmeyen yanıt formatı");
+  }
+  return data.map(normalizeCourse).filter(Boolean);
+}
+
 export function usePublicCoursesQuery(options = {}) {
   return useQuery({
     queryKey: [...coursesQueryKey, "public"],
-    queryFn: async () => {
-      const payload = await api.publicCourses();
-      const data = payload?.data;
-      if (!Array.isArray(data)) {
-        throw new ApiError("Beklenmeyen yanıt formatı");
-      }
-      return data.map(normalizeCourse).filter(Boolean);
-    },
+    queryFn: fetchPublicCourses,
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
@@ -246,6 +250,8 @@ export function usePublicCourseQuery(idOrSlug, options = {}) {
       normalizeCourseDetail(await api.publicCourse(idOrSlug)),
     enabled: options.enabled !== false && Boolean(idOrSlug),
     retry: false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 

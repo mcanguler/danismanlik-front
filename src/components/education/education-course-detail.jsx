@@ -16,6 +16,7 @@ import {
   Lock,
   PlayCircle,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
 } from "lucide-react";
 import { ServicesPageShell } from "@/components/marketing/services-page";
@@ -35,6 +36,7 @@ import { ApiError } from "@/lib/api";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
 import { useCreateOrder } from "@/lib/orders";
+import { useAddCartItem } from "@/lib/products";
 import {
   formatLessonDuration as formatDuration,
   useCourseSectionsQuery,
@@ -199,11 +201,56 @@ function PurchasePanel({ course, hasAccess }) {
   const router = useRouter();
   const { status, user } = useAuth();
   const createOrder = useCreateOrder();
+  const addCartItem = useAddCartItem();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
 
   const price = formatPrice(course.effective_price);
   const originalPrice = course.has_discount ? formatPrice(course.price) : null;
   const isCustomer = user?.role === ROLES.CUSTOMER;
+
+  const handleAddToCart = async () => {
+    if (status === "loading") return;
+    if (status === "authenticated" && !isCustomer) {
+      toast.add({
+        title: "Sepete eklenemez",
+        description:
+          "Sepete eklemek için müşteri hesabıyla giriş yapmalısınız.",
+        type: "error",
+      });
+      return;
+    }
+    setAddingToCart(true);
+    try {
+      await addCartItem.mutateAsync({
+        item_type: "COURSE",
+        item_id: course.id,
+        quantity: 1,
+        _snapshot: {
+          unitPrice: Number(course.effective_price ?? 0),
+          item: {
+            id: course.id,
+            title: course.title,
+            slug: course.slug,
+          },
+        },
+      });
+      toast.add({
+        title: "Sepete eklendi",
+        description: `${course.title} sepetinize eklendi.`,
+        type: "success",
+      });
+    } catch (error) {
+      toast.add({
+        title: "Sepete eklenemedi",
+        description:
+          error?.message ?? "Bir sorun oluştu, lütfen tekrar deneyin.",
+        type: "error",
+      });
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   const handleBuyClick = () => {
     if (status === "unauthenticated") {
@@ -226,30 +273,31 @@ function PurchasePanel({ course, hasAccess }) {
     setDialogOpen(true);
   };
 
-  const handleConfirmPurchase = () => {
-    createOrder.mutate(
-      {
+  const handleConfirmPurchase = async () => {
+    let order;
+    try {
+      order = await createOrder.mutateAsync({
         items: [{ item_type: "COURSE", item_id: course.id }],
-      },
-      {
-        onSuccess: (order) => {
-          setDialogOpen(false);
-          toast.add({
-            title: "Kayıt oluşturuldu",
-            description: "Güvenli ödeme ekranına yönlendiriliyorsunuz.",
-            type: "info",
-          });
-          router.push(`/odeme/${order.id}`);
-        },
-        onError: (error) => {
-          toast.add({
-            title: "Kayıt oluşturulamadı",
-            description: error?.message ?? "Bir sorun oluştu, lütfen tekrar deneyin.",
-            type: "error",
-          });
-        },
-      }
-    );
+      });
+    } catch (error) {
+      toast.add({
+        title: "Kayıt oluşturulamadı",
+        description: error?.message ?? "Bir sorun oluştu, lütfen tekrar deneyin.",
+        type: "error",
+      });
+      return;
+    }
+    setDialogOpen(false);
+    toast.add({
+      title: "Kayıt oluşturuldu",
+      description: "Güvenli ödeme ekranına yönlendiriliyorsunuz.",
+      type: "info",
+    });
+    try {
+      router.push(`/odeme/${order.id}`);
+    } catch (error) {
+      console.error("Ödeme sayfasına yönlendirilemedi", error);
+    }
   };
 
   return (
@@ -294,19 +342,35 @@ function PurchasePanel({ course, hasAccess }) {
           Bu eğitime erişiminiz var
         </Button>
       ) : (
-        <Button
-          className="mt-5 h-12 w-full rounded-full text-base"
-          disabled={status === "loading" || createOrder.isPending}
-          onClick={handleBuyClick}
-          type="button"
-        >
-          {createOrder.isPending ? (
-            <LoaderCircle className="size-4 animate-spin" />
-          ) : (
-            <Sparkles className="size-4" />
-          )}
-          {createOrder.isPending ? "Yönlendiriliyorsunuz..." : "Eğitime Hemen Kaydol"}
-        </Button>
+        <>
+          <Button
+            className="mt-5 h-12 w-full rounded-full text-base"
+            disabled={status === "loading" || createOrder.isPending}
+            onClick={handleBuyClick}
+            type="button"
+          >
+            {createOrder.isPending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <Sparkles className="size-4" />
+            )}
+            {createOrder.isPending ? "Yönlendiriliyorsunuz..." : "Eğitime Hemen Kaydol"}
+          </Button>
+          <Button
+            className="mt-3 h-12 w-full rounded-full text-base"
+            variant="outline"
+            disabled={status === "loading" || addingToCart}
+            onClick={handleAddToCart}
+            type="button"
+          >
+            {addingToCart ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <ShoppingBag className="size-4" />
+            )}
+            {addingToCart ? "Sepete ekleniyor..." : "Sepete Ekle"}
+          </Button>
+        </>
       )}
       <p className="mt-3 text-center font-label-sm text-label-sm text-on-surface-variant">
         Kayıt sonrası içerikler anında hesabınıza tanımlanır.
@@ -396,8 +460,10 @@ function FaqItem({ question, answer }) {
   );
 }
 
-export function EducationCourseDetail({ slug }) {
-  const listQuery = usePublicCoursesQuery();
+export function EducationCourseDetail({ slug, initialCourses = [] }) {
+  const listQuery = usePublicCoursesQuery({
+    initialData: initialCourses.length > 0 ? initialCourses : undefined,
+  });
   const courses = listQuery.data ?? [];
   const course = resolveCourseFromList(courses, slug);
 

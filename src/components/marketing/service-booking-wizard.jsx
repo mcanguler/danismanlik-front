@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { KvkkModalLink } from "@/components/kvkk-modal";
 import {
   ArrowLeft,
   ArrowRight,
@@ -510,26 +511,27 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
     );
   };
 
-  const startAppointmentPayment = (appointmentId) => {
-    createOrder.mutate(
-      {
+  const startAppointmentPayment = async (appointmentId) => {
+    let order;
+    try {
+      order = await createOrder.mutateAsync({
         items: [{ item_type: "APPOINTMENT", item_id: appointmentId }],
-      },
-      {
-        onSuccess: (order) => {
-          router.push(`/odeme/${order.id}`);
-        },
-        onError: (error) => {
-          toast.add({
-            title: "Ödeme başlatılamadı",
-            description:
-              error?.message ??
-              "Sipariş oluşturulurken bir sorun oluştu, tekrar deneyin.",
-            type: "error",
-          });
-        },
-      }
-    );
+      });
+    } catch (error) {
+      toast.add({
+        title: "Ödeme başlatılamadı",
+        description:
+          error?.message ??
+          "Sipariş oluşturulurken bir sorun oluştu, tekrar deneyin.",
+        type: "error",
+      });
+      return;
+    }
+    try {
+      router.push(`/odeme/${order.id}`);
+    } catch (error) {
+      console.error("Ödeme sayfasına yönlendirilemedi", error);
+    }
   };
 
   const handleBooking = () => {
@@ -1202,9 +1204,7 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
                       type="checkbox"
                     />
                     <span className="font-body-sm text-body-sm text-on-surface-variant">
-                      <a className="underline hover:text-primary-container" href="#">
-                        KVKK Aydınlatma Metni
-                      </a>
+                      <KvkkModalLink className="underline hover:text-primary-container" />
                       &apos;ni ve{" "}
                       <a className="underline hover:text-primary-container" href="#">
                         Kişisel Verilerin Korunması ve Gizlilik Sözleşmesi

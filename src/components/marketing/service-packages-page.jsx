@@ -343,31 +343,32 @@ function PurchasePanel({servicePackage}) {
         setDialogOpen(true);
     };
 
-    const handleConfirmPurchase = () => {
-        createOrder.mutate(
-            {
+    const handleConfirmPurchase = async () => {
+        let order;
+        try {
+            order = await createOrder.mutateAsync({
                 items: [{item_type: "SERVICE_PACKAGE", item_id: servicePackage.id}],
-            },
-            {
-                onSuccess: (order) => {
-                    setDialogOpen(false);
-                    toast.add({
-                        title: "Sipariş oluşturuldu",
-                        description: "Güvenli ödeme ekranına yönlendiriliyorsunuz.",
-                        type: "info",
-                    });
-                    router.push(`/odeme/${order.id}`);
-                },
-                onError: (error) => {
-                    toast.add({
-                        title: "Sipariş oluşturulamadı",
-                        description:
-                            error?.message ?? "Bir sorun oluştu, lütfen tekrar deneyin.",
-                        type: "error",
-                    });
-                },
-            }
-        );
+            });
+        } catch (error) {
+            toast.add({
+                title: "Sipariş oluşturulamadı",
+                description:
+                    error?.message ?? "Bir sorun oluştu, lütfen tekrar deneyin.",
+                type: "error",
+            });
+            return;
+        }
+        setDialogOpen(false);
+        toast.add({
+            title: "Sipariş oluşturuldu",
+            description: "Güvenli ödeme ekranına yönlendiriliyorsunuz.",
+            type: "info",
+        });
+        try {
+            router.push(`/odeme/${order.id}`);
+        } catch (error) {
+            console.error("Ödeme sayfasına yönlendirilemedi", error);
+        }
     };
 
     return (

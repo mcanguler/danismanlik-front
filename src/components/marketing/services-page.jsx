@@ -615,8 +615,10 @@ export function ServicesPageShell({ children }) {
 const DEFAULT_HERO_DESCRIPTION =
   "İlişkilerinizdeki tekrar eden tıkanıklıkları, bastırılmış dişil enerji blokajlarını ve derin bağlanma yaralarını Sümeyra Aydın rehberliğinde; şefkatli, yargısız ve güvenli bir alanda kalıcı çözüme dönüştürün.";
 
-export function ServiceCategoriesPage() {
-  const query = usePublicServiceCategoriesQuery();
+export function ServiceCategoriesPage({ initialCategories = [] }) {
+  const query = usePublicServiceCategoriesQuery({}, {
+    initialData: initialCategories.length > 0 ? initialCategories : undefined,
+  });
   const categories = useMemo(
     () => sortItems((query.data ?? []).filter((item) => item.is_active)),
     [query.data]
@@ -648,9 +650,17 @@ export function ServiceCategoriesPage() {
   );
 }
 
-export function CategoryServicesPage({ slug }) {
-  const categoriesQuery = usePublicServiceCategoriesQuery();
-  const servicesQuery = usePublicServicesQuery();
+export function CategoryServicesPage({
+  slug,
+  initialCategories = [],
+  initialServices = [],
+}) {
+  const categoriesQuery = usePublicServiceCategoriesQuery({}, {
+    initialData: initialCategories.length > 0 ? initialCategories : undefined,
+  });
+  const servicesQuery = usePublicServicesQuery({}, {
+    initialData: initialServices.length > 0 ? initialServices : undefined,
+  });
 
   const categories = categoriesQuery.data ?? [];
   const category =

@@ -1,14 +1,52 @@
+import { cache } from "react";
 import { Suspense } from "react";
 import { LoaderCircle } from "lucide-react";
 import { ProductStorePage } from "@/components/products/product-store-page";
+import {
+  fetchPublicProductCategories,
+  fetchPublicProducts,
+} from "@/lib/products";
+import { buildMetadata, getSeoSettings } from "@/lib/seo";
 
-export const metadata = {
-  title: "Ürünler | Sümeyra Aydın Akademi & Danışmanlık",
-  description:
-    "Boutique ürün koleksiyonunu keşfedin; güvenli ödeme altyapısıyla sipariş verin.",
-};
+const loadStoreData = cache(async (category) => {
+  const [products, categories, seo] = await Promise.all([
+    fetchPublicProducts(category ? { category } : {}).catch(() => []),
+    fetchPublicProductCategories().catch(() => []),
+    getSeoSettings(),
+  ]);
+  return { products, categories, seo };
+});
 
-export default function ProductStoreRoute() {
+export async function generateMetadata({ searchParams }) {
+  const { category } = (await searchParams) ?? {};
+  const { categories, seo } = await loadStoreData(category);
+  const activeCategory = category
+    ? (categories.find((item) => item.slug === category) ??
+      categories.find((item) => String(item.id) === String(category)) ??
+      null)
+    : null;
+
+  return buildMetadata({
+    title:
+      activeCategory?.seo_title ||
+      activeCategory?.name ||
+      seo.productsTitle ||
+      "Ürünler",
+    description:
+      activeCategory?.seo_description ||
+      seo.productsDescription ||
+      "Boutique ürün koleksiyonunu keşfedin; güvenli ödeme altyapısıyla sipariş verin.",
+    keywords: seo.productsKeywords,
+    path: category
+      ? `/urunler?category=${encodeURIComponent(category)}`
+      : "/urunler",
+  });
+}
+
+export default async function ProductStoreRoute({ searchParams }) {
+  const { category } = (await searchParams) ?? {};
+  const { products, categories } = await loadStoreData(category);
+
   return (
     <Suspense
       fallback={
@@ -17,7 +55,10 @@ export default function ProductStoreRoute() {
         </div>
       }
     >
-      <ProductStorePage />
+      <ProductStorePage
+        initialCategories={categories}
+        initialProducts={products}
+      />
     </Suspense>
   );
 }

@@ -5,8 +5,17 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
-import { useAuthStore } from "./auth";
-import { normalizeOrderDetail, ordersQueryKey } from "./orders";
+import { useAuthStore, readToken } from "./auth";
+import {
+  addGuestCartItem,
+  hasGuestCartItems,
+  isGuestCartId,
+  mergeGuestCartToServer,
+  readGuestCart,
+  removeGuestCartItem,
+  updateGuestCartItem,
+} from "./guest-cart";
+import {normalizeOrder, normalizeOrderDetail, ordersQueryKey} from "./orders";
 
 export const productsQueryKey = ["products"];
 export const productCategoriesQueryKey = ["product-categories"];
@@ -555,9 +564,10 @@ export function useProductCategoryQuery(id, options = {}) {
 export function usePublicProductCategoriesQuery(filters = {}, options = {}) {
   return useQuery({
     queryKey: [...productCategoriesQueryKey, "public", filters],
-    queryFn: async () =>
-      normalizeCategoryList(await api.productCategories(null, filters)),
+    queryFn: () => fetchPublicProductCategories(filters),
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
@@ -599,28 +609,42 @@ export function useDeleteProductCategory() {
   });
 }
 
+/** Sunucu tarafında (RSC / generateMetadata) kullanılabilir veri çekiciler. */
+export async function fetchPublicProducts(params = {}) {
+  const payload = await api.publicProducts(params);
+  const data = payload?.data;
+  if (!Array.isArray(data)) {
+    throw new ApiError("Beklenmeyen yanıt formatı");
+  }
+  return data.map(normalizeProduct).filter(Boolean);
+}
+
+export async function fetchPublicProduct(id) {
+  return normalizeProductDetail(await api.publicProduct(id));
+}
+
+export async function fetchPublicProductCategories(filters = {}) {
+  return normalizeCategoryList(await api.productCategories(null, filters));
+}
+
 export function usePublicProductsQuery(params = {}, options = {}) {
   return useQuery({
     queryKey: [...productsQueryKey, "public", params],
-    queryFn: async () => {
-      const payload = await api.publicProducts(params);
-      const data = payload?.data;
-      if (!Array.isArray(data)) {
-        throw new ApiError("Beklenmeyen yanıt formatı");
-      }
-      return data.map(normalizeProduct).filter(Boolean);
-    },
+    queryFn: () => fetchPublicProducts(params),
     enabled: options.enabled !== false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
 export function usePublicProductQuery(id, options = {}) {
   return useQuery({
     queryKey: [...productsQueryKey, "public", "detail", String(id)],
-    queryFn: async () =>
-      normalizeProductDetail(await api.publicProduct(id)),
+    queryFn: () => fetchPublicProduct(id),
     enabled: (options.enabled ?? true) !== false && Boolean(id),
     retry: false,
+    initialData: options.initialData,
+    staleTime: options.initialData ? 60 * 1000 : 0,
   });
 }
 
@@ -652,22 +676,47 @@ export function normalizeCartPayload(payload) {
   };
 }
 
+/**
+ * Sepet sorgusu misafir ve kullanıcı sepetlerini ayrı anahtarlarda tutar.
+ * Böylece oturum durumu değiştiğinde bayat misafir verisi kullanıcıya
+ * gösterilmez (sepet/API senkronizasyon kaymasının ana kaynağı buydu).
+ */
+export function cartQueryKeyFor(token) {
+  return [...cartQueryKey, token ? "user" : "guest"];
+}
+
 export function useCartQuery(options = {}) {
   const token = useToken();
 
   return useQuery({
-    queryKey: [...cartQueryKey],
-    queryFn: async () => normalizeCartPayload(await api.publicCart(token)),
-    enabled: options.enabled !== false && Boolean(token),
+    queryKey: cartQueryKeyFor(token),
+    queryFn: async () => {
+      if (!token) return readGuestCart();
+      // Misafirken eklenen (ya da oturum kurulurken yarışa giren) öğeleri
+      // sunucu sepetine aktar, sonra güncel sepeti oku.
+      if (hasGuestCartItems()) {
+        await mergeGuestCartToServer(token);
+      }
+      return normalizeCartPayload(await api.publicCart(token));
+    },
+    enabled: options.enabled !== false,
   });
 }
 
 export function useAddCartItem() {
   const queryClient = useQueryClient();
-  const token = useToken();
 
   return useMutation({
-    mutationFn: (payload) => api.createCartItem(token, payload),
+    mutationFn: async (input) => {
+      const { _snapshot: snapshot, ...payload } = input ?? {};
+      // Oturum henüz yüklenmediyse (ilk render) bile localStorage'daki
+      // token'ı kullan: ekleme yanlışlıkla misafir sepetine düşmesin.
+      const token = useAuthStore.getState().token ?? readToken();
+      if (!token) {
+        return addGuestCartItem(payload, snapshot);
+      }
+      return api.createCartItem(token, payload);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
@@ -676,11 +725,20 @@ export function useAddCartItem() {
 
 export function useUpdateCartItem() {
   const queryClient = useQueryClient();
-  const token = useToken();
 
   return useMutation({
-    mutationFn: ({ id, quantity }) =>
-      api.updateCartItem(token, id, { quantity }),
+    mutationFn: async ({ id, quantity }) => {
+      if (isGuestCartId(id)) {
+        updateGuestCartItem(id, quantity);
+        return null;
+      }
+      const token = useAuthStore.getState().token ?? readToken();
+      if (!token) {
+        updateGuestCartItem(id, quantity);
+        return null;
+      }
+      return api.updateCartItem(token, id, { quantity });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
@@ -689,10 +747,20 @@ export function useUpdateCartItem() {
 
 export function useDeleteCartItem() {
   const queryClient = useQueryClient();
-  const token = useToken();
 
   return useMutation({
-    mutationFn: (id) => api.deleteCartItem(token, id),
+    mutationFn: async (id) => {
+      if (isGuestCartId(id)) {
+        removeGuestCartItem(id);
+        return null;
+      }
+      const token = useAuthStore.getState().token ?? readToken();
+      if (!token) {
+        removeGuestCartItem(id);
+        return null;
+      }
+      return api.deleteCartItem(token, id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
@@ -712,7 +780,7 @@ export function useApplyCartCoupon() {
       return normalizeCartPayload(await api.applyCartCoupon(token, normalized));
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(cartQueryKey, data);
+      queryClient.setQueryData(cartQueryKeyFor(token), data);
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
   });
@@ -726,7 +794,7 @@ export function useRemoveCartCoupon() {
     mutationFn: async () =>
       normalizeCartPayload(await api.removeCartCoupon(token)),
     onSuccess: (data) => {
-      queryClient.setQueryData(cartQueryKey, data);
+      queryClient.setQueryData(cartQueryKeyFor(token), data);
       queryClient.invalidateQueries({ queryKey: cartQueryKey });
     },
   });
@@ -737,9 +805,15 @@ export function useCheckoutCart() {
   const token = useToken();
 
   return useMutation({
-    mutationFn: async () => {
-      const payload = await api.checkoutCart(token);
-      const normalized = normalizeOrder(payload?.data ?? payload);
+    mutationFn: async (payload) => {
+      const currentToken = useAuthStore.getState().token ?? token;
+      // Görünen sepet ile sunucu sepeti ayrışmasın diye ödeme öncesi
+      // bekleyen misafir sepeti öğelerini sunucuya aktar.
+      if (currentToken && hasGuestCartItems()) {
+        await mergeGuestCartToServer(currentToken);
+      }
+      const response = await api.checkoutCart(currentToken, payload);
+      const normalized = normalizeOrder(response?.data ?? response);
       if (!normalized) throw new ApiError("Beklenmeyen yanıt formatı");
       return normalized;
     },
