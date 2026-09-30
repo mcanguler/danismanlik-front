@@ -127,8 +127,8 @@ const { status } = useAuth();
       {/*  </div>*/}
       {/*</div>*/}
       <header className="w-full bg-canvas-pure/90 backdrop-blur-md shadow-[0_4px_24px_rgba(92,29,36,0.04)]">
-        <div className="h-20 max-w-[1320px] mx-auto px-4 sm:px-6 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="h-20 mx-auto px-4 sm:px-6 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-4 shrink-0">
             <Link className="flex flex-col" href="/">
               <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-semibold">
                 {headerSiteName}
@@ -157,8 +157,8 @@ const { status } = useAuth();
                       {link.label}
                       <ChevronDown className="size-4 transition-transform duration-200 group-hover:rotate-180" />
                     </MenuLink>
-                    <div className="invisible absolute left-0 top-full z-50 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                      <div className="min-w-[260px] rounded-2xl bg-canvas-pure py-2 shadow-[0_24px_48px_rgba(92,29,36,0.14)] ring-1 ring-border-delicate">
+                    <div className="invisible absolute left-0 top-full z-50 translate-y-1 pt-2 opacity-0 transition-all duration-200 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                      <div className="min-w-65 rounded-2xl bg-canvas-pure py-2 shadow-[0_24px_48px_rgba(92,29,36,0.14)] ring-1 ring-border-delicate">
                         {link.children.map((child) => (
                           <div key={`${child.href}-${child.label}`}>
                             <MenuLink
