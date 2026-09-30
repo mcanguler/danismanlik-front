@@ -27,26 +27,6 @@ function toCardPricing(item) {
   };
 }
 
-function isEbook(product) {
-  return (
-    product.isDigital ||
-    (product.category?.name ?? "").toLowerCase().includes("e-kitap")
-  );
-}
-
-function GridSkeleton({ count = 3 }) {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
-      {Array.from({ length: count }).map((_, index) => (
-        <div
-          className="h-96 rounded-3xl bg-canvas-pure border border-border-delicate"
-          key={index}
-        />
-      ))}
-    </div>
-  );
-}
-
 const FALLBACK_QUICK_LINKS = [
   { label: "1e1 Seanslar", href: null },
   { label: "Atölyeler", href: null },
@@ -146,13 +126,14 @@ function ArrowIcon() {
 }
 
 export function HomePage() {
-  const productsQuery = usePublicProductsQuery();
+  const productsQuery = usePublicProductsQuery({
+      category: "e-kitaplar",
+  });
   const coursesQuery = usePublicCoursesQuery();
 
   const ebooks = useMemo(() => {
     const products = productsQuery.data ?? [];
     return products
-      .filter((product) => product.is_active && isEbook(product))
       .map((product) => {
         const hasVariations = (product.variations ?? []).length > 0;
         const hasRequiredFields = (product.fields ?? []).some(
