@@ -1,26 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  CalendarDays,
   ChevronDown,
+  GraduationCap,
+  Home,
+  LayoutDashboard,
   LoaderCircle,
   LogOut,
   MessageCircle,
+  Package,
   Search,
   ShoppingBag,
   Sparkles,
+  Store,
   User,
   X,
+  ZoomIn,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartQuery } from "@/lib/products";
 import { usePublicServiceCategoriesQuery } from "@/lib/service-categories";
 import { useHeaderMenuLinks } from "@/lib/menus";
 import { useSettingsQuery } from "@/lib/settings";
-import { roleHomePath } from "@/lib/auth";
+import { roleHomePath, ROLES, ROLE_LABELS } from "@/lib/auth";
+import { getNav } from "@/lib/nav";
 import { useAuth, useLogout } from "@/lib/auth-hooks";
 
 const LOGO_URL =
@@ -63,11 +71,14 @@ export function SiteHeader({
   onAccountLogout,
 }) {
 const [mobileOpen, setMobileOpen] = useState(false);
+const [accountOpen, setAccountOpen] = useState(false);
+const accountMenuRef = useRef(null);
 const router = useRouter();
 const { status, user } = useAuth();
   const logout = useLogout();
   const isAuthenticated = status === "authenticated";
-  const accountLinkHref = isAuthenticated ? roleHomePath(user?.role) : accountHref;
+  const isCustomer = user?.role === ROLES.CUSTOMER;
+  const dashboardLinks = isCustomer ? getNav(ROLES.CUSTOMER) : [];
   const cartQuery = useCartQuery({ enabled: status !== "loading" });
   const cartCount = Number(
     cartQuery.data?.meta?.count ??
@@ -106,6 +117,7 @@ const { status, user } = useAuth();
 
   const handleAccountLogout = () => {
     setMobileOpen(false);
+    setAccountOpen(false);
     if (onAccountLogout) {
       onAccountLogout();
       return;
@@ -116,6 +128,27 @@ const { status, user } = useAuth();
   };
 
   const logoutPending = !onAccountLogout && logout.isPending;
+
+  useEffect(() => {
+    if (!accountOpen) return;
+    function handlePointerDown(event) {
+      if (
+        accountMenuRef.current &&
+        !accountMenuRef.current.contains(event.target)
+      ) {
+        setAccountOpen(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") setAccountOpen(false);
+    }
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [accountOpen]);
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
@@ -273,13 +306,88 @@ const { status, user } = useAuth();
           </span>
         )}
       </Link>
-            <Link
-                className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-burgundy-light transition-colors"
-                href={accountLinkHref}
-                aria-label={isAuthenticated ? "Hesabım" : "Giriş Yap"}
-            >
-              <User className="size-4" />
-            </Link>
+            {isAuthenticated ? (
+              <div className="relative" ref={accountMenuRef}>
+                <button
+                  aria-expanded={accountOpen}
+                  aria-label="Hesabım"
+                  className="flex size-9 items-center justify-center rounded-full bg-primary text-on-primary transition-colors hover:bg-burgundy-light"
+                  onClick={() => setAccountOpen((open) => !open)}
+                  type="button"
+                >
+                  <User className="size-4" />
+                </button>
+                {accountOpen && (
+                  <div className="absolute right-0 top-11 z-50 w-64 overflow-hidden rounded-2xl bg-canvas-pure shadow-[0_24px_48px_rgba(92,29,36,0.14)] ring-1 ring-border-delicate">
+                    <div className="border-b border-border-delicate px-4 py-3">
+                      <p className="truncate font-label-md text-label-md font-semibold text-primary">
+                        {accountName || user?.name || "Hesabım"}
+                      </p>
+                      {user?.role ? (
+                        <p className="font-label-sm text-label-sm uppercase tracking-wider text-accent-gold">
+                          {ROLE_LABELS[user.role] ?? user.role}
+                        </p>
+                      ) : null}
+                    </div>
+                    <nav className="p-2">
+                      {isCustomer ? (
+                        dashboardLinks.map((item) => (
+                          <Link
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-label-md text-label-md text-on-surface-variant transition-colors hover:bg-blush-surface hover:text-primary-container"
+                            href={item.href}
+                            key={item.href}
+                            onClick={() => setAccountOpen(false)}
+                          >
+                            <item.icon className="size-4" />
+                            {item.label}
+                          </Link>
+                        ))
+                      ) : (
+                        <Link
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 font-label-md text-label-md font-semibold text-primary-container transition-colors hover:bg-blush-surface"
+                          href={roleHomePath(user?.role)}
+                          onClick={() => setAccountOpen(false)}
+                        >
+                          <LayoutDashboard className="size-4" />
+                          Yönetim Paneli
+                        </Link>
+                      )}
+                      <div className="my-1 h-px bg-border-delicate" />
+                      <button
+                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 font-label-md text-label-md text-on-surface-variant transition-colors hover:bg-blush-surface hover:text-primary-container disabled:pointer-events-none disabled:opacity-60"
+                        disabled={logoutPending}
+                        onClick={handleAccountLogout}
+                        type="button"
+                      >
+                        {logoutPending ? (
+                          <LoaderCircle className="size-4 animate-spin" />
+                        ) : (
+                          <LogOut className="size-4" />
+                        )}
+                        {logoutPending
+                          ? "Çıkış yapılıyor..."
+                          : "Çıkış Yap"}
+                      </button>
+                    </nav>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="hidden items-center gap-2 sm:flex">
+                <Link
+                  className="rounded-full border border-border-delicate px-4 py-2 font-label-md text-label-md text-primary transition-colors hover:bg-blush-surface"
+                  href="/login"
+                >
+                  Giriş Yap
+                </Link>
+                <Link
+                  className="rounded-full bg-primary px-4 py-2 font-label-md text-label-md font-semibold text-on-primary transition-colors hover:bg-burgundy-light"
+                  href="/register"
+                >
+                  Kayıt Ol
+                </Link>
+              </div>
+            )}
             <button
               className="xl:hidden w-9 h-9 rounded-full flex items-center justify-center text-primary hover:bg-blush-surface transition-colors"
               type="button"
@@ -379,28 +487,82 @@ const { status, user } = useAuth();
             </nav>
             <div className="mt-4 flex flex-col gap-2">
               {isAuthenticated ? (
-                <button
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-60"
-                  disabled={logoutPending}
-                  onClick={handleAccountLogout}
-                  type="button"
-                >
-                  {logoutPending ? (
-                    <LoaderCircle className="size-4 animate-spin" />
-                  ) : (
-                    <LogOut className="size-4" />
-                  )}
-                  <span>{logoutPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}</span>
-                </button>
+                isCustomer ? (
+                  <>
+                    <div className="flex flex-col rounded-2xl border border-border-delicate p-2">
+                      {dashboardLinks.map((item) => (
+                        <Link
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 font-label-md text-label-md text-on-surface-variant transition-colors hover:bg-blush-surface hover:text-primary-container"
+                          href={item.href}
+                          key={item.href}
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          <item.icon className="size-4" />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                    <button
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-60"
+                      disabled={logoutPending}
+                      onClick={handleAccountLogout}
+                      type="button"
+                    >
+                      {logoutPending ? (
+                        <LoaderCircle className="size-4 animate-spin" />
+                      ) : (
+                        <LogOut className="size-4" />
+                      )}
+                      <span>
+                        {logoutPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-label-lg text-label-lg font-semibold text-on-primary transition-colors hover:bg-burgundy-light"
+                      href={roleHomePath(user?.role)}
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      <LayoutDashboard className="size-4" />
+                      <span>Yönetim Paneli</span>
+                    </Link>
+                    <button
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover disabled:pointer-events-none disabled:opacity-60"
+                      disabled={logoutPending}
+                      onClick={handleAccountLogout}
+                      type="button"
+                    >
+                      {logoutPending ? (
+                        <LoaderCircle className="size-4 animate-spin" />
+                      ) : (
+                        <LogOut className="size-4" />
+                      )}
+                      <span>
+                        {logoutPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}
+                      </span>
+                    </button>
+                  </>
+                )
               ) : (
-                <Link
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-blush-surface px-5 py-3 font-label-lg text-label-lg text-primary-container transition-colors hover:bg-blush-hover"
-                  href={accountHref}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  <User className="size-4" />
-                  <span>Giriş Yap</span>
-                </Link>
+                <>
+                  <Link
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-border-delicate px-5 py-3 font-label-lg text-label-lg text-primary transition-colors hover:bg-blush-surface"
+                    href="/login"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <User className="size-4" />
+                    <span>Giriş Yap</span>
+                  </Link>
+                  <Link
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 font-label-lg text-label-lg font-semibold text-on-primary transition-colors hover:bg-burgundy-light"
+                    href="/register"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <span>Kayıt Ol</span>
+                  </Link>
+                </>
               )}
             </div>
           </div>

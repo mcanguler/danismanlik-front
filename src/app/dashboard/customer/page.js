@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
@@ -9,11 +10,14 @@ import {
   CreditCard,
   GraduationCap,
   Clock,
+  LogOut,
   Package,
   Store,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LoaderCircle } from "lucide-react";
 import { RequireRole } from "@/components/require-role";
-import { useAuth } from "@/lib/auth-hooks";
+import { useAuth, useLogout } from "@/lib/auth-hooks";
 import { useMyServicePackagesQuery } from "@/lib/service-packages";
 import { packageIsUsable } from "@/lib/service-packages";
 
@@ -54,6 +58,8 @@ export default function CustomerDashboardPage() {
 
 function CustomerHome() {
   const { user } = useAuth();
+  const logout = useLogout();
+  const router = useRouter();
   const packagesQuery = useMyServicePackagesQuery();
   const purchases = packagesQuery.data ?? [];
   const activePurchase = purchases.find((purchase) => packageIsUsable(purchase));
@@ -62,6 +68,12 @@ function CustomerHome() {
   const expiresAt = activePurchase?.expiresAt
     ? format(new Date(activePurchase.expiresAt), "d MMMM yyyy", { locale: tr })
     : null;
+
+  const handleLogout = () => {
+    logout.mutate(undefined, {
+      onSuccess: () => router.replace("/login"),
+    });
+  };
 
   return (
     <div className="w-full flex-1 px-4 py-6 lg:px-8">
@@ -86,6 +98,20 @@ function CustomerHome() {
               Profilinizi ve randevularınızı yönetmek için aşağıdaki bağlantıları kullanabilirsiniz.
             </p>
           </div>
+          <Button
+            className="h-10 shrink-0 self-start border-border-delicate text-primary hover:bg-blush-surface"
+            disabled={logout.isPending}
+            onClick={handleLogout}
+            type="button"
+            variant="outline"
+          >
+            {logout.isPending ? (
+              <LoaderCircle className="size-4 animate-spin" />
+            ) : (
+              <LogOut className="size-4" />
+            )}
+            {logout.isPending ? "Çıkış yapılıyor..." : "Çıkış Yap"}
+          </Button>
         </div>
       </div>
 
