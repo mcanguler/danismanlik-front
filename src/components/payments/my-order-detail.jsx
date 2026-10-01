@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CircleAlert,
   CreditCard,
+  Download,
   FileText,
   LoaderCircle,
   Package,
@@ -16,17 +17,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   ORDER_ITEM_TYPE_LABELS,
+  ORDER_STATUSES,
   ORDER_STATUS_BADGE_CLASSES,
   ORDER_STATUS_LABELS,
   PAYMENT_STATUS_BADGE_CLASSES,
   PAYMENT_STATUS_LABELS,
+  useOrderDownloadsQuery,
   useOrderQuery,
 } from "@/lib/orders";
 import { useOrderContractQuery } from "@/lib/contracts";
+import { useAuth } from "@/lib/auth-hooks";
 import { printContract } from "@/components/contract/contract-acceptance";
 import { formatDateTimeTr, formatPrice } from "@/lib/format";
 import { getQueryErrorMessage } from "@/lib/query-errors";
+import { api, ApiError } from "@/lib/api";
+import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
+
+function sanitizeFileName(value) {
+  return String(value ?? "dijital-dosya")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .trim() || "dijital-dosya";
+}
 
 function DetailRow({ label, value }) {
   return (
@@ -66,11 +78,49 @@ function OrderStatusBadge({ status }) {
 export function MyOrderDetail({ orderId }) {
   const query = useOrderQuery(orderId);
   const order = query.data;
+  const { token } = useAuth();
   const contractQuery = useOrderContractQuery(orderId, {
     enabled: query.isSuccess && Boolean(orderId),
   });
   const contract = contractQuery.data ?? null;
   const [contractOpen, setContractOpen] = useState(false);
+  // Dijital dosyalar yalnızca ödenmiş siparişlerde mevcut; backend erişimi
+  // yönetir, yalnızca PAID durumunda liste istenir.
+  const downloadsQuery = useOrderDownloadsQuery(orderId, {
+    enabled: query.isSuccess && order?.status === ORDER_STATUSES.PAID,
+  });
+  const downloads = downloadsQuery.data ?? [];
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownload = async (download) => {
+    setDownloadingId(download.id);
+    try {
+      const blob = await api.downloadOrderFile(token, orderId, download.id);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = sanitizeFileName(
+        download.product?.title
+          ? `${download.product.title} - ${download.title}`
+          : download.title
+      );
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.add({
+        title: "Dosya indirilemedi",
+        description:
+          error instanceof ApiError
+            ? error.message
+            : "Beklenmeyen bir hata oluştu",
+        type: "error",
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   if (query.isPending) {
     return (
@@ -185,7 +235,7 @@ export function MyOrderDetail({ orderId }) {
             <div className="flex justify-between border-t pt-3 text-sm font-semibold">
               <span>Toplam Tutar</span>
               <span>
-                {formatPrice(order.totalAmount)} {order.currency}
+                {formatPrice(order.totalAmount)}
               </span>
             </div>
           </CardContent>
@@ -195,8 +245,7 @@ export function MyOrderDetail({ orderId }) {
           <Card>
             <CardHeader>
               <CardTitle>Satış Sözleşmesi</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            </CardHeader>            <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">
                 {contract.title}
                 {contract.version ? ` · v${contract.version}` : ""}
@@ -222,6 +271,49 @@ export function MyOrderDetail({ orderId }) {
                   Yazdır
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {order.status === ORDER_STATUSES.PAID && downloads.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Dijital Dosyalar</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {downloads.map((download) => (
+                <div
+                  className="flex items-center justify-between gap-3 rounded-xl border p-3"
+                  key={download.id}
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">
+                      {download.title}
+                    </p>
+                    {download.product?.title && (
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                        {download.product.title}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    disabled={downloadingId != null}
+                    onClick={() => handleDownload(download)}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    {downloadingId === download.id ? (
+                      <LoaderCircle className="size-4 animate-spin" />
+                    ) : (
+                      <Download className="size-4" />
+                    )}
+                    {downloadingId === download.id
+                      ? "İndiriliyor..."
+                      : "İndir"}
+                  </Button>
+                </div>
+              ))}
             </CardContent>
           </Card>
         )}

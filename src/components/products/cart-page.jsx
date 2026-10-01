@@ -36,6 +36,8 @@ import { useAuth } from "@/lib/auth-hooks";
 import { formatDateTimeTr, formatPrice } from "@/lib/format";
 import {
   CART_ITEM_TYPES,
+  cartItemSelectedFields,
+  remainingPurchaseQuantity,
   useApplyCartCoupon,
   useCartQuery,
   useCheckoutCart,
@@ -43,6 +45,7 @@ import {
   useRemoveCartCoupon,
   useUpdateCartItem,
 } from "@/lib/products";
+import { useOrdersQuery } from "@/lib/orders";
 import { toast } from "@/components/ui/toast";
 
 function errorMessage(error) {
@@ -127,13 +130,15 @@ function CartItemTitle({ item, product, typeMeta }) {
   );
 }
 
-function CartItem({ item, onQuantityChange, onRemove, busy }) {
+function CartItem({ item, onQuantityChange, onRemove, busy, remainingQty }) {
   const typeMeta = cartItemTypeMeta(item);
   const product = item.product ?? null;
   const isProduct = item.item_type === CART_ITEM_TYPES.PRODUCT;
   const quantity = Number(item.quantity ?? 1);
   const unitPrice = Number(item.unit_price ?? 0);
   const total = Number(item.total ?? unitPrice * quantity);
+  const selectedFields = isProduct ? cartItemSelectedFields(item) : [];
+  const atLimit = remainingQty != null && remainingQty < 1;
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl bg-canvas-pure p-4 shadow-sm sm:flex-row sm:items-center">
@@ -158,9 +163,26 @@ function CartItem({ item, onQuantityChange, onRemove, busy }) {
             {formatDateTimeTr(item.item.start_at)}
           </p>
         )}
+        {selectedFields.length > 0 && (
+          <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+            {selectedFields.map((field) => (
+              <li key={field.key}>
+                <span className="font-medium text-on-surface">{field.name}:</span>{" "}
+                {field.value}
+              </li>
+            ))}
+          </ul>
+        )}
         <p className="mt-2 text-sm text-muted-foreground">
           Birim fiyat: {formatPrice(unitPrice)}
         </p>
+        {isProduct && remainingQty != null && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {atLimit
+              ? `Alım limiti: en fazla ${product?.max_purchase_quantity} adet`
+              : `Kalan alım hakkı: ${remainingQty} adet`}
+          </p>
+        )}
       </div>
       <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
         {isProduct ? (
@@ -180,7 +202,7 @@ function CartItem({ item, onQuantityChange, onRemove, busy }) {
             <button
               aria-label="Adedi artır"
               className="flex size-8 items-center justify-center rounded-lg text-primary hover:bg-canvas-pure disabled:opacity-50"
-              disabled={busy}
+              disabled={busy || atLimit}
               type="button"
               onClick={() => onQuantityChange(item, quantity + 1)}
             >
@@ -216,8 +238,10 @@ export function CartPage() {
   const { status, user } = useAuth();
   const isGuest = status !== "authenticated";
   const cartQuery = useCartQuery({ enabled: status !== "loading" });
+  const ordersQuery = useOrdersQuery({
+    enabled: status === "authenticated",
+  });
   const [contractAccepted, setContractAccepted] = useState(false);
-  const [contractRequired, setContractRequired] = useState(false);
   const updateItem = useUpdateCartItem();
   const deleteItem = useDeleteCartItem();
   const checkout = useCheckoutCart();
@@ -237,6 +261,20 @@ export function CartPage() {
 
   const handleQuantityChange = (item, quantity) => {
     if (quantity < 1) return;
+    const remaining = remainingPurchaseQuantity({
+      product: item.product ?? { id: item.product_id, max_purchase_quantity: item.product?.max_purchase_quantity },
+      cartItems: items,
+      orders: ordersQuery.data ?? [],
+      ignoreCartItemId: item.id,
+    });
+    if (remaining != null && quantity > remaining) {
+      toast.add({
+        title: "Alım limiti aşıldı",
+        description: `Bu üründen en fazla ${item.product?.max_purchase_quantity ?? remaining} adet satın alabilirsiniz.`,
+        type: "info",
+      });
+      return;
+    }
     setBusyId(item.id);
     updateItem.mutate(
       { id: item.id, quantity },
@@ -329,8 +367,8 @@ export function CartPage() {
       });
     } catch (error) {
       if (isContractRequiredError(error)) {
-        setContractRequired(true);
-        setContractAccepted(false);
+        // Backend zorunluluğunu koru: beklenmeyen bir race'te onay
+        // talebini mevcut hata akışıyla göster.
         toast.add({
           title: "Satış sözleşmesi onayı gerekli",
           description: getContractRequiredMessage(error),
@@ -411,7 +449,23 @@ export function CartPage() {
             <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
               <div className="flex flex-col gap-4 lg:col-span-7">
                 {/*<div className="rounded-2xl bg-blush-surface p-4 text-sm text-on-secondary-container"><strong className="text-primary">Güvenli alışveriş:</strong> Ödeme ve dijital teslimat işlemleriniz güvenli altyapıyla korunur.</div>*/}
-                {items.map((item) => <CartItem busy={busyId === item.id} item={item} key={item.id} onQuantityChange={handleQuantityChange} onRemove={handleRemove} />)}
+                {items.map((item) => (
+                  <CartItem
+                    busy={busyId === item.id}
+                    item={item}
+                    key={item.id}
+                    onQuantityChange={handleQuantityChange}
+                    onRemove={handleRemove}
+                    remainingQty={remainingPurchaseQuantity({
+                      product: item.product ?? {
+                        id: item.product_id,
+                        max_purchase_quantity: item.product?.max_purchase_quantity,
+                      },
+                      cartItems: items,
+                      orders: ordersQuery.data ?? [],
+                    })}
+                  />
+                ))}
                 <Link className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-primary-container hover:text-burgundy-light" href="/urunler"><ArrowLeft className="size-4" /> Alışverişe devam et</Link>
               </div>
               <aside className="flex flex-col gap-5 lg:sticky lg:top-24 lg:col-span-5">
@@ -464,7 +518,7 @@ export function CartPage() {
                     <div className="flex justify-between text-muted-foreground"><span>Kargo</span><span className="font-semibold text-secondary">Ücretsiz</span></div>
                     <div className="flex items-end justify-between border-t border-border-delicate pt-4"><div><span className="block font-title-md font-bold text-primary">Toplam Tutar</span><span className="text-xs text-muted-foreground">Güvenli ödeme</span></div><span className="font-headline-md font-bold text-primary-container">{formatPrice(total)}</span></div>
                   </div>
-                  {contractRequired && !isGuest && (
+                  {status !== "loading" && (
                     <div className="mt-5">
                       <ContractAcceptance
                         checked={contractAccepted}
@@ -472,7 +526,19 @@ export function CartPage() {
                       />
                     </div>
                   )}
-                  <Button className="mt-6 h-12 w-full text-base" disabled={checkout.isPending || (contractRequired && !isGuest && !contractAccepted)} onClick={handleCheckout}><LockKeyhole className="size-4" />{checkout.isPending ? "Hazırlanıyor..." : "Güvenle Öde ve Devam Et"}</Button>
+                  <Button
+                    className="mt-6 h-12 w-full text-base"
+                    disabled={
+                      checkout.isPending ||
+                      (status !== "loading" && !contractAccepted)
+                    }
+                    onClick={handleCheckout}
+                  >
+                    <LockKeyhole className="size-4" />
+                    {checkout.isPending
+                      ? "Hazırlanıyor..."
+                      : "Güvenle Öde ve Devam Et"}
+                  </Button>
                   {isGuest && (
                     <p className="mt-3 text-center text-xs text-muted-foreground">
                       Ödeme için giriş yapmanız gerekiyor; sepetiniz giriş sonrası hesabınıza aktarılır.

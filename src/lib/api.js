@@ -807,6 +807,44 @@ export const api = {
     return request(`/v1/orders/${orderId}/contract`, { token });
   },
 
+  orderDownloads(token, orderId) {
+    return request(`/v1/orders/${orderId}/downloads`, { token });
+  },
+
+  /**
+   * Dijital dosya indirme; endpoint stream (binary) döndürdüğü için
+   * Blob olarak alınır ve çağıran taraf object URL ile dosyayı kaydeder.
+   */
+  async downloadOrderFile(token, orderId, downloadId) {
+    let response;
+    try {
+      response = await fetch(
+        `${API_BASE_URL}/v1/orders/${orderId}/downloads/${downloadId}`,
+        {
+          headers: {
+            Accept: "application/octet-stream",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        }
+      );
+    } catch {
+      throw new ApiError("Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.", 0);
+    }
+    if (!response.ok) {
+      let data = null;
+      const contentType = response.headers.get("content-type") ?? "";
+      if (contentType.includes("application/json")) {
+        data = await response.json().catch(() => null);
+      }
+      throw new ApiError(
+        data?.message ?? `İndirme başarısız (${response.status})`,
+        response.status,
+        data?.errors ?? null
+      );
+    }
+    return response.blob();
+  },
+
   contractTemplates(token) {
     return request("/v1/admin/contract-templates", { token });
   },

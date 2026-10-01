@@ -8,7 +8,6 @@ import {
   BadgeCheck,
   ChevronRight,
   CircleAlert,
-  GraduationCap,
   Layers,
   LoaderCircle,
   Package,
@@ -28,17 +27,21 @@ import {
 } from "@/lib/contracts";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
+import { ProductCard } from "@/components/products/product-card";
 import { toast } from "@/components/ui/toast";
 import { formatPrice } from "@/lib/format";
 import {
   PRODUCT_FIELD_TYPES,
   PRODUCT_TYPES,
   isOptionBasedFieldType,
+  remainingPurchaseQuantity,
   useAddCartItem,
+  useCartQuery,
   useCheckoutCart,
   usePublicProductQuery,
   usePublicProductsQuery,
 } from "@/lib/products";
+import { useOrdersQuery } from "@/lib/orders";
 import {Textarea} from "@/components/ui/textarea";
 
 const CARD_CTA_CLASS =
@@ -58,7 +61,7 @@ function resolveProductFromList(products, param) {
   );
 }
 
-function FieldInput({ field, value, onChange }) {
+function FieldInput({ field, value, onChange, isOptionAllowed }) {
   if (field.type === PRODUCT_FIELD_TYPES.INPUT) {
     return (
       <Textarea
@@ -75,14 +78,19 @@ function FieldInput({ field, value, onChange }) {
   if (field.type === PRODUCT_FIELD_TYPES.SELECT) {
     return (
       <select
-        className="h-10 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+        className="h-10 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30 disabled:bg-muted/50 disabled:text-muted-foreground"
         id={`field_${field.key}`}
         onChange={(event) => onChange(field, event.target.value)}
         value={value ?? ""}
       >
         <option value="">Seçin</option>
         {(field.options ?? []).map((option) => (
-          <option key={option.id} value={option.id}>
+          <option
+            disabled={isOptionAllowed ? !isOptionAllowed(field, option.id) : false}
+            hidden={isOptionAllowed ? !isOptionAllowed(field, option.id) : false}
+            key={option.id}
+            value={option.id}
+          >
             {option.label}
           </option>
         ))}
@@ -95,21 +103,25 @@ function FieldInput({ field, value, onChange }) {
   if (field.type === PRODUCT_FIELD_TYPES.RADIO) {
     return (
       <div className="flex flex-wrap gap-2">
-        {options.map((option) => (
-          <button
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
-              value === String(option.id)
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-input hover:bg-accent"
-            )}
-            key={option.id}
-            onClick={() => onChange(field, value === String(option.id) ? "" : String(option.id))}
-            type="button"
-          >
-            {option.label}
-          </button>
-        ))}
+        {options.map((option) => {
+          const allowed = isOptionAllowed ? isOptionAllowed(field, option.id) : true;
+          return (
+            <button
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:line-through",
+                value === String(option.id)
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-input hover:bg-accent"
+              )}
+              disabled={!allowed}
+              key={option.id}
+              onClick={() => onChange(field, value === String(option.id) ? "" : String(option.id))}
+              type="button"
+            >
+              {option.label}
+            </button>
+          );
+        })}
       </div>
     );
   }
@@ -118,14 +130,16 @@ function FieldInput({ field, value, onChange }) {
     <div className="flex flex-wrap gap-2">
       {options.map((option) => {
         const selected = (value ?? []).includes(String(option.id));
+        const allowed = isOptionAllowed ? isOptionAllowed(field, option.id) : true;
         return (
           <button
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
+              "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:line-through",
               selected
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-input hover:bg-accent"
             )}
+            disabled={!allowed}
             key={option.id}
             onClick={() => {
               const current = value ?? [];
@@ -149,20 +163,102 @@ function PurchasePanel({ product, relatedCount = 0 }) {
   const { status, user } = useAuth();
   const addCartItem = useAddCartItem();
   const checkoutCart = useCheckoutCart();
+  const cartQuery = useCartQuery({ enabled: status !== "loading" });
+  const ordersQuery = useOrdersQuery({
+    enabled: status === "authenticated",
+  });
 
   const variations = product.variations ?? [];
   const hasVariations = variations.length > 0 && product.type === PRODUCT_TYPES.PHYSICAL;
+
+  // Variation -> alan eşleşmesi backend'in id bazlı options dizisiyle yapılır:
+  // options: [{ id, label, product_field_id }]
+  const fieldsById = useMemo(
+    () =>
+      new Map(
+        (product.fields ?? []).map((field) => [String(field.id), field])
+      ),
+    [product.fields]
+  );
+
+  const variationToValues = (variation) => {
+    const values = {};
+    for (const option of variation?.options ?? []) {
+      const field = fieldsById.get(String(option.product_field_id));
+      if (!field || !isOptionBasedFieldType(field.type)) continue;
+      if (field.type === PRODUCT_FIELD_TYPES.CHECKBOX) {
+        values[field.key] = [...(values[field.key] ?? []), String(option.id)];
+        continue;
+      }
+      values[field.key] = String(option.id);
+    }
+    return values;
+  };
+
+  const variationMatchesValues = (variation, values) => {
+    const covered = (variation?.options ?? [])
+      .map((option) => fieldsById.get(String(option.product_field_id)))
+      .filter((field) => field && isOptionBasedFieldType(field.type));
+    if (covered.length === 0) return false;
+    return covered.every((field) => {
+      const expected = String(
+        (variation.options ?? []).find(
+          (option) => String(option.product_field_id) === String(field.id)
+        )?.id ?? ""
+      );
+      const value = values[field.key];
+      if (field.type === PRODUCT_FIELD_TYPES.CHECKBOX) {
+        return Array.isArray(value) && value.includes(expected);
+      }
+      return String(value ?? "") === expected;
+    });
+  };
 
   const [quantity, setQuantity] = useState(1);
   const [variationId, setVariationId] = useState(
     hasVariations ? String(variations[0]?.id ?? "") : ""
   );
-  const [optionValues, setOptionValues] = useState({});
+  const [optionValues, setOptionValues] = useState(() =>
+    hasVariations ? variationToValues(variations[0]) : {}
+  );
   const [pending, setPending] = useState(false);
+
+  // Geçersiz kombinasyon engelleme: bir seçenek, mevcut seçimlerle en az
+  // bir varyasyonla uyumluysa seçilebilir; değilse devre dışıdır.
+  const isOptionAllowed = (field, optionId) => {
+    if (!hasVariations) return true;
+    const isCheckbox = field.type === PRODUCT_FIELD_TYPES.CHECKBOX;
+    const candidate = { ...optionValues };
+    if (isCheckbox) {
+      const current = Array.isArray(optionValues[field.key])
+        ? optionValues[field.key]
+        : [];
+      candidate[field.key] = current.includes(String(optionId))
+        ? current
+        : [...current, String(optionId)];
+    } else {
+      candidate[field.key] = String(optionId);
+    }
+    return variations.some((variation) =>
+      variationMatchesValues(variation, candidate)
+    );
+  };
 
   const selectedVariation = hasVariations
     ? variations.find((variation) => String(variation.id) === String(variationId)) ?? null
     : null;
+
+  // Seçenekler tamamlanınca eşleşen varyasyon bulunamıyorsa gönderim engellenir
+  const selectedOptionsValueCount = (product.fields ?? []).filter((field) => {
+    if (!isOptionBasedFieldType(field.type)) return false;
+    const value = optionValues[field.key];
+    if (field.type === PRODUCT_FIELD_TYPES.CHECKBOX) {
+      return Array.isArray(value) && value.length > 0;
+    }
+    return value != null && value !== "";
+  }).length;
+  const variationPending = hasVariations && !selectedVariation;
+  const hasOptionSelections = selectedOptionsValueCount > 0;
 
   const price = formatPrice(
     selectedVariation ? selectedVariation.effective_price : product.effective_price
@@ -177,6 +273,26 @@ function PurchasePanel({ product, relatedCount = 0 }) {
 
   const stock = selectedVariation ? selectedVariation.stock : product.stock;
   const isDigital = product.type === PRODUCT_TYPES.DIGITAL;
+  const remainingQty = remainingPurchaseQuantity({
+    product,
+    cartItems: cartQuery.data?.items ?? [],
+    orders: ordersQuery.data ?? [],
+  });
+  const maxQuantity =
+    remainingQty == null
+      ? isDigital
+        ? 99
+        : Math.max(1, Number(stock ?? 0))
+      : Math.max(0, remainingQty);
+
+  // hasVariations ise seçenekler tamamen ve geçerli eşleşmeyle seçilmiş olmalı
+  const invalidCombination = hasVariations && (
+    hasOptionSelections
+      ? !selectedVariation
+      : selectedOptionsValueCount !== (product.fields ?? []).filter(
+          (field) => isOptionBasedFieldType(field.type)
+        ).length || false
+  );
 
   const requiredMissing = useMemo(
     () =>
@@ -194,8 +310,30 @@ function PurchasePanel({ product, relatedCount = 0 }) {
     [product.fields, optionValues]
   );
 
+  const handleVariationChange = (value) => {
+    setVariationId(value);
+    const variation = variations.find(
+      (item) => String(item.id) === String(value)
+    );
+    // Seçilen varyasyonun option'ları otomatik işaretlenir; başka
+    // varyasyonun seçimleri kalıntı olarak bırakılmaz.
+    setOptionValues(
+      variation ? variationToValues(variation) : {}
+    );
+  };
+
   const setFieldValue = (field, value) => {
-    setOptionValues((current) => ({ ...current, [field.key]: value }));
+    const next = { ...optionValues, [field.key]: value };
+    setOptionValues(next);
+    if (!hasVariations) return;
+    const stillValid =
+      selectedVariation != null &&
+      variationMatchesValues(selectedVariation, next);
+    if (stillValid) return;
+    const match = variations.find((variation) =>
+      variationMatchesValues(variation, next)
+    );
+    setVariationId(match ? String(match.id) : "");
   };
 
   const buildPayload = () => {
@@ -266,11 +404,22 @@ function PurchasePanel({ product, relatedCount = 0 }) {
 
   const handleAddToCart = () => {
     if (!ensureCustomerRole()) return;
-    if (requiredMissing) {
+    if (requiredMissing || invalidCombination) {
       toast.add({
         title: "Eksik alanlar var",
         description: "Lütfen zorunlu seçenekleri doldurun.",
         type: "error",
+      });
+      return;
+    }
+    if (remainingQty != null && quantity > remainingQty) {
+      toast.add({
+        title: "Alım limiti aşıldı",
+        description:
+          remainingQty < 1
+            ? `Bu üründen en fazla ${product.max_purchase_quantity} adet satın alabilirsiniz.`
+            : `Bu üründen en fazla ${remainingQty} adet daha ekleyebilirsiniz.`,
+        type: "info",
       });
       return;
     }
@@ -295,11 +444,22 @@ function PurchasePanel({ product, relatedCount = 0 }) {
 
   const handleBuyNow = async () => {
     if (!ensureCustomerRole()) return;
-    if (requiredMissing) {
+    if (requiredMissing || invalidCombination) {
       toast.add({
         title: "Eksik alanlar var",
         description: "Lütfen zorunlu seçenekleri doldurun.",
         type: "error",
+      });
+      return;
+    }
+    if (remainingQty != null && quantity > remainingQty) {
+      toast.add({
+        title: "Alım limiti aşıldı",
+        description:
+          remainingQty < 1
+            ? `Bu üründen en fazla ${product.max_purchase_quantity} adet satın alabilirsiniz.`
+            : `Bu üründen en fazla ${remainingQty} adet daha ekleyebilirsiniz.`,
+        type: "info",
       });
       return;
     }
@@ -375,9 +535,16 @@ function PurchasePanel({ product, relatedCount = 0 }) {
           {originalPrice && (
             <span className="font-body-md text-body-md text-outline line-through">
               {formatPrice(originalPrice)}
-            </span>
-          )}
-        </div>
+          </span>
+        )}
+      </div>
+      {remainingQty != null && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          {remainingQty < 1
+            ? `Bu üründen en fazla ${product.max_purchase_quantity} adet satın alabilirsiniz.`
+            : `Kalan alım hakkınız: ${remainingQty} adet`}
+        </p>
+      )}
         {product.has_discount && (
           <span className="w-fit rounded-full bg-accent-gold px-2.5 py-0.5 font-label-sm text-label-sm font-bold text-primary">
             İndirimli Fiyat
@@ -393,7 +560,7 @@ function PurchasePanel({ product, relatedCount = 0 }) {
           <select
             className="h-10 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
             id="variation_select"
-            onChange={(event) => setVariationId(event.target.value)}
+            onChange={(event) => handleVariationChange(event.target.value)}
             value={variationId}
           >
             {variations.map((variation) => (
@@ -419,6 +586,7 @@ function PurchasePanel({ product, relatedCount = 0 }) {
               </Label>
               <FieldInput
                 field={field}
+                isOptionAllowed={isOptionAllowed}
                 onChange={setFieldValue}
                 value={optionValues[field.key]}
               />
@@ -427,6 +595,13 @@ function PurchasePanel({ product, relatedCount = 0 }) {
         </div>
       )}
 
+      {variationPending && hasOptionSelections && (
+        <p className="flex items-center gap-1.5 pt-4 text-xs text-muted-foreground">
+          <CircleAlert className="size-3.5 shrink-0" />
+          Seçilen seçenekler geçerli bir varyasyonla eşleşmiyor; lütfen
+          uyumlu bir seçim yapın.
+        </p>
+      )}
       <div className="mt-5 flex items-center gap-3">
         <Label className="shrink-0 font-label-md text-label-md" htmlFor="quantity_input">
           Adet
@@ -435,11 +610,12 @@ function PurchasePanel({ product, relatedCount = 0 }) {
           className="h-10 w-24"
           id="quantity_input"
           inputMode="numeric"
-          max={100}
+          max={Math.max(1, maxQuantity)}
           min={1}
           onChange={(event) => {
             const value = Number(event.target.value);
-            setQuantity(Number.isInteger(value) && value > 0 ? value : 1);
+            const next = Number.isInteger(value) && value > 0 ? value : 1;
+            setQuantity(Math.min(next, Math.max(1, maxQuantity)));
           }}
           step="1"
           type="number"
@@ -455,7 +631,7 @@ function PurchasePanel({ product, relatedCount = 0 }) {
       <div className="mt-6 flex flex-col gap-3">
         <Button
           className="h-12 w-full rounded-full text-base"
-          disabled={pending || (!isDigital && stock <= 0)}
+          disabled={pending || invalidCombination || (!isDigital && stock <= 0) || maxQuantity < 1}
           onClick={handleAddToCart}
           type="button"
         >
@@ -468,7 +644,7 @@ function PurchasePanel({ product, relatedCount = 0 }) {
         </Button>
         <Button
           className="h-12 w-full rounded-full text-base"
-          disabled={pending || (!isDigital && stock <= 0)}
+          disabled={pending || invalidCombination || (!isDigital && stock <= 0) || maxQuantity < 1}
           onClick={handleBuyNow}
           type="button"
           variant="outline"
@@ -619,7 +795,7 @@ export function ProductStoreDetail({ slug, initialProduct, initialProducts = [] 
                         {product.short_description}
                       </p>
                     )}
-                    <PurchasePanel product={product} />
+                    <PurchasePanel key={product.id} product={product} />
                     <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border-delicate bg-canvas-pure px-4 py-3 font-body-sm text-body-sm text-on-surface-variant">
                       <span className="flex items-center gap-1.5">
                         <ShieldCheck className="size-4 text-primary-container" />
@@ -663,39 +839,7 @@ export function ProductStoreDetail({ slug, initialProduct, initialProducts = [] 
                     </div>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                       {related.map((item) => (
-                        <Link
-                          className="group flex flex-col overflow-hidden rounded-3xl border border-border-delicate bg-canvas-pure shadow-sm transition-shadow hover:shadow-lg"
-                          href={`/urunler/${item.slug || item.id}`}
-                          key={item.id}
-                        >
-                          <div className="relative aspect-square">
-                            {item.thumbnail ? (
-                              <img
-                                alt={item.title}
-                                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                loading="lazy"
-                                src={item.thumbnail}
-                              />
-                            ) : (
-                              <span className="absolute inset-0 flex items-center justify-center bg-blush-surface text-primary-container">
-                                <GraduationCap className="size-8" />
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-col gap-1.5 p-4">
-                            <p className="font-title-sm text-title-sm font-semibold text-primary">
-                              {item.title}
-                            </p>
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="font-title-sm text-title-sm font-bold text-primary">
-                                {formatPrice(item.effective_price)}
-                              </span>
-                              <span className="rounded-full bg-blush-surface px-3 py-1 font-label-sm text-label-sm font-semibold text-primary transition-colors group-hover:bg-blush-hover">
-                                İncele
-                              </span>
-                            </div>
-                          </div>
-                        </Link>
+                        <ProductCard key={item.id} product={item} />
                       ))}
                     </div>
                   </section>

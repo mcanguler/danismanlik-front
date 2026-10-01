@@ -1,176 +1,37 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   CircleAlert,
   LoaderCircle,
   Package,
   Search,
-  Store,
 } from "lucide-react";
 import { ServicesPageShell } from "@/components/marketing/services-page";
 import { PageTitleSection } from "@/components/marketing/page-title-section";
+import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
-import { ApiError } from "@/lib/api";
+import { isApiError } from "@/lib/query-errors";
 import { ROLES } from "@/lib/auth";
 import { useAuth } from "@/lib/auth-hooks";
-import { formatPrice } from "@/lib/format";
 import {
+  remainingPurchaseQuantity,
   useAddCartItem,
+  useCartQuery,
+  usePublicProductCategoriesQuery,
   usePublicProductsQuery,
 } from "@/lib/products";
-import { usePublicProductCategoriesQuery } from "@/lib/products";
+import { useOrdersQuery } from "@/lib/orders";
 
 function getErrorMessage(error) {
-  if (error instanceof ApiError) return error.message;
+  if (isApiError(error)) return error.message;
   return "Beklenmeyen bir hata oluştu";
 }
 
 const PAGE_SIZE = 8;
-
-function excerpt(text, maxLength = 110) {
-  const value = String(text ?? "").trim();
-  if (value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength).trimEnd()}...`;
-}
-
-function ProductMedia({ alt, src, className }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className={cn("relative overflow-hidden bg-surface-container-highest", className)}>
-      {src && !failed ? (
-        <img
-          alt={alt}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-          onError={() => setFailed(true)}
-          src={src}
-        />
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-blush-surface text-primary-container">
-          <Package className="size-9" />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function PriceTag({ product, large = false }) {
-  if (product.has_discount) {
-    return (
-      <div className="flex flex-col">
-        <span
-          className={cn(
-            "font-bold text-primary",
-            large ? "font-headline-md text-headline-md" : "font-title-sm text-title-sm"
-          )}
-        >
-          {formatPrice(product.effective_price)}
-        </span>
-        <span className="font-body-sm text-body-sm text-outline line-through">
-          {formatPrice(product.price)}
-        </span>
-      </div>
-    );
-  }
-  return (
-    <span
-      className={cn(
-        "font-bold text-primary",
-        large ? "font-headline-md text-headline-md" : "font-title-sm text-title-sm"
-      )}
-    >
-      {formatPrice(product.effective_price)}
-    </span>
-  );
-}
-
-function ProductCard({ product, onAddToCart, adding }) {
-  return (
-    <div className="group flex flex-col overflow-hidden rounded-3xl border border-border-delicate bg-canvas-pure shadow-sm hover:shadow-xl transition-all duration-300">
-      <Link
-        className="relative block aspect-square"
-        href={`/urunler/${product.slug || product.id}`}
-      >
-        <ProductMedia alt={product.title} className="h-full rounded-none" src={product.thumbnail} />
-        {product.has_discount && (
-          <span className="absolute left-3 top-3 rounded-full bg-accent-gold px-2.5 py-0.5 font-label-sm text-label-sm font-bold text-primary shadow-sm">
-            İndirimli
-          </span>
-        )}
-      </Link>
-      <div className="flex flex-grow flex-col gap-2 p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-1.5">
-          {product.category?.name ? (
-            <span className="rounded-full bg-blush-surface px-2 py-0.5 font-label-sm text-label-sm text-primary">
-              {product.category.name}
-            </span>
-          ) : (
-            <span className="rounded-full bg-muted px-2 py-0.5 font-label-sm text-label-sm text-muted-foreground">
-              Kategorisiz
-            </span>
-          )}
-        </div>
-        <Link href={`/urunler/${product.slug || product.id}`}>
-          <h3 className="font-title-md text-title-md font-semibold leading-snug text-primary transition-colors hover:text-burgundy-light">
-            {product.title}
-          </h3>
-        </Link>
-        {product.short_description && (
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            {excerpt(product.short_description, 100)}
-          </p>
-        )}
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
-          <PriceTag product={product} />
-          <Button
-            className="h-9 rounded-full"
-            disabled={adding}
-            onClick={() => onAddToCart(product)}
-            size="sm"
-            type="button"
-          >
-            {adding ? (
-              <LoaderCircle className="size-4 animate-spin" />
-            ) : (
-              <Store className="size-4" />
-            )}
-            {adding ? "Ekleniyor..." : "Sepete Ekle"}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Sadeleştirme: güven çipleri devre dışı bırakıldı (gerekirse geri açılır)
-// const TRUST_CHIPS = [
-//   {
-//     icon: ShieldCheck,
-//     title: "256-Bit SSL",
-//     description: "Güvenli ödeme altyapısı",
-//   },
-//   {
-//     icon: Tags,
-//     title: "Boutique Seçki",
-//     description: "Özenle seçilmiş ürünler",
-//   },
-//   {
-//     icon: BadgeCheck,
-//     title: "Web & Mobil",
-//     description: "7/24 sipariş takibi",
-//   },
-//   {
-//     icon: Package,
-//     title: "Hızlı Teslimat",
-//     description: "Onaylı satıcı seçkisi",
-//   },
-// ];
 
 export function ProductStorePage({ initialProducts = [], initialCategories = [] }) {
   const router = useRouter();
@@ -178,14 +39,16 @@ export function ProductStorePage({ initialProducts = [], initialCategories = [] 
   const searchParams = useSearchParams();
   const { status, user } = useAuth();
   const addCartItem = useAddCartItem();
+  const cartQuery = useCartQuery({ enabled: status !== "loading" });
+  const ordersQuery = useOrdersQuery({
+    enabled: status === "authenticated",
+  });
   const [addingId, setAddingId] = useState(null);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
   const [page, setPage] = useState(1);
 
   const categorySlug = searchParams.get("category") ?? "";
-  // Sunucuda çekilen veri yalnızca aynı kategori filtresiyle eşleşen
-  // sorguya başlangıç verisi olarak verilir; filtre değişince taze çekilir.
   const [serverParams] = useState(categorySlug ? { category: categorySlug } : {});
   const currentParams = categorySlug ? { category: categorySlug } : {};
   const paramsMatchServer =
@@ -213,6 +76,19 @@ export function ProductStorePage({ initialProducts = [], initialCategories = [] 
       });
       return;
     }
+    const remaining = remainingPurchaseQuantity({
+      product,
+      cartItems: cartQuery.data?.items ?? [],
+      orders: ordersQuery.data ?? [],
+    });
+    if (remaining != null && remaining < 1) {
+      toast.add({
+        title: "Alım limiti doldu",
+        description: `Bu üründen en fazla ${product.max_purchase_quantity} adet satın alabilirsiniz.`,
+        type: "info",
+      });
+      return;
+    }
     setAddingId(product.id);
     addCartItem.mutate(
       {
@@ -225,6 +101,8 @@ export function ProductStorePage({ initialProducts = [], initialCategories = [] 
             title: product.title,
             slug: product.slug,
             thumbnail: product.thumbnail,
+            max_purchase_quantity: product.max_purchase_quantity ?? null,
+            fields: product.fields ?? [],
           },
         },
       },
@@ -286,132 +164,92 @@ export function ProductStorePage({ initialProducts = [], initialCategories = [] 
     currentPage * PAGE_SIZE
   );
 
+  const activeCategory = categorySlug
+    ? categories.find((category) => category.slug === categorySlug)
+    : null;
+
   const clearAll = () => {
     setSearch("");
     setSort("default");
     setPage(1);
-    if (categorySlug) {
-      router.push(pathname, { scroll: false });
-    }
+    router.push(pathname, { scroll: false });
   };
 
   return (
     <ServicesPageShell>
-      <PageTitleSection title="Ürünler" />
-
-      <div className="mx-auto w-full max-w-[1320px] px-4 sm:px-6">
-        <div className="rounded-3xl border border-border-delicate bg-canvas-pure p-4 shadow-sm sm:p-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative min-w-56 flex-1">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <PageTitleSection
+        description="Boutique ürün koleksiyonunu keşfedin; güvenli ödeme altyapısıyla sipariş verin."
+        title={activeCategory?.name ?? "Ürünler"}
+      />
+      <div className="mx-auto w-full max-w-[1320px] px-4 py-10 sm:px-6">
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3 rounded-2xl border border-border-delicate bg-canvas-pure p-4 sm:flex-row sm:items-center">
+            <div className="relative min-w-0 flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <input
-                className="h-10 w-full rounded-xl border border-input bg-canvas-cream pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+                className="h-11 w-full rounded-xl border-0 bg-surface-container-low pl-10 pr-3.5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                 onChange={(event) => {
                   setSearch(event.target.value);
                   setPage(1);
                 }}
-                placeholder="Ürün adı, türü veya anahtar kelime ara..."
-                type="text"
+                placeholder="Ürün ara..."
+                type="search"
                 value={search}
               />
             </div>
             <select
-              className="h-10 rounded-xl border border-input bg-transparent px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+              className="h-11 rounded-xl border-0 bg-surface-container-low px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
               onChange={(event) => {
                 setSort(event.target.value);
                 setPage(1);
               }}
               value={sort}
             >
-              <option value="default">Sıralama: Varsayılan</option>
-              <option value="price-asc">Fiyat: Artan</option>
-              <option value="price-desc">Fiyat: Azalan</option>
+              <option value="default">Sıralama</option>
+              <option value="price-asc">Fiyat (artan)</option>
+              <option value="price-desc">Fiyat (azalan)</option>
             </select>
-            <Button
-              className="h-10 rounded-xl"
-              onClick={clearAll}
-              type="button"
-              variant="outline"
-            >
-              Temizle
-            </Button>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              className={cn(
-                "rounded-full px-4 py-1.5 font-label-md text-label-md font-semibold transition-colors",
-                categorySlug === ""
-                  ? "bg-primary-container text-on-primary shadow-sm"
-                  : "bg-blush-surface text-primary hover:bg-blush-hover"
-              )}
-              onClick={() => selectCategory("")}
-              type="button"
-            >
-              Tümü
-            </button>
-            {categories.map((category) => (
+
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2">
               <button
                 className={cn(
-                  "rounded-full px-4 py-1.5 font-label-md text-label-md font-semibold transition-colors",
-                  categorySlug === category.slug
-                    ? "bg-primary-container text-on-primary shadow-sm"
+                  "rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors",
+                  !categorySlug
+                    ? "bg-primary text-on-primary"
                     : "bg-blush-surface text-primary hover:bg-blush-hover"
                 )}
-                key={category.id}
-                onClick={() => selectCategory(category.slug)}
+                onClick={() => selectCategory("")}
                 type="button"
               >
-                {category.name}
+                Tümü
               </button>
-            ))}
-          </div>
-          {/* Sadeleştirme: aktif seçim etiketleri kaldırıldı */}
-          {/* {(categorySlug || search.trim() || sort !== "default") && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 font-label-sm text-label-sm text-muted-foreground">
-              <span>Aktif Seçim:</span>
-              {categorySlug && (
-                <span className="rounded-full bg-primary-container px-2.5 py-0.5 font-medium text-on-primary">
-                  Kategori:{" "}
-                  {categories.find((c) => c.slug === categorySlug)?.name ?? "—"}
-                </span>
-              )}
-              {search.trim() && (
-                <span className="rounded-full bg-primary-container px-2.5 py-0.5 font-medium text-on-primary">
-                  Arama: {search.trim()}
-                </span>
-              )}
-            </div>
-          )} */}
-        </div>
-      </div>
-
-      <div className="w-full py-12">
-        <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-          <div className="mb-6 flex items-end justify-between gap-4 border-b border-border-delicate pb-3">
-            <h2 className="font-headline-md text-headline-md font-semibold text-primary">
-              Katalog
-            </h2>
-            <span className="whitespace-nowrap font-label-md text-label-md text-on-surface-variant">
-              {visible.length} ürün listeleniyor
-            </span>
-          </div>
-
-          {productsQuery.isPending && (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {[0, 1, 2, 3].map((index) => (
-                <div
-                  className="flex flex-col gap-4 rounded-3xl border border-border-delicate bg-canvas-pure p-4"
-                  key={index}
+              {categories.map((category) => (
+                <button
+                  className={cn(
+                    "rounded-full px-4 py-1.5 font-label-md text-label-md transition-colors",
+                    categorySlug === category.slug
+                      ? "bg-primary text-on-primary"
+                      : "bg-blush-surface text-primary hover:bg-blush-hover"
+                  )}
+                  key={category.id}
+                  onClick={() => selectCategory(category.slug)}
+                  type="button"
                 >
-                  <div className="aspect-square w-full animate-pulse rounded-2xl bg-surface-container-highest" />
-                  <div className="h-5 w-3/4 animate-pulse rounded-full bg-surface-container-highest" />
-                  <div className="h-8 w-28 animate-pulse rounded-xl bg-surface-container-highest" />
-                </div>
+                  {category.name}
+                </button>
               ))}
             </div>
           )}
 
-          {productsQuery.isError && (
+          {(productsQuery.isPending || categoriesQuery.isPending) && (
+            <div className="flex justify-center py-16">
+              <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+
+          {(productsQuery.isError || categoriesQuery.isError) && (
             <div className="flex flex-col items-center gap-3 rounded-3xl border border-border-delicate bg-canvas-pure px-4 py-14 text-center">
               <CircleAlert className="size-7 text-destructive" />
               <p className="font-body-md text-body-md text-on-surface-variant">
@@ -424,7 +262,7 @@ export function ProductStorePage({ initialProducts = [], initialCategories = [] 
             <div className="flex flex-col items-center gap-3 rounded-3xl border border-border-delicate bg-canvas-pure px-4 py-14 text-center">
               <Package className="size-8 text-accent-gold" />
               <p className="font-title-md text-title-md font-semibold text-primary">
-                Şu anda satışta ürün bulunmuyor
+                Şu anda listelenen ürün yok
               </p>
               <p className="font-body-md text-body-md text-on-surface-variant">
                 Yeni ürünler için kısa süre içinde tekrar ziyaret edin.

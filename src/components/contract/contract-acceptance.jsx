@@ -1,17 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FileText, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { isApiError } from "@/lib/query-errors";
-import { usePublicPageQuery } from "@/lib/pages";
-
-/**
- * Mesafeli satış sözleşmesinin CMS sayfası (site footeriyle aynı kaynak).
- * Metnin içeriği backend/CMS'ten gelir; frontend'de tutulmaz.
- */
-export const DISTANCE_SALES_PAGE_SLUG = "mesafeli-satis-sozlesmesi";
+import { usePublicPagesQuery } from "@/lib/pages";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -34,58 +28,76 @@ export function printContract(contract) {
   win.print();
 }
 
-/** Checkout'ta sözleşme onayı: checkbox + modal (scroll edilebilir içerik). */
-export function ContractAcceptance({ checked, onCheckedChange }) {
+const MESAFELI_MATCH = /mesafeli|mesafelİ/i;
+
+/**
+ * CMS'teki mesafeli satış sözleşmesi sayfasını bulur.
+ * Metnin kendisi backend/CMS'ten gelir; frontend'de tutulmaz.
+ * Yönetim panelinde slug ve/veya başlığında "mesafeli" geçen bir
+ * sayfa yayına alındığında içerik otomatik görünür.
+ */
+export function useDistanceSalesContractPage(enabled) {
+  const pagesQuery = usePublicPagesQuery({ enabled });
+
+  const page = useMemo(() => {
+    const pages = pagesQuery.data ?? [];
+    return (
+      pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.slug)) ??
+      pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.title)) ??
+      null
+    );
+  }, [pagesQuery.data]);
+
+  return page;
+}
+
+/**
+ * Checkout/randevu onay sözleşme onayı: checkbox + görüntüleme modalı.
+ * İçerik CMS kaynağı yoksa hata gösterilmez; checkbox akışı çalışır,
+ * sipariş sözleşmesi yine backend'in snapshot'ı ile sipariş detayında sunulur.
+ */
+export function ContractAcceptance({
+  checked,
+  onCheckedChange,
+  label = "Satış sözleşmesini",
+  trailing = "okudum ve kabul ediyorum.",
+}) {
   const [open, setOpen] = useState(false);
-  const pageQuery = usePublicPageQuery(DISTANCE_SALES_PAGE_SLUG, {
-    enabled: open,
-  });
+  const page = useDistanceSalesContractPage(open);
 
   return (
     <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
       <label className="flex cursor-pointer items-start gap-3">
         <input
           checked={checked}
-          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-burgundy-light rounded"
+          className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded accent-burgundy-light"
           onChange={(event) => onCheckedChange(event.target.checked)}
           type="checkbox"
         />
         <span className="text-sm leading-snug text-foreground">
           <button
-            className="font-semibold text-primary underline underline-offset-2 hover:text-burgundy-light"
-            onClick={() => setOpen(true)}
+            className={page ? "font-semibold text-primary underline underline-offset-2 hover:text-burgundy-light" : "cursor-default"}
+            onClick={(event) => {
+              event.preventDefault();
+              if (page) setOpen(true);
+            }}
             type="button"
           >
-            Satış sözleşmesini
+            {label}
           </button>{" "}
-          okudum ve kabul ediyorum.
+          {trailing}
         </span>
       </label>
 
-      <Dialog onOpenChange={setOpen} open={open}>
+      <Dialog onOpenChange={setOpen} open={open && Boolean(page)}>
         <DialogContent className="max-w-2xl">
           <DialogTitle className="pr-6 font-title-lg text-title-lg font-semibold text-primary">
-            Mesafeli Satış Sözleşmesi
+            {page?.title || "Mesafeli Satış Sözleşmesi"}
           </DialogTitle>
-          {pageQuery.isPending ? (
-            <div className="flex justify-center py-10">
-              <LoaderCircle className="size-5 animate-spin text-muted-foreground" />
-            </div>
-          ) : null}
-          {pageQuery.isError ? (
-            <div className="px-6 py-8 text-center">
-              <FileText className="mx-auto size-6 text-muted-foreground" />
-              <p className="mt-2 text-sm text-destructive">
-                {isApiError(pageQuery.error)
-                  ? pageQuery.error.message
-                  : "Sözleşme metni yüklenemedi."}
-              </p>
-            </div>
-          ) : null}
-          {pageQuery.data?.content ? (
+          {page?.content ? (
             <div className="max-h-[60vh] overflow-y-auto pr-2">
               <div className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground">
-                {pageQuery.data.content}
+                {page.content}
               </div>
             </div>
           ) : null}

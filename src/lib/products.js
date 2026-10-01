@@ -62,6 +62,80 @@ export function isOptionBasedFieldType(type) {
   return OPTION_BASED_FIELD_TYPES.includes(type);
 }
 
+/**
+ * Satın alınabilir kalan adet. `null` = sınırsız.
+ * Frontend UX amaçlıdır; asıl kontrol backend'dedir.
+ */
+export function remainingPurchaseQuantity({
+  product,
+  cartItems = [],
+  orders = [],
+  ignoreCartItemId = null,
+} = {}) {
+  const limit = product?.max_purchase_quantity;
+  if (limit == null || Number.isNaN(Number(limit))) return null;
+  const productId = product?.id ?? product?.product_id ?? null;
+  if (productId == null) return Number(limit);
+
+  const purchased = (orders ?? []).reduce((sum, order) => {
+    const status = order?.status;
+    if (status !== "PAID" && status !== "PENDING") return sum;
+    return (
+      sum +
+      (order.items ?? []).reduce((inner, item) => {
+        const isProduct =
+          (item.itemType ?? item.item_type) === CART_ITEM_TYPES.PRODUCT;
+        const itemProductId = item.item_id ?? item.product_id;
+        if (!isProduct || String(itemProductId) !== String(productId)) {
+          return inner;
+        }
+        return inner + Number(item.quantity ?? 0);
+      }, 0)
+    );
+  }, 0);
+
+  const inCart = (cartItems ?? []).reduce((sum, item) => {
+    if (ignoreCartItemId != null && String(item.id) === String(ignoreCartItemId)) {
+      return sum;
+    }
+    const isProduct = (item.item_type ?? CART_ITEM_TYPES.PRODUCT) === CART_ITEM_TYPES.PRODUCT;
+    const itemProductId = item.product_id ?? item.product?.id ?? item.item_id;
+    if (!isProduct || String(itemProductId) !== String(productId)) return sum;
+    return sum + Number(item.quantity ?? 0);
+  }, 0);
+
+  return Math.max(0, Number(limit) - purchased - inCart);
+}
+
+export function formatSelectedOptionValue(field, value) {
+  if (value == null || value === "") return null;
+  if (!isOptionBasedFieldType(field?.type)) {
+    const text = String(value).trim();
+    return text || null;
+  }
+  const options = field?.options ?? [];
+  const ids = Array.isArray(value) ? value : [value];
+  const labels = ids
+    .map((id) => options.find((option) => String(option.id) === String(id))?.label)
+    .filter(Boolean);
+  return labels.length > 0 ? labels.join(", ") : ids.map(String).join(", ");
+}
+
+export function cartItemSelectedFields(item) {
+  const product = item?.product;
+  const fields = Array.isArray(product?.fields) ? product.fields : [];
+  const selected = item?.selected_options;
+  if (!selected || typeof selected !== "object") return [];
+  return fields
+    .map((field) => {
+      const raw = selected[field.key];
+      const display = formatSelectedOptionValue(field, raw);
+      if (!display) return null;
+      return { key: field.key, name: field.name, value: display };
+    })
+    .filter(Boolean);
+}
+
 function useToken() {
   return useAuthStore((state) => state.token);
 }
@@ -177,6 +251,10 @@ export function normalizeProduct(item) {
     effective_price: item.effective_price ?? null,
     has_discount: Boolean(item.has_discount),
     stock: item.stock ?? 0,
+    max_purchase_quantity:
+      item.max_purchase_quantity == null
+        ? null
+        : Number(item.max_purchase_quantity),
     seo_title: item.seo_title ?? "",
     seo_description: item.seo_description ?? "",
     is_active: Boolean(item.is_active),

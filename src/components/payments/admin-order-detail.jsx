@@ -24,6 +24,7 @@ import {
   ORDER_STATUS_LABELS,
   PAYMENT_STATUS_BADGE_CLASSES,
   PAYMENT_STATUS_LABELS,
+  latestPayment,
   useAdminOrderQuery,
   useAdminUpdateOrderStatus,
 } from "@/lib/orders";
@@ -269,13 +270,24 @@ export function AdminOrderDetail({ orderId }) {
           </h1>
           <span
             className={cn(
-              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+              "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium",
               ORDER_STATUS_BADGE_CLASSES[order.status] ??
                 "bg-muted text-muted-foreground"
             )}
           >
-            {ORDER_STATUS_LABELS[order.status] ?? order.status}
+            Sipariş: {ORDER_STATUS_LABELS[order.status] ?? order.status}
           </span>
+          {latestPayment(order) && (
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+                PAYMENT_STATUS_BADGE_CLASSES[latestPayment(order).status] ??
+                  "bg-muted text-muted-foreground"
+              )}
+            >
+              Ödeme: {PAYMENT_STATUS_LABELS[latestPayment(order).status] ?? ""}
+            </span>
+          )}
         </div>
       </div>
 

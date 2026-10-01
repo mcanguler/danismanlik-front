@@ -3,12 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-hooks";
 import {
   BadgeCheck,
   CircleAlert,
   CircleCheck,
   Clock,
   CreditCard,
+  Download,
   GraduationCap,
   LoaderCircle,
   Package,
@@ -18,22 +20,31 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { RequireAuth } from "@/components/require-auth";
+import { api, ApiError } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 import { getQueryErrorMessage } from "@/lib/query-errors";
-import { formatPrice } from "@/lib/format";
+import { formatDateTimeTr, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { marketingNavLinks } from "@/lib/marketing-nav";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import {
+  ORDER_ITEM_TYPE_LABELS,
   ORDER_STATUSES,
   PAYMENT_STATUSES,
   invalidatePaymentRelatedQueries,
   latestPayment,
   useCreateOrder,
   useCreateOrderPayment,
+  useOrderDownloadsQuery,
   useOrderQuery,
 } from "@/lib/orders";
+
+function sanitizeFileName(value) {
+  return String(value ?? "dijital-dosya")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .trim() || "dijital-dosya";
+}
 
 function OrderStatusBadge({ status }) {
   return (
@@ -126,10 +137,12 @@ function ResultShell({ children }) {
 export function PaymentCheckout({ orderId }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { token } = useAuth();
   const invalidatedRef = useRef(false);
   const initiatedRef = useRef(false);
   const [iframeUrl, setIframeUrl] = useState(null);
   const [initError, setInitError] = useState(null);
+  const [universalDownloadingId, setUniversalDownloadingId] = useState(null);
 
   const orderQuery = useOrderQuery(orderId, {
     refetchInterval: (query) =>
@@ -145,6 +158,40 @@ export function PaymentCheckout({ orderId }) {
   const hasCourseItem = (order?.items ?? []).some(
     (item) => item.itemType === "COURSE"
   );
+  const universalDownloadsQuery = useOrderDownloadsQuery(orderId, {
+    enabled: orderStatus === ORDER_STATUSES.PAID,
+  });
+  const universalDownloads = universalDownloadsQuery.data ?? [];
+
+  const handleUniversalDownload = async (download) => {
+    setUniversalDownloadingId(download.id);
+    try {
+      const blob = await api.downloadOrderFile(token, orderId, download.id);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = sanitizeFileName(
+        download.product?.title
+          ? `${download.product.title} - ${download.title}`
+          : download.title
+      );
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.add({
+        title: "Dosya indirilemedi",
+        description:
+          error instanceof ApiError
+            ? error.message
+            : "Beklenmeyen bir hata oluştu",
+        type: "error",
+      });
+    } finally {
+      setUniversalDownloadingId(null);
+    }
+  };
 
   const startPayment = useCreateOrderPayment();
   const createOrder = useCreateOrder();
@@ -214,6 +261,29 @@ export function PaymentCheckout({ orderId }) {
   }
 
   if (orderStatus === ORDER_STATUSES.PAID) {
+    const items = order?.items ?? [];
+    const groups = {
+      APPOINTMENT: items.filter((item) => item.itemType === "APPOINTMENT"),
+      COURSE: items.filter((item) => item.itemType === "COURSE"),
+      SERVICE_PACKAGE: items.filter((item) => item.itemType === "SERVICE_PACKAGE"),
+      PRODUCT: items.filter((item) => item.itemType === "PRODUCT"),
+    };
+    const primaryType =
+      groups.APPOINTMENT.length > 0
+        ? "APPOINTMENT"
+        : groups.COURSE.length > 0
+          ? "COURSE"
+          : groups.SERVICE_PACKAGE.length > 0
+            ? "SERVICE_PACKAGE"
+            : "PRODUCT";
+    const resultDescription =
+      primaryType === "APPOINTMENT"
+        ? "Randevunuz onaylandı. Randevu detayları SMS ve WhatsApp üzerinden size iletilecek."
+        : primaryType === "COURSE"
+          ? "Eğitim kaydınız onaylandı. Eğitim içerikleri hesabınıza tanımlandı."
+          : primaryType === "SERVICE_PACKAGE"
+            ? "Paketiniz hesabınıza eklendi. Randevu oluştururken paketinizi kullanabilirsiniz."
+            : "Satın aldığınız içerikler hesabınıza tanımlandı.";
     return (
       <ResultShell>
         <CircleCheck className="size-14 text-emerald-600" />
@@ -221,27 +291,94 @@ export function PaymentCheckout({ orderId }) {
           Ödemeniz başarıyla tamamlandı
         </h1>
         <p className="max-w-md text-sm text-muted-foreground">
-          {hasAppointmentItem
-            ? "Randevunuz onaylandı. Randevu detayları SMS ve WhatsApp üzerinden size iletilecek."
-            : hasCourseItem
-              ? "Eğitim kaydınız onaylandı. Eğitim içerikleri hesabınıza tanımlandı."
-              : "Satın aldığınız paket hesabınıza eklendi. Randevu oluştururken paketinizi kullanabilirsiniz."}
+          {resultDescription}
         </p>
+        <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-2xl border border-border-delicate bg-canvas-pure px-5 py-4 text-sm">
+          <span className="font-mono text-muted-foreground">
+            {order?.orderNo ?? `#${orderId}`}
+          </span>
+          <span className="font-semibold text-primary">
+            {formatPrice(order?.totalAmount)} {order?.currency ?? "TRY"}
+          </span>
+        </div>
+        {items.length > 0 && (
+          <div className="mt-3 w-full max-w-md rounded-2xl border border-border-delicate bg-canvas-pure p-4 text-left">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Satın Alınan İçerikler
+            </p>
+            <ul className="space-y-2.5">
+              {items.map((item) => (
+                <li className="flex items-start justify-between gap-3 text-sm" key={item.id}>
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {ORDER_ITEM_TYPE_LABELS[item.itemType] ?? item.itemType} ·{" "}
+                      {item.quantity} adet
+                      {primaryType === "APPOINTMENT" &&
+                        item.itemType === "APPOINTMENT" &&
+                        item.metadata?.start_at
+                        ? ` · ${formatDateTimeTr(item.metadata.start_at)}`
+                        : null}
+                    </p>
+                  </div>
+                  <span className="whitespace-nowrap text-sm">
+                    {formatPrice(item.total_price)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {universalDownloads.length > 0 && (
+              <div className="mt-3 border-t pt-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  İndirilebilir Dosyalar
+                </p>
+                <div className="space-y-2">
+                  {universalDownloads.map((download) => (
+                    <div className="flex items-center justify-between gap-3" key={download.id}>
+                      <p className="min-w-0 truncate text-sm">
+                        {download.title}
+                      </p>
+                      <Button
+                        disabled={universalDownloadingId != null}
+                        onClick={() => handleUniversalDownload(download)}
+                        size="sm"
+                        type="button"
+                        variant="outline"
+                      >
+                        {universalDownloadingId === download.id ? (
+                          <LoaderCircle className="size-4 animate-spin" />
+                        ) : (
+                          <Download className="size-4" />
+                        )}
+                        İndir
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          {hasAppointmentItem ? (
+          {primaryType === "APPOINTMENT" ? (
             <Button render={<Link href="/appointments" />}>
               <BadgeCheck className="size-4" />
               Randevularıma Git
             </Button>
-          ) : hasCourseItem ? (
+          ) : primaryType === "COURSE" ? (
             <Button render={<Link href={`/egitimler/kayit-onay/${orderId}`} />}>
               <GraduationCap className="size-4" />
               Kayıt Onayım
             </Button>
-          ) : (
+          ) : primaryType === "SERVICE_PACKAGE" ? (
             <Button render={<Link href="/dashboard/customer/paketlerim" />}>
               <Package className="size-4" />
               Paketlerime Git
+            </Button>
+          ) : (
+            <Button render={<Link href={`/dashboard/customer/siparislerim/${orderId}`} />}>
+              <Package className="size-4" />
+              Sipariş Detayına Git
             </Button>
           )}
           <Button

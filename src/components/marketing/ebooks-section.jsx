@@ -1,4 +1,6 @@
-import { EbookCard } from "@/components/marketing/ebook-card";
+"use client";
+
+import { ProductCard } from "@/components/products/product-card";
 import { SectionHeading } from "@/components/marketing/section-heading";
 
 function EbooksGridSkeleton({ count = 4 }) {
@@ -6,10 +8,10 @@ function EbooksGridSkeleton({ count = 4 }) {
     <div className="grid animate-pulse grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, index) => (
         <div
-          className="overflow-hidden rounded-2xl border border-border-delicate bg-canvas-pure"
+          className="overflow-hidden rounded-3xl border border-border-delicate bg-canvas-pure"
           key={index}
         >
-          <div className="aspect-[4/5] bg-blush-surface/60" />
+          <div className="aspect-square bg-blush-surface/60" />
           <div className="flex flex-col gap-3 p-5">
             <div className="h-4 w-3/4 rounded bg-surface-container" />
             <div className="h-3 w-1/2 rounded bg-surface-container" />
@@ -21,7 +23,7 @@ function EbooksGridSkeleton({ count = 4 }) {
   );
 }
 
-export function EbooksSection({ ebooks, loading = false }) {
+export function EbooksSection({ products, loading = false }) {
   if (loading) {
     return (
       <section
@@ -34,7 +36,7 @@ export function EbooksSection({ ebooks, loading = false }) {
     );
   }
 
-  if (!ebooks || ebooks.length === 0) return null;
+  if (!products || products.length === 0) return null;
 
   return (
     <section
@@ -43,8 +45,8 @@ export function EbooksSection({ ebooks, loading = false }) {
     >
       <SectionHeading description="" eyebrow="" title="E-Kitaplar" />
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {ebooks.map((ebook) => (
-          <EbookCard ebook={ebook} key={ebook.id ?? ebook.title} />
+        {products.map((product) => (
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>

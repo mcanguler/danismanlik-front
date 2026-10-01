@@ -4,6 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { KvkkModalLink } from "@/components/kvkk-modal";
+import { ContractAcceptance } from "@/components/contract/contract-acceptance";
+import {
+  getContractRequiredMessage,
+  isContractRequiredError,
+} from "@/lib/contracts";
 import {
   ArrowLeft,
   ArrowRight,
@@ -285,6 +290,8 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
   const [customerServicePackageId, setCustomerServicePackageId] = useState(null);
   const [createdAppointment, setCreatedAppointment] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [contractAccepted, setContractAccepted] = useState(false);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
 
   const login = useLogin();
   const register = useRegister();
@@ -541,6 +548,17 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
       return;
     }
     if (!isCustomer) return;
+    // Özeti ve Onay adımındaki onaylar işaretlenmeden randevu oluşturma
+    // unless backend zamanı; backend validation'da korumalı.
+    if (!contractAccepted || !kvkkAccepted) {
+      toast.add({
+        title: "Onay eksik",
+        description:
+          "Devam etmek için satış sözleşmesini ve KVKK aydınlatma metnini onaylayın.",
+        type: "info",
+      });
+      return;
+    }
 
     if (createdAppointment && !selectedPackage) {
       startAppointmentPayment(createdAppointment.id);
@@ -555,6 +573,8 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
         start_at: `${date} ${slot.start}:00`,
         end_at: slot.end ? `${date} ${slot.end}:00` : `${date} ${slot.start}:00`,
         notes: notes.trim() ? notes.trim() : null,
+        contract_accepted: true,
+        kvkk_accepted: true,
         ...(selectedPackage
           ? { customer_service_package_id: selectedPackage.id }
           : {}),
@@ -1493,29 +1513,61 @@ export function ServiceBookingWizard({ service, offerings, offeringsPending }) {
                       </div>
                     )}
                     {isCustomer && (
-                      <button
-                        className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg shadow-lg hover:bg-burgundy-light transition-all transform hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none"
-                        disabled={create.isPending || createOrder.isPending}
-                        onClick={handleBooking}
-                        type="button"
-                      >
-                        {create.isPending || createOrder.isPending ? (
-                          <LoaderCircle className="size-5 animate-spin" />
-                        ) : selectedPackage ? (
-                          <CircleCheck className="size-5" />
-                        ) : (
-                          <CreditCard className="size-5" />
+                      <>
+                        <div className="flex flex-col gap-2">
+                          <ContractAcceptance
+                            checked={contractAccepted}
+                            label="Satış sözleşmesini"
+                            onCheckedChange={setContractAccepted}
+                          />
+                          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                            <label className="flex cursor-pointer items-start gap-3">
+                              <input
+                                checked={kvkkAccepted}
+                                className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded accent-burgundy-light"
+                                onChange={(event) =>
+                                  setKvkkAccepted(event.target.checked)
+                                }
+                                type="checkbox"
+                              />
+                              <span className="text-sm leading-snug text-foreground">
+                                <KvkkModalLink className="font-semibold text-primary underline underline-offset-2 hover:text-burgundy-light" />{" "}
+                                okudum ve onaylıyorum.
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                        {isCustomer && (
+                          <button
+                            className="w-full inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg shadow-lg hover:bg-burgundy-light transition-all transform hover:-translate-y-0.5 disabled:opacity-60 disabled:pointer-events-none"
+                            disabled={
+                              create.isPending ||
+                              createOrder.isPending ||
+                              !contractAccepted ||
+                              !kvkkAccepted
+                            }
+                            onClick={handleBooking}
+                            type="button"
+                          >
+                            {create.isPending || createOrder.isPending ? (
+                              <LoaderCircle className="size-5 animate-spin" />
+                            ) : selectedPackage ? (
+                              <CircleCheck className="size-5" />
+                            ) : (
+                              <CreditCard className="size-5" />
+                            )}
+                            <span>
+                              {create.isPending || createOrder.isPending
+                                ? selectedPackage
+                                  ? "Randevu oluşturuluyor..."
+                                  : "Ödeme ekranına geçiliyor..."
+                                : selectedPackage
+                                  ? "Randevuyu Onayla"
+                                  : "Ödemeye Geç ve Randevuyu Oluştur"}
+                            </span>
+                          </button>
                         )}
-                        <span>
-                          {create.isPending || createOrder.isPending
-                            ? selectedPackage
-                              ? "Randevu oluşturuluyor..."
-                              : "Ödeme ekranına geçiliyor..."
-                            : selectedPackage
-                              ? "Randevuyu Onayla"
-                              : "Ödemeye Geç ve Randevuyu Oluştur"}
-                        </span>
-                      </button>
+                      </>
                     )}
                     {isGuest && (
                       <button

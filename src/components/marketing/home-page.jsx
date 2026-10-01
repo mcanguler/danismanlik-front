@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { HeroSection } from "@/components/marketing/hero-section";
@@ -10,23 +9,8 @@ import { EbooksSection } from "@/components/marketing/ebooks-section";
 import { CoursesSection } from "@/components/marketing/courses-section";
 import { marketingNavLinks } from "@/lib/marketing-nav";
 import { MENU_SETTING_SOURCES, useSettingMenuItems } from "@/lib/menus";
-import { PRODUCT_TYPES, usePublicProductsQuery } from "@/lib/products";
+import { usePublicProductsQuery } from "@/lib/products";
 import { usePublicCoursesQuery } from "@/lib/courses";
-import { formatPrice } from "@/lib/format";
-
-function toCardPricing(item) {
-  const discount = item.has_discount
-    ? `%${Math.round(
-        (1 - Number(item.effective_price ?? 0) / Number(item.price)) * 100
-      )} İndirim`
-    : null;
-  return {
-    effectivePrice: Number(item.effective_price ?? item.price ?? 0),
-    price: formatPrice(item.effective_price ?? item.price),
-    oldPrice: item.has_discount ? formatPrice(item.price) : null,
-    discount,
-  };
-}
 
 const FALLBACK_QUICK_LINKS = [
   { label: "1e1 Seanslar", href: null },
@@ -132,39 +116,10 @@ export function HomePage() {
   });
   const coursesQuery = usePublicCoursesQuery();
 
-  const ebooks = useMemo(() => {
-    const products = productsQuery.data ?? [];
-    return products
-      .map((product) => {
-        const hasVariations = (product.variations ?? []).length > 0;
-        const hasRequiredFields = (product.fields ?? []).some(
-          (field) => field.is_required
-        );
-        const outOfStock =
-          product.type === PRODUCT_TYPES.PHYSICAL && (product.stock ?? 0) <= 0;
-        return {
-          id: product.id,
-          title: product.title,
-          image: product.thumbnail,
-          slug: product.slug,
-          canQuickAdd: !hasVariations && !hasRequiredFields,
-          outOfStock,
-          ...toCardPricing(product),
-        };
-      });
-  }, [productsQuery.data]);
+  const ebooks = useMemo(() => productsQuery.data ?? [], [productsQuery.data]);
 
   const courses = useMemo(() => {
-    const courses = coursesQuery.data ?? [];
-    return courses
-      .filter((course) => course.is_active)
-      .map((course) => ({
-        id: course.id,
-        title: course.title,
-        image: course.image,
-        slug: course.slug,
-        ...toCardPricing(course),
-      }));
+    return (coursesQuery.data ?? []).filter((course) => course.is_active);
   }, [coursesQuery.data]);
 
   return (
@@ -172,8 +127,8 @@ export function HomePage() {
       <SiteHeader links={marketingNavLinks("/")} />
       <main className="w-full pt-28 bg-canvas-cream">
         <EbooksSection
-          ebooks={ebooks}
           loading={productsQuery.isPending}
+          products={ebooks}
         />
         <CoursesSection
           courses={courses}

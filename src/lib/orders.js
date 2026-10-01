@@ -267,6 +267,44 @@ export function useCreateOrderPayment() {
   });
 }
 
+export function normalizeOrderDownload(item) {
+  if (!item || typeof item !== "object") return null;
+  return {
+    ...item,
+    title: item.title || "Dijital Dosya",
+    product:
+      item.product && typeof item.product === "object"
+        ? {
+            id: item.product.id,
+            title: item.product.title ?? "",
+            slug: item.product.slug ?? "",
+          }
+        : null,
+  };
+}
+
+/**
+ * Siparişe bağlı indirilebilir dijital dosyalar; yalnızca ödenmiş
+ * siparişler için backend erişim izni verir (404/403 → boş liste).
+ */
+export function useOrderDownloadsQuery(orderId, options = {}) {
+  const token = useToken();
+
+  return useQuery({
+    queryKey: [...ordersQueryKey, "downloads", String(orderId)],
+    queryFn: async () => {
+      const payload = await api.orderDownloads(token, orderId);
+      const data = payload?.data ?? payload;
+      if (!Array.isArray(data)) {
+        throw new ApiError("Beklenmeyen yanıt formatı");
+      }
+      return data.map(normalizeOrderDownload).filter(Boolean);
+    },
+    enabled: options.enabled === true && Boolean(token && orderId),
+    staleTime: 60 * 1000,
+  });
+}
+
 export function useAdminOrdersQuery(params = {}, options = {}) {
   const token = useToken();
 

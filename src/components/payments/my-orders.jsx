@@ -55,10 +55,6 @@ export function MyOrders() {
             {query.isSuccess ? `${orders.length} sipariş` : "Satın alımlarınız"}
           </p>
         </div>
-        <Button render={<Link href="/paketler" />} variant="outline">
-          <CreditCard className="size-4" />
-          Paketleri Keşfet
-        </Button>
       </div>
 
       <div className="mt-4 flex flex-col gap-3">
