@@ -30,25 +30,29 @@ export function printContract(contract) {
 
 const MESAFELI_MATCH = /mesafeli|mesafelİ/i;
 
+function findDistanceSalesContract(pages) {
+  if (!Array.isArray(pages)) return null;
+  return (
+    pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.slug)) ??
+    pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.title)) ??
+    null
+  );
+}
+
 /**
- * CMS'teki mesafeli satış sözleşmesi sayfasını bulur.
+ * CMS'teki mesafeli satış sözleşmesi sayfasını arar.
  * Metnin kendisi backend/CMS'ten gelir; frontend'de tutulmaz.
  * Yönetim panelinde slug ve/veya başlığında "mesafeli" geçen bir
  * sayfa yayına alındığında içerik otomatik görünür.
  */
+export function useDistanceSalesContractQuery(enabled = true) {
+  const query = usePublicPagesQuery({ enabled });
+  const page = useMemo(() => findDistanceSalesContract(query.data), [query.data]);
+  return { ...query, page };
+}
+
 export function useDistanceSalesContractPage(enabled) {
-  const pagesQuery = usePublicPagesQuery({ enabled });
-
-  const page = useMemo(() => {
-    const pages = pagesQuery.data ?? [];
-    return (
-      pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.slug)) ??
-      pages.find((item) => item.is_active && MESAFELI_MATCH.test(item.title)) ??
-      null
-    );
-  }, [pagesQuery.data]);
-
-  return page;
+  return useDistanceSalesContractQuery(enabled).page;
 }
 
 /**
@@ -63,7 +67,7 @@ export function ContractAcceptance({
   trailing = "okudum ve kabul ediyorum.",
 }) {
   const [open, setOpen] = useState(false);
-  const page = useDistanceSalesContractPage(open);
+  const { page, isPending, isError, error } = useDistanceSalesContractQuery(open);
 
   return (
     <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
@@ -76,10 +80,10 @@ export function ContractAcceptance({
         />
         <span className="text-sm leading-snug text-foreground">
           <button
-            className={page ? "font-semibold text-primary underline underline-offset-2 hover:text-burgundy-light" : "cursor-default"}
+            className="font-semibold text-primary underline underline-offset-2 hover:text-burgundy-light"
             onClick={(event) => {
               event.preventDefault();
-              if (page) setOpen(true);
+              setOpen(true);
             }}
             type="button"
           >
@@ -89,11 +93,28 @@ export function ContractAcceptance({
         </span>
       </label>
 
-      <Dialog onOpenChange={setOpen} open={open && Boolean(page)}>
+      <Dialog onOpenChange={setOpen} open={open}>
         <DialogContent className="max-w-2xl">
           <DialogTitle className="pr-6 font-title-lg text-title-lg font-semibold text-primary">
             {page?.title || "Mesafeli Satış Sözleşmesi"}
           </DialogTitle>
+          {open && isPending ? (
+            <div className="flex justify-center py-10">
+              <LoaderCircle className="size-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : null}
+          {open && isError ? (
+            <p className="text-sm text-destructive">
+              {isApiError(error) ? error.message : "Sözleşme metni yüklenemedi."}
+            </p>
+          ) : null}
+          {open && !isPending && !isError && !page ? (
+            <p className="text-sm text-muted-foreground">
+              Satış sözleşmesi metni henüz yayınlanmadı. Yönetim panelinde
+              &quot;mesafeli&quot; içeren bir sayfa yayına alındığında burada
+              görüntülenir.
+            </p>
+          ) : null}
           {page?.content ? (
             <div className="max-h-[60vh] overflow-y-auto pr-2">
               <div className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   CircleAlert,
@@ -28,6 +28,9 @@ import {
   useOrderDownloadsQuery,
   useOrderQuery,
 } from "@/lib/orders";
+
+/** Onay callback'i için beklenen azami süre (saniye). */
+const RESOLVE_TIMEOUT_SECONDS = 60;
 
 function sanitizeFileName(value) {
   return (
@@ -127,6 +130,17 @@ export function OrderResultPage({ orderId, variant = "success" }) {
   const order = orderQuery.data;
   const status = order?.status ?? null;
   const [downloadingId, setDownloadingId] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
+  const startedAtRef = useRef(null);
+
+  useEffect(() => {
+    if (status !== ORDER_STATUSES.PENDING) return undefined;
+    if (startedAtRef.current === null) startedAtRef.current = Date.now();
+    const timer = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [status]);
 
   const downloadsQuery = useOrderDownloadsQuery(orderId, {
     enabled: status === ORDER_STATUSES.PAID,
@@ -256,6 +270,7 @@ export function OrderResultPage({ orderId, variant = "success" }) {
   }
 
   if (status === ORDER_STATUSES.PENDING) {
+    const timedOut = elapsed >= RESOLVE_TIMEOUT_SECONDS;
     return (
       <ResultShell>
         <Clock className="size-14 text-amber-600" />
@@ -263,20 +278,27 @@ export function OrderResultPage({ orderId, variant = "success" }) {
           Ödeme durumunuz doğrulanıyor
         </h1>
         <p className="max-w-md text-sm text-muted-foreground">
-          PayTR dönüşü tek başına ödeme onayı değildir; onay sunucularımıza
-          ulaştığında bu sayfa otomatik güncellenir. Lütfen bekleyin.
+          {timedOut
+            ? "Ödeme onayı beklenenden uzun sürdü. Siparişinizin güncel durumunu siparişlerinizden kontrol edebilirsiniz."
+            : "PayTR, ödeme sonucunu sunucularımıza bildiriyor. Sonuç birkaç saniye içinde bu sayfada görünecek."}
         </p>
         <OrderSummary order={order} />
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <Button variant="outline" onClick={() => orderQuery.refetch()}>
-            <RefreshCw className="size-4" />
-            Ödeme Durumunu Kontrol Et
-          </Button>
-          <Button render={<Link href={`/odeme/${orderId}`} />}>
-            <CreditCard className="size-4" />
-            Ödeme Sayfasına Dön
-          </Button>
-        </div>
+        {!timedOut ? (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <LoaderCircle className="size-4 animate-spin" />
+            Ödeme sonucu bekleniyor...
+          </p>
+        ) : (
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Button variant="outline" onClick={() => orderQuery.refetch()}>
+              <RefreshCw className="size-4" />
+              Tekrar Dene
+            </Button>
+            <Button render={<Link href="/dashboard/customer/siparislerim" />}>
+              Siparişlerime Git
+            </Button>
+          </div>
+        )}
       </ResultShell>
     );
   }

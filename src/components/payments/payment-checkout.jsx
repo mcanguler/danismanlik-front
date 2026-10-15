@@ -2,20 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-hooks";
 import {
   BadgeCheck,
   CircleAlert,
   CircleCheck,
-  Clock,
   CreditCard,
   Download,
   GraduationCap,
   LoaderCircle,
   Package,
   RefreshCw,
-  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
@@ -33,8 +30,6 @@ import {
   ORDER_STATUSES,
   PAYMENT_STATUSES,
   invalidatePaymentRelatedQueries,
-  latestPayment,
-  useCreateOrder,
   useCreateOrderPayment,
   useOrderDownloadsQuery,
   useOrderQuery,
@@ -135,7 +130,6 @@ function ResultShell({ children }) {
 }
 
 export function PaymentCheckout({ orderId }) {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { token } = useAuth();
   const invalidatedRef = useRef(false);
@@ -150,7 +144,6 @@ export function PaymentCheckout({ orderId }) {
   });
   const order = orderQuery.data;
   const orderStatus = order?.status ?? null;
-  const payment = latestPayment(order);
   const isPendingOrder = orderStatus === ORDER_STATUSES.PENDING;
   const hasAppointmentItem = (order?.items ?? []).some(
     (item) => item.itemType === "APPOINTMENT"
@@ -194,7 +187,6 @@ export function PaymentCheckout({ orderId }) {
   };
 
   const startPayment = useCreateOrderPayment();
-  const createOrder = useCreateOrder();
 
   const initiate = () => {
     startPayment.mutate(orderId, {
@@ -402,30 +394,6 @@ export function PaymentCheckout({ orderId }) {
       (item) => item.status === PAYMENT_STATUSES.FAILED
     );
 
-    const handleRetry = async () => {
-      let newOrder;
-      try {
-        newOrder = await createOrder.mutateAsync({
-          items: (order.items ?? []).map((item) => ({
-            item_type: item.itemType,
-            item_id: item.item_id,
-          })),
-        });
-      } catch (error) {
-        toast.add({
-          title: "Yeni sipariş oluşturulamadı",
-          description: getQueryErrorMessage(error),
-          type: "error",
-        });
-        return;
-      }
-      try {
-        router.push(`/odeme/${newOrder.id}`);
-      } catch (error) {
-        console.error("Ödeme sayfasına yönlendirilemedi", error);
-      }
-    };
-
     return (
       <ResultShell>
         <CircleAlert className="size-14 text-destructive" />
@@ -442,13 +410,9 @@ export function PaymentCheckout({ orderId }) {
             : "Bu sipariş için ödeme tamamlanmadı."}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <Button disabled={createOrder.isPending} onClick={handleRetry}>
-            {createOrder.isPending ? (
-              <RefreshCw className="size-4 animate-spin" />
-            ) : (
-              <CreditCard className="size-4" />
-            )}
-            {createOrder.isPending ? "Yönlendiriliyorsunuz..." : "Tekrar Öde"}
+          <Button render={<Link href="/sepet" />}>
+            <CreditCard className="size-4" />
+            Sepetten Tekrar Öde
           </Button>
           <Button
             render={<Link href="/dashboard/customer/siparislerim" />}
@@ -505,45 +469,6 @@ export function PaymentCheckout({ orderId }) {
               src={iframeUrl}
               title="Güvenli ödeme ekranı"
             />
-          </div>
-        )}
-
-        {isPendingOrder && !errorMessage && (
-          <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border-delicate bg-canvas-pure p-5 shadow-[0_2px_12px_rgba(92,29,36,0.03)]">
-            <div className="flex items-start gap-3">
-              <Clock className="mt-0.5 size-4 shrink-0 text-amber-600" />
-              <p className="text-sm text-muted-foreground">
-                {payment?.status === PAYMENT_STATUSES.PENDING
-                  ? "Ödemeniz beklemede. PayTR ekranında işlemi tamamladıktan sonra bu sayfa otomatik güncellenecek. Sekmeyi kapattıysanız bu sayfadan ödemeye devam edebilirsiniz."
-                  : "Ödemenizin sonucu kontrol ediliyor..."}
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                className="h-9"
-                onClick={() => orderQuery.refetch()}
-                variant="outline"
-              >
-                <RefreshCw className="size-4" />
-                Ödeme Durumunu Kontrol Et
-              </Button>
-              {iframeUrl && (
-                <Button
-                  className="h-9"
-                  disabled={startPayment.isPending}
-                  onClick={() => initiate()}
-                  variant="outline"
-                >
-                  <CreditCard className="size-4" />
-                  Ödemeyi Yeniden Başlat
-                </Button>
-              )}
-            </div>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <ShieldCheck className="size-3.5" />
-              Ödemeniz PayTR altyapısı ile güvenli olarak alınır; kart
-              bilgilerimizde saklanmaz.
-            </p>
           </div>
         )}
       </div>
