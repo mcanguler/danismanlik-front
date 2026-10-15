@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { ServicesPageShell } from "@/components/marketing/services-page";
 import { Button } from "@/components/ui/button";
+import { ContractAcceptance } from "@/components/contract/contract-acceptance";
 import {
   Dialog,
   DialogContent,
@@ -204,6 +205,7 @@ function PurchasePanel({ course, hasAccess }) {
   const addCartItem = useAddCartItem();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [contractAccepted, setContractAccepted] = useState(false);
 
   const price = formatPrice(course.effective_price);
   const originalPrice = course.has_discount ? formatPrice(course.price) : null;
@@ -278,6 +280,7 @@ function PurchasePanel({ course, hasAccess }) {
     try {
       order = await createOrder.mutateAsync({
         items: [{ item_type: "COURSE", item_id: course.id }],
+        contract_accepted: true,
       });
     } catch (error) {
       toast.add({
@@ -331,6 +334,14 @@ function PurchasePanel({ course, hasAccess }) {
           PayTR altyapısı ile güvenli ödeme
         </li>
       </ul>
+      {!hasAccess && (
+        <div className="mt-5">
+          <ContractAcceptance
+            checked={contractAccepted}
+            onCheckedChange={setContractAccepted}
+          />
+        </div>
+      )}
       {hasAccess ? (
         <Button
           className="mt-5 h-12 w-full rounded-full text-base"
@@ -345,7 +356,9 @@ function PurchasePanel({ course, hasAccess }) {
         <>
           <Button
             className="mt-5 h-12 w-full rounded-full text-base"
-            disabled={status === "loading" || createOrder.isPending}
+            disabled={
+              status === "loading" || createOrder.isPending || !contractAccepted
+            }
             onClick={handleBuyClick}
             type="button"
           >
@@ -396,7 +409,7 @@ function PurchasePanel({ course, hasAccess }) {
             </Button>
             <Button
               className="h-10"
-              disabled={createOrder.isPending}
+              disabled={createOrder.isPending || !contractAccepted}
               onClick={handleConfirmPurchase}
               type="button"
             >
