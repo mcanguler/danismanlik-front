@@ -7,6 +7,19 @@ const NON_GSM7_CHARS = /[çÇğĞıİöÖşŞüÜ]/;
 /** Backend TemplateRenderer ile aynı yer tutucu deseni. */
 const PLACEHOLDER_PATTERN = /\{\{\s*([a-zA-Z0-9_.]+)\s*\}\}/g;
 
+/** API'nin kabul ettiği kanal değerleri (küçük harf). */
+export const CHANNEL_VALUES = ["sms", "mail"];
+
+/**
+ * Kanal değerini küçük harfe indirip doğrular.
+ * API kanalları küçük harfle döndürür; yazma uçları büyük/küçük harfe duyarsızdır.
+ * @returns {"sms"|"mail"|null}
+ */
+export function normalizeChannelValue(value) {
+  const channel = String(value ?? "").trim().toLowerCase();
+  return CHANNEL_VALUES.includes(channel) ? channel : null;
+}
+
 /**
  * SMS metnini tahmini olarak parçalara böler.
  * Türkçe karakter yoksa 160 (çok parçalı 153), varsa 70 (çok parçalı 67)

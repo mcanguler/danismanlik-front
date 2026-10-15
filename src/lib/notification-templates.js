@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import {
+  CHANNEL_VALUES,
+  normalizeChannelValue,
+} from "./notification-template-utils.mjs";
 
 export const notificationTemplatesQueryKey = ["notification-templates"];
 
@@ -11,11 +15,13 @@ export const NOTIFICATION_AUDIENCES = {
   ADMIN: "ADMIN",
 };
 
-/** Backend enum değerleri (NotificationChannel). */
+/** API kanal değerleri (NotificationTemplateResource küçük harfe çevirir). */
 export const NOTIFICATION_CHANNELS = {
-  SMS: "SMS",
-  MAIL: "MAIL",
+  SMS: "sms",
+  MAIL: "mail",
 };
+
+export const NOTIFICATION_CHANNEL_VALUES = CHANNEL_VALUES;
 
 export const NOTIFICATION_AUDIENCE_LABELS = {
   [NOTIFICATION_AUDIENCES.CUSTOMER]: "Müşteri",
@@ -35,7 +41,7 @@ function asArray(value) {
 function normalizeTemplateChannel(item) {
   if (!item || typeof item !== "object") return null;
   return {
-    channel: item.channel ?? "",
+    channel: normalizeChannelValue(item.channel) ?? "",
     channelLabel: item.channel_label ?? "",
     subject: item.subject ?? "",
     body: item.body ?? "",
@@ -48,9 +54,12 @@ export function normalizeNotificationTemplate(item) {
   if (!item || typeof item !== "object") return null;
 
   const templates = {};
-  for (const [channel, value] of Object.entries(item.templates ?? {})) {
+  for (const [key, value] of Object.entries(item.templates ?? {})) {
     const normalized = normalizeTemplateChannel(value);
-    if (normalized) templates[channel] = normalized;
+    if (!normalized) continue;
+    const channel = normalized.channel || normalizeChannelValue(key);
+    if (!channel) continue;
+    templates[channel] = { ...normalized, channel };
   }
 
   const variables = asArray(item.variables)
@@ -61,9 +70,9 @@ export function normalizeNotificationTemplate(item) {
     }))
     .filter((variable) => variable.key);
 
-  const channels = asArray(item.channels).filter(
-    (channel) => channel === NOTIFICATION_CHANNELS.SMS || channel === NOTIFICATION_CHANNELS.MAIL
-  );
+  const channels = asArray(item.channels)
+    .map((channel) => normalizeChannelValue(channel))
+    .filter(Boolean);
 
   return {
     type: item.type ?? "",

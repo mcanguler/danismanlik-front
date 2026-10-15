@@ -5,7 +5,21 @@ import {
   estimateSmsSegments,
   findUnknownVariables,
   insertVariable,
+  normalizeChannelValue,
 } from "./notification-template-utils.mjs";
+
+test("normalizeChannelValue: büyük harfli API değerini küçük harfe indirir", () => {
+  assert.equal(normalizeChannelValue("MAIL"), "mail");
+  assert.equal(normalizeChannelValue("SMS"), "sms");
+  assert.equal(normalizeChannelValue("mail"), "mail");
+  assert.equal(normalizeChannelValue(" sms "), "sms");
+});
+
+test("normalizeChannelValue: bilinmeyen kanalda null döner", () => {
+  assert.equal(normalizeChannelValue("push"), null);
+  assert.equal(normalizeChannelValue(""), null);
+  assert.equal(normalizeChannelValue(undefined), null);
+});
 
 test("estimateSmsSegments: boş metin sıfır parça", () => {
   const result = estimateSmsSegments("");

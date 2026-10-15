@@ -334,11 +334,31 @@ export function NotificationTemplateEditPage({ type }) {
     );
   }
 
-  if (!template || !drafts || !currentDraft) {
+  if (!template || !drafts) {
     return (
       <div className="w-full flex-1 px-4 py-6">
         <div className="flex justify-center py-16">
           <LoaderCircle className="size-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentDraft) {
+    return (
+      <div className="w-full flex-1 px-4 py-6">
+        <button
+          className="text-sm text-muted-foreground hover:text-foreground"
+          onClick={() => router.push(NOTIFICATION_TEMPLATES_PATH)}
+          type="button"
+        >
+          ← Bildirim Şablonları
+        </button>
+        <div className="mt-4 flex flex-col items-center gap-3 rounded-xl border px-4 py-14 text-center">
+          <CircleAlert className="size-6 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            Bu bildirim için düzenlenebilir kanal bulunamadı.
+          </p>
         </div>
       </div>
     );
