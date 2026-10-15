@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import { notifyScheduleConflicts } from "./schedule-conflicts";
 
 export const blockedTimesQueryKey = ["blocked-times"];
 
@@ -52,8 +53,9 @@ export function useCreateBlockedTime() {
 
   return useMutation({
     mutationFn: (payload) => api.createBlockedTime(token, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: blockedTimesQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -65,8 +67,9 @@ export function useUpdateBlockedTime() {
   return useMutation({
     mutationFn: ({ id, payload }) =>
       api.updateBlockedTime(token, id, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: blockedTimesQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -77,8 +80,9 @@ export function useDeleteBlockedTime() {
 
   return useMutation({
     mutationFn: (id) => api.deleteBlockedTime(token, id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: blockedTimesQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }

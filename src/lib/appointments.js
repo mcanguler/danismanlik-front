@@ -185,6 +185,8 @@ function normalizeAppointment(item) {
     notes: item.notes ?? "",
     customerId: customer?.id ?? item.customer_id ?? null,
     consultantId: consultant?.id ?? item.consultant_id ?? null,
+    orderId: item.order_id ?? null,
+    paymentUrl: item.payment_url ?? null,
   };
 }
 

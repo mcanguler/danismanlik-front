@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import { notifyScheduleConflicts } from "./schedule-conflicts";
 
 export const workingHoursQueryKey = ["working-hours"];
 
@@ -64,8 +65,9 @@ export function useCreateWorkingHour() {
 
   return useMutation({
     mutationFn: (payload) => api.createWorkingHour(token, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: workingHoursQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -76,8 +78,9 @@ export function useUpdateWorkingHour() {
 
   return useMutation({
     mutationFn: ({ id, payload }) => api.updateWorkingHour(token, id, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: workingHoursQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -88,8 +91,9 @@ export function useDeleteWorkingHour() {
 
   return useMutation({
     mutationFn: (id) => api.deleteWorkingHour(token, id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: workingHoursQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }

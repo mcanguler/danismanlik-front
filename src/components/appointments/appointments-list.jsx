@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {CircleAlert, CreditCard, LoaderCircle, Pencil, Plus, X} from "lucide-react";
@@ -35,7 +35,6 @@ import {
     useAppointmentsQuery,
     useCancelAppointment,
 } from "@/lib/appointments";
-import {ORDER_STATUSES, useOrdersQuery} from "@/lib/orders";
 import {AppointmentStatusBadge} from "@/components/appointments/appointment-status-badge";
 
 const CANCELLABLE_STATUSES = [
@@ -47,19 +46,13 @@ function canCancel(status) {
     return CANCELLABLE_STATUSES.includes(status);
 }
 
-function buildPendingOrderMap(orders) {
-    const map = {};
-    for (const order of orders ?? []) {
-        if (order.status !== ORDER_STATUSES.PENDING) continue;
-        for (const item of order.items ?? []) {
-            if (item.itemType !== "APPOINTMENT") continue;
-            const itemId = item.itemId ?? item.item_id;
-            if (itemId === undefined || itemId === null) continue;
-            const key = String(itemId);
-            if (!map[key]) map[key] = order.id;
-        }
-    }
-    return map;
+/**
+ * Ödenmemiş randevu için "Ödemeyi Tamamla" bağlantısı.
+ * Tercihen uygulama içi /odeme/{orderId}; yoksa backend'in payment_url'i.
+ */
+function appointmentPaymentHref(appointment) {
+    if (appointment.orderId) return `/odeme/${appointment.orderId}`;
+    return appointment.paymentUrl || null;
 }
 
 function AppointmentRowCells({appointment, role}) {
@@ -114,11 +107,6 @@ export function AppointmentsList() {
 
     const query = useAppointmentsQuery();
     const appointments = query.data ?? [];
-    const ordersQuery = useOrdersQuery({ enabled: role === "CUSTOMER" });
-    const pendingOrderMap = useMemo(
-        () => (role === "CUSTOMER" ? buildPendingOrderMap(ordersQuery.data) : {}),
-        [role, ordersQuery.data]
-    );
 
     useEffect(() => {
         if (query.isError && query.error instanceof ApiError && query.error.status === 401) {
@@ -229,14 +217,14 @@ export function AppointmentsList() {
                                             <TableCell className="pr-4">
                                                 <div className="flex items-center justify-end gap-1">
                                                     {role === "CUSTOMER" &&
-                                                        pendingOrderMap[String(appointment.id)] && (
+                                                        appointmentPaymentHref(appointment) && (
                                                             <Button
                                                                 variant="outline"
                                                                 size="sm"
                                                                 className="h-8"
                                                                 render={
                                                                     <Link
-                                                                        href={`/odeme/${pendingOrderMap[String(appointment.id)]}`}
+                                                                        href={appointmentPaymentHref(appointment)}
                                                                     />
                                                                 }
                                                             >
@@ -310,12 +298,12 @@ export function AppointmentsList() {
                                         role === "ADMIN" ||
                                         role === "CONSULTANT" ||
                                         (role === "CUSTOMER" &&
-                                            pendingOrderMap[String(appointment.id)])) && (
+                                            appointmentPaymentHref(appointment))) && (
                                         <div className="mt-3 flex items-center gap-2">
                                             {role === "CUSTOMER" &&
-                                                pendingOrderMap[String(appointment.id)] && (
+                                                appointmentPaymentHref(appointment) && (
                                                     <Link
-                                                        href={`/odeme/${pendingOrderMap[String(appointment.id)]}`}
+                                                        href={appointmentPaymentHref(appointment)}
                                                         className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium transition-colors hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                                                         <CreditCard className="size-3.5"/>
                                                         Ödemeyi Tamamla

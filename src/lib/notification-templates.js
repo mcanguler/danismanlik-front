@@ -196,9 +196,14 @@ export function usePreviewNotificationTemplate() {
   const token = useToken();
 
   return useMutation({
-    mutationFn: async ({ type, variables }) =>
+    mutationFn: async ({ type, variables, channel }) =>
       normalizeNotificationPreview(
-        await api.previewNotificationTemplate(token, type, { variables })
+        await api.previewNotificationTemplate(
+          token,
+          type,
+          { variables },
+          channel
+        )
       ),
   });
 }

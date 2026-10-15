@@ -271,7 +271,7 @@ export function NotificationTemplateEditPage({ type }) {
   const handlePreview = () => {
     if (!template) return;
     previewMutation.mutate(
-      { type: template.type, variables: {} },
+      { type: template.type, variables: {}, channel: activeChannel },
       {
         onSuccess: (data) => {
           setPreviewData(data);

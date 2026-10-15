@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import { notifyScheduleConflicts } from "./schedule-conflicts";
 
 export const breaksQueryKey = ["breaks"];
 
@@ -63,8 +64,9 @@ export function useCreateBreak() {
 
   return useMutation({
     mutationFn: (payload) => api.createBreak(token, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: breaksQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -75,8 +77,9 @@ export function useUpdateBreak() {
 
   return useMutation({
     mutationFn: ({ id, payload }) => api.updateBreak(token, id, payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: breaksQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }
@@ -87,8 +90,9 @@ export function useDeleteBreak() {
 
   return useMutation({
     mutationFn: (id) => api.deleteBreak(token, id),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: breaksQueryKey });
+      notifyScheduleConflicts(response);
     },
   });
 }

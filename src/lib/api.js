@@ -439,9 +439,10 @@ export const api = {
       token,
     });
   },
-  previewNotificationTemplate(token, type, payload = {}) {
+  previewNotificationTemplate(token, type, payload = {}, channel = null) {
+    const query = channel ? `?channel=${encodeURIComponent(channel)}` : "";
     return request(
-      `/v1/admin/notification-templates/${encodeURIComponent(type)}/preview`,
+      `/v1/admin/notification-templates/${encodeURIComponent(type)}/preview${query}`,
       { method: "POST", body: payload, token }
     );
   },

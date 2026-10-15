@@ -401,6 +401,14 @@ export function CartPage() {
         });
         return;
       }
+      if (isApiError(error) && error.errors?.email) {
+        // E-posta hatasını alan altında göster (tek yerde, tekrarlamadan).
+        const emailMessages = error.errors.email;
+        setEmailError(
+          Array.isArray(emailMessages) ? emailMessages[0] : emailMessages
+        );
+        return;
+      }
       toast.add({
         title: "Sipariş oluşturulamadı",
         description: errorMessage(error),
@@ -543,7 +551,7 @@ export function CartPage() {
                     <div className="flex justify-between text-muted-foreground"><span>Kargo</span><span className="font-semibold text-secondary">Ücretsiz</span></div>
                     <div className="flex items-end justify-between border-t border-border-delicate pt-4"><div><span className="block font-title-md font-bold text-primary">Toplam Tutar</span><span className="text-xs text-muted-foreground">Güvenli ödeme</span></div><span className="font-headline-md font-bold text-primary-container">{formatPrice(total)}</span></div>
                   </div>
-                  {needsEmail && (
+                  {(needsEmail || emailError) && (
                     <div className="mt-5 flex flex-col gap-1.5">
                       <label
                         className="text-sm font-medium text-primary"
