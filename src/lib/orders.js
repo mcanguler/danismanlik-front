@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { api, ApiError } from "./api";
 import { useAuthStore } from "./auth";
+import { resolvePaytrIframeUrl } from "./paytr-iframe.mjs";
 import {
   customerServicePackagesQueryKey,
   myServicePackagesQueryKey,
@@ -203,11 +204,12 @@ function normalizePaginated(payload, normalizeItem) {
 export function normalizePaymentInitiation(payload) {
   const payment = normalizePayment(payload?.data ?? payload);
   if (!payment) throw new ApiError("Beklenmeyen yanıt formatı");
+  const token = payload?.paytr?.token ?? "";
   return {
     payment,
     paytr: {
-      token: payload?.paytr?.token ?? "",
-      iframeUrl: payload?.paytr?.iframe_url ?? "",
+      token,
+      iframeUrl: resolvePaytrIframeUrl(token, payload?.paytr?.iframe_url ?? ""),
     },
   };
 }
