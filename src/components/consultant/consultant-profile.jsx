@@ -11,6 +11,7 @@ import {
   Mail,
   Phone,
   Save,
+  ShieldCheck,
 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -353,6 +354,13 @@ export function ConsultantProfilePage() {
                     {form.formState.errors.email.message}
                   </p>
                 )}
+              </div>
+              <div className="flex items-start gap-2 rounded-xl border border-border-delicate bg-canvas-cream px-4 py-3 md:col-span-2">
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary-container" />
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Telefon veya e-posta bilgilerinizi değiştirdiğinizde
+                  hesabınıza güvenlik bildirimi gönderilir.
+                </p>
               </div>
               {form.formState.errors.root && (
                 <p className="text-sm text-destructive md:col-span-2">

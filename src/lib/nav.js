@@ -1,5 +1,6 @@
 import {
   Briefcase,
+  Bell,
   Calendar,
   CalendarClock,
   CalendarDays,
@@ -175,6 +176,11 @@ export const NAV = {
           href: "/dashboard/admin/iletisim-formlari",
           icon: Mail,
           bottom: true,
+        },
+        {
+          label: "Bildirim Şablonları",
+          href: "/dashboard/admin/bildirim-sablonlari",
+          icon: Bell,
         },
       ],
     },

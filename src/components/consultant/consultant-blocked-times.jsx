@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ApiError } from "@/lib/api";
+import { applyApiErrorToForm } from "@/lib/form-api-error";
 import { toast } from "@/components/ui/toast";
 import { useMyConsultant } from "@/lib/consultant-scope";
 import {
@@ -334,17 +335,7 @@ function ConsultantBlockedTimeForm({ isEdit, item }) {
   });
 
   const handleError = (error) => {
-    if (error instanceof ApiError) {
-      for (const [field, messages] of Object.entries(error.errors ?? {})) {
-        if (fieldNames.includes(field)) {
-          const message = Array.isArray(messages) ? messages[0] : messages;
-          form.setError(field, { message });
-        }
-      }
-      form.setError("root", { message: error.message });
-    } else {
-      form.setError("root", { message: getErrorMessage(error) });
-    }
+    applyApiErrorToForm(form, error, fieldNames);
   };
 
   const onSubmit = form.handleSubmit((values) => {

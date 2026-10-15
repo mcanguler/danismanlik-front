@@ -34,47 +34,59 @@ function getErrorMessage(error) {
   return "Beklenmeyen bir hata oluştu";
 }
 
+function sortByOrder(items) {
+  return [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+}
+
 export function ProductGallery({ product }) {
   const inputRef = useRef(null);
   const [deleting, setDeleting] = useState(null);
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [reordering, setReordering] = useState(false);
 
   const addImage = useAddProductGalleryImage(product.id);
   const updateImage = useUpdateProductGalleryImage();
   const deleteImage = useDeleteProductGalleryImage();
 
-  const gallery = product.gallery ?? [];
+  const gallery = sortByOrder(product.gallery ?? []);
+  const busy = reordering || updateImage.isPending;
 
-  const moveImage = (image, direction) => {
+  const moveImage = async (image, direction) => {
+    if (busy) return;
     const index = gallery.findIndex((item) => item.id === image.id);
     if (index < 0) return;
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= gallery.length) return;
 
-    const current = gallery[index];
-    const target = gallery[targetIndex];
+    const next = [...gallery];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
 
-    updateImage.mutate(
-      { id: current.id, payload: { sort_order: target.sort_order ?? 0 } },
-      {
-        onSuccess: () => {
-          updateImage.mutate({
-            id: target.id,
-            payload: { sort_order: current.sort_order ?? 0 },
-          });
-        },
-        onError: (error) => {
-          toast.add({
-            title: "Sıralama güncellenemedi",
-            description: getErrorMessage(error),
-            type: "error",
-          });
-        },
+    const updates = next
+      .map((item, position) => ({ item, position }))
+      .filter(({ item, position }) => (item.sort_order ?? 0) !== position)
+      .map(({ item, position }) => ({
+        id: item.id,
+        payload: { sort_order: position },
+      }));
+
+    setReordering(true);
+    try {
+      for (const update of updates) {
+        await updateImage.mutateAsync(update);
       }
-    );
+    } catch (error) {
+      toast.add({
+        title: "Sıralama güncellenemedi",
+        description: getErrorMessage(error),
+        type: "error",
+      });
+    } finally {
+      setReordering(false);
+    }
   };
 
-  const handleFilesChange = (event) => {
+  const handleFilesChange = async (event) => {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (files.length === 0) return;
@@ -95,29 +107,23 @@ export function ProductGallery({ product }) {
 
     setUploadingCount(files.length);
 
-    let pending = files.length;
-    const finish = () => {
-      pending -= 1;
-      if (pending <= 0) {
-        setUploadingCount(0);
-      }
-    };
-
-    files.forEach((file) => {
-      const formData = new FormData();
-      formData.append("image", file);
-      addImage.mutate(formData, {
-        onSuccess: finish,
-        onError: (error) => {
+    await Promise.all(
+      files.map(async (file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+        try {
+          await addImage.mutateAsync(formData);
+        } catch (error) {
           toast.add({
             title: "Görsel eklenemedi",
-            description: getErrorMessage(error),
+            description: `${file.name}: ${getErrorMessage(error)}`,
             type: "error",
           });
-          finish();
-        },
-      });
-    });
+        } finally {
+          setUploadingCount((count) => Math.max(0, count - 1));
+        }
+      })
+    );
   };
 
   return (
@@ -177,12 +183,12 @@ export function ProductGallery({ product }) {
               </div>
               <div className="flex items-center justify-between gap-1 p-2">
                 <span className="text-xs text-muted-foreground">
-                  #{(image.sort_order ?? 0) + 1}
+                  #{index + 1}
                 </span>
                 <div className="flex items-center gap-0.5">
                   <Button
                     aria-label="Yukarı taşı"
-                    disabled={index === 0 || updateImage.isPending}
+                    disabled={index === 0 || busy}
                     onClick={() => moveImage(image, "up")}
                     size="icon-xs"
                     type="button"
@@ -192,7 +198,7 @@ export function ProductGallery({ product }) {
                   </Button>
                   <Button
                     aria-label="Aşağı taşı"
-                    disabled={index === gallery.length - 1 || updateImage.isPending}
+                    disabled={index === gallery.length - 1 || busy}
                     onClick={() => moveImage(image, "down")}
                     size="icon-xs"
                     type="button"

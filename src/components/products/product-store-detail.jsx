@@ -10,6 +10,7 @@ import {
   CircleAlert,
   Layers,
   LoaderCircle,
+  Mail,
   Package,
   ShieldCheck,
   Store,
@@ -657,6 +658,13 @@ function PurchasePanel({ product, relatedCount = 0 }) {
         <ShieldCheck className="size-3.5" />
         Ödemeniz PayTR altyapısı ile 256-Bit SSL şifrelemeyle korunur.
       </p>
+      {isDigital && (
+        <p className="mt-2 flex items-start justify-center gap-1.5 text-center font-label-sm text-label-sm text-on-surface-variant">
+          <Mail className="mt-0.5 size-3.5 shrink-0 text-primary-container" />
+          Bu dijital ürün e-posta ile gönderilir: ödemeniz başarılı olduğunda
+          indirme bağlantısı hesabınızdaki e-posta adresine iletilir.
+        </p>
+      )}
     </div>
   );
 }

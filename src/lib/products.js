@@ -228,7 +228,8 @@ export function normalizeProduct(item) {
   if (!item || typeof item !== "object") return null;
   const gallery = asArray(item.gallery)
     .map(normalizeProductImage)
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   const fields = asArray(item.fields)
     .map(normalizeProductField)
     .filter(Boolean);
@@ -237,7 +238,8 @@ export function normalizeProduct(item) {
     .filter(Boolean);
   const downloads = asArray(item.downloads)
     .map(normalizeProductDownload)
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   return {
     ...item,
     type: item.type ?? PRODUCT_TYPES.PHYSICAL,

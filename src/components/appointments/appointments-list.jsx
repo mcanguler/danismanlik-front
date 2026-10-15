@@ -1,9 +1,9 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {CircleAlert, LoaderCircle, Pencil, Plus, X} from "lucide-react";
+import {CircleAlert, CreditCard, LoaderCircle, Pencil, Plus, X} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {
     Table,
@@ -35,6 +35,7 @@ import {
     useAppointmentsQuery,
     useCancelAppointment,
 } from "@/lib/appointments";
+import {ORDER_STATUSES, useOrdersQuery} from "@/lib/orders";
 import {AppointmentStatusBadge} from "@/components/appointments/appointment-status-badge";
 
 const CANCELLABLE_STATUSES = [
@@ -44,6 +45,21 @@ const CANCELLABLE_STATUSES = [
 
 function canCancel(status) {
     return CANCELLABLE_STATUSES.includes(status);
+}
+
+function buildPendingOrderMap(orders) {
+    const map = {};
+    for (const order of orders ?? []) {
+        if (order.status !== ORDER_STATUSES.PENDING) continue;
+        for (const item of order.items ?? []) {
+            if (item.itemType !== "APPOINTMENT") continue;
+            const itemId = item.itemId ?? item.item_id;
+            if (itemId === undefined || itemId === null) continue;
+            const key = String(itemId);
+            if (!map[key]) map[key] = order.id;
+        }
+    }
+    return map;
 }
 
 function AppointmentRowCells({appointment, role}) {
@@ -98,6 +114,11 @@ export function AppointmentsList() {
 
     const query = useAppointmentsQuery();
     const appointments = query.data ?? [];
+    const ordersQuery = useOrdersQuery({ enabled: role === "CUSTOMER" });
+    const pendingOrderMap = useMemo(
+        () => (role === "CUSTOMER" ? buildPendingOrderMap(ordersQuery.data) : {}),
+        [role, ordersQuery.data]
+    );
 
     useEffect(() => {
         if (query.isError && query.error instanceof ApiError && query.error.status === 401) {
@@ -207,6 +228,22 @@ export function AppointmentsList() {
                                             <AppointmentRowCells appointment={appointment} role={role}/>
                                             <TableCell className="pr-4">
                                                 <div className="flex items-center justify-end gap-1">
+                                                    {role === "CUSTOMER" &&
+                                                        pendingOrderMap[String(appointment.id)] && (
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8"
+                                                                render={
+                                                                    <Link
+                                                                        href={`/odeme/${pendingOrderMap[String(appointment.id)]}`}
+                                                                    />
+                                                                }
+                                                            >
+                                                                <CreditCard className="size-3.5"/>
+                                                                Ödemeyi Tamamla
+                                                            </Button>
+                                                        )}
                                                     {(role === "ADMIN" || role === "CONSULTANT") && (
                                                         <Button
                                                             variant="ghost"
@@ -271,8 +308,19 @@ export function AppointmentsList() {
                                     </div>
                                     {(canCancel(appointment.status) ||
                                         role === "ADMIN" ||
-                                        role === "CONSULTANT") && (
+                                        role === "CONSULTANT" ||
+                                        (role === "CUSTOMER" &&
+                                            pendingOrderMap[String(appointment.id)])) && (
                                         <div className="mt-3 flex items-center gap-2">
+                                            {role === "CUSTOMER" &&
+                                                pendingOrderMap[String(appointment.id)] && (
+                                                    <Link
+                                                        href={`/odeme/${pendingOrderMap[String(appointment.id)]}`}
+                                                        className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium transition-colors hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                                        <CreditCard className="size-3.5"/>
+                                                        Ödemeyi Tamamla
+                                                    </Link>
+                                                )}
                                             {(role === "ADMIN" || role === "CONSULTANT") && (
                                                 <Link href={`/appointments/${appointment.id}/edit`}
                                                       className="flex h-9 flex-1 items-center justify-center gap-2 rounded-lg border bg-card px-3 text-sm font-medium transition-colors hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
@@ -312,7 +360,7 @@ export function AppointmentsList() {
                         <AlertDialogTitle>Randevuyu iptal et</AlertDialogTitle>
                         <AlertDialogDescription>
                             {cancelling
-                                ? `${formatDateLabel(cancelling.startAt)} ${formatTimeLabel(cancelling.startAt)} tarihli randevu iptal edilecek. Bu işlem geri alınamaz.`
+                                ? `${cancelling.serviceName ? `${cancelling.serviceName} · ` : ""}${formatDateLabel(cancelling.startAt)} ${formatTimeLabel(cancelling.startAt)} tarihli randevu iptal edilecek. Kayıt "İptal Edildi" durumunda kalır; bu işlem geri alınamaz.`
                                 : "Randevu iptal edilecek."}
                         </AlertDialogDescription>
                     </AlertDialogHeader>

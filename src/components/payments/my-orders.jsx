@@ -19,6 +19,7 @@ import {
 import {
   ORDER_STATUS_BADGE_CLASSES,
   ORDER_STATUS_LABELS,
+  ORDER_STATUSES,
   ORDER_ITEM_TYPE_LABELS,
   PAYMENT_STATUS_LABELS,
   latestPayment,
@@ -92,46 +93,62 @@ export function MyOrders() {
 
         {orders.map((order) => {
           const payment = latestPayment(order);
+          const isPending = order.status === ORDER_STATUSES.PENDING;
           return (
-            <Link
-              className="group block rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 transition-shadow hover:shadow-md"
-              href={`/dashboard/customer/siparislerim/${order.id}`}
-              key={order.id}
-            >
-              <Card className="border-0 shadow-none ring-0 transition-colors group-hover:bg-accent/30">
-                <CardHeader>
-                  <CardTitle className="font-mono text-sm">
-                    {order.orderNo}
-                  </CardTitle>
-                  <CardDescription>
-                    {formatDateTimeTr(order.createdAt)} ·{" "}
-                    {(order.items ?? [])
-                      .map((item) => item.name)
-                      .filter(Boolean)
-                      .join(", ")}
-                  </CardDescription>
-                  <CardAction className="flex flex-col items-end gap-1.5">
-                    <OrderStatusBadge order={order} />
-                    <span className="text-xs text-muted-foreground">
-                      {formatPrice(order.totalAmount)} {order.currency}
-                    </span>
-                  </CardAction>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span>
+            <div className="flex flex-col gap-2" key={order.id}>
+              <Link
+                className="group block rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 transition-shadow hover:shadow-md"
+                href={`/dashboard/customer/siparislerim/${order.id}`}
+              >
+                <Card className="border-0 shadow-none ring-0 transition-colors group-hover:bg-accent/30">
+                  <CardHeader>
+                    <CardTitle className="font-mono text-sm">
+                      {order.orderNo}
+                    </CardTitle>
+                    <CardDescription>
+                      {formatDateTimeTr(order.createdAt)} ·{" "}
                       {(order.items ?? [])
-                        .map((item) => ORDER_ITEM_TYPE_LABELS[item.itemType])
+                        .map((item) => item.name)
                         .filter(Boolean)
-                        .join(" + ") || "Sipariş"}
-                    </span>
-                    {payment && (
-                      <span>Ödeme: {PAYMENT_STATUS_LABELS[payment.status]}</span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                        .join(", ")}
+                    </CardDescription>
+                    <CardAction className="flex flex-col items-end gap-1.5">
+                      <OrderStatusBadge order={order} />
+                      <span className="text-xs text-muted-foreground">
+                        {formatPrice(order.totalAmount)} {order.currency}
+                      </span>
+                    </CardAction>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      <span>
+                        {(order.items ?? [])
+                          .map((item) => ORDER_ITEM_TYPE_LABELS[item.itemType])
+                          .filter(Boolean)
+                          .join(" + ") || "Sipariş"}
+                      </span>
+                      {payment && (
+                        <span>Ödeme: {PAYMENT_STATUS_LABELS[payment.status]}</span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+              {isPending && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+                  <p className="text-sm text-muted-foreground">
+                    Bu sipariş için ödeme bekleniyor.
+                  </p>
+                  <Button
+                    className="h-9"
+                    render={<Link href={`/odeme/${order.id}`} />}
+                  >
+                    <CreditCard className="size-4" />
+                    Ödemeyi Tamamla
+                  </Button>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

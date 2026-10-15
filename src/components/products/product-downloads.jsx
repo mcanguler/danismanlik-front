@@ -39,9 +39,13 @@ function getErrorMessage(error) {
   return "Beklenmeyen bir hata oluştu";
 }
 
+function sortByOrder(items) {
+  return [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+}
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-function DownloadRow({ download, index, total, move, update, onDelete }) {
+function DownloadRow({ download, index, total, move, update, busy, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(download.title ?? "");
 
@@ -114,7 +118,7 @@ function DownloadRow({ download, index, total, move, update, onDelete }) {
           <>
             <p className="truncate text-sm font-medium">{download.title}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Sıra: {(download.sort_order ?? 0) + 1}
+              Sıra: {index + 1}
             </p>
           </>
         )}
@@ -141,7 +145,7 @@ function DownloadRow({ download, index, total, move, update, onDelete }) {
         <span className="flex items-center gap-0.5">
           <Button
             aria-label="Yukarı taşı"
-            disabled={index === 0 || update.isPending}
+            disabled={index === 0 || busy}
             onClick={() => move(download, "up")}
             size="icon-xs"
             type="button"
@@ -151,7 +155,7 @@ function DownloadRow({ download, index, total, move, update, onDelete }) {
           </Button>
           <Button
             aria-label="Aşağı taşı"
-            disabled={index === total - 1 || update.isPending}
+            disabled={index === total - 1 || busy}
             onClick={() => move(download, "down")}
             size="icon-xs"
             type="button"
@@ -190,40 +194,48 @@ export function ProductDownloads({ product }) {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [deleting, setDeleting] = useState(null);
+  const [reordering, setReordering] = useState(false);
 
   const addDownload = useAddProductDownload(product.id);
   const updateDownload = useUpdateProductDownload();
   const deleteDownload = useDeleteProductDownload();
 
-  const downloads = product.downloads ?? [];
+  const downloads = sortByOrder(product.downloads ?? []);
+  const busy = reordering || updateDownload.isPending;
 
-  const moveDownload = (download, direction) => {
+  const moveDownload = async (download, direction) => {
+    if (busy) return;
     const index = downloads.findIndex((item) => item.id === download.id);
     if (index < 0) return;
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= downloads.length) return;
 
-    const current = downloads[index];
-    const target = downloads[targetIndex];
+    const next = [...downloads];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
 
-    updateDownload.mutate(
-      { id: current.id, payload: { sort_order: target.sort_order ?? 0 } },
-      {
-        onSuccess: () => {
-          updateDownload.mutate({
-            id: target.id,
-            payload: { sort_order: current.sort_order ?? 0 },
-          });
-        },
-        onError: (error) => {
-          toast.add({
-            title: "Sıralama güncellenemedi",
-            description: getErrorMessage(error),
-            type: "error",
-          });
-        },
+    const updates = next
+      .map((item, position) => ({ item, position }))
+      .filter(({ item, position }) => (item.sort_order ?? 0) !== position)
+      .map(({ item, position }) => ({
+        id: item.id,
+        payload: { sort_order: position },
+      }));
+
+    setReordering(true);
+    try {
+      for (const update of updates) {
+        await updateDownload.mutateAsync(update);
       }
-    );
+    } catch (error) {
+      toast.add({
+        title: "Sıralama güncellenemedi",
+        description: getErrorMessage(error),
+        type: "error",
+      });
+    } finally {
+      setReordering(false);
+    }
   };
 
   const handleFileChange = (event) => {
@@ -337,6 +349,7 @@ export function ProductDownloads({ product }) {
         <div className="flex flex-col gap-2">
           {downloads.map((download, index) => (
             <DownloadRow
+              busy={busy}
               download={download}
               index={index}
               key={download.id}

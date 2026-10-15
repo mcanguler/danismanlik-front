@@ -250,6 +250,14 @@ export function CartPage() {
   const [busyId, setBusyId] = useState(null);
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState(null);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(null);
+
+  const accountEmail = (user?.email ?? "").trim();
+  const needsEmail =
+    status === "authenticated" &&
+    user?.role === ROLES.CUSTOMER &&
+    accountEmail.length === 0;
 
   const items = cartQuery.data?.items ?? [];
   const meta = cartQuery.data?.meta ?? {};
@@ -358,12 +366,29 @@ export function CartPage() {
       return;
     }
 
+    let checkoutEmail;
+    if (needsEmail) {
+      checkoutEmail = email.trim();
+      if (!/^\S+@\S+\.\S+$/.test(checkoutEmail)) {
+        setEmailError("Geçerli bir e-posta adresi girin");
+        toast.add({
+          title: "E-posta gerekli",
+          description:
+            "Dijital ürünlerin indirme bağlantısı için geçerli bir e-posta adresi girin.",
+          type: "info",
+        });
+        return;
+      }
+      setEmailError(null);
+    }
+
     // Sipariş oluşturma dışındaki adımlar (navigasyon vb.) hata verse bile
     // "sipariş oluşturulamadı" mesajı gösterilmemesi için kapsam daraltıldı.
     let order;
     try {
       order = await checkout.mutateAsync({
         contract_accepted: contractAccepted ? true : undefined,
+        ...(checkoutEmail ? { email: checkoutEmail } : {}),
       });
     } catch (error) {
       if (isContractRequiredError(error)) {
@@ -518,6 +543,37 @@ export function CartPage() {
                     <div className="flex justify-between text-muted-foreground"><span>Kargo</span><span className="font-semibold text-secondary">Ücretsiz</span></div>
                     <div className="flex items-end justify-between border-t border-border-delicate pt-4"><div><span className="block font-title-md font-bold text-primary">Toplam Tutar</span><span className="text-xs text-muted-foreground">Güvenli ödeme</span></div><span className="font-headline-md font-bold text-primary-container">{formatPrice(total)}</span></div>
                   </div>
+                  {needsEmail && (
+                    <div className="mt-5 flex flex-col gap-1.5">
+                      <label
+                        className="text-sm font-medium text-primary"
+                        htmlFor="checkout_email"
+                      >
+                        E-posta Adresi
+                      </label>
+                      <Input
+                        className="h-10 bg-canvas-cream"
+                        id="checkout_email"
+                        inputMode="email"
+                        onChange={(event) => {
+                          setEmail(event.target.value);
+                          if (emailError) setEmailError(null);
+                        }}
+                        placeholder="ornek@eposta.com"
+                        type="email"
+                        value={email}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Dijital ürünlerin indirme bağlantısı bu adrese gönderilir.
+                      </p>
+                      {emailError && (
+                        <p className="flex items-center gap-1.5 text-xs font-medium text-destructive">
+                          <CircleAlert className="size-3.5 shrink-0" />
+                          {emailError}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {status !== "loading" && (
                     <div className="mt-5">
                       <ContractAcceptance

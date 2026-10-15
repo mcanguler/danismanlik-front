@@ -425,6 +425,38 @@ export const api = {
   deleteCoupon(token, id) {
     return request(`/v1/admin/coupons/${id}`, { method: "DELETE", token });
   },
+  adminNotificationTemplates(token, params = {}) {
+    const search = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== "")
+    ).toString();
+    return request(
+      `/v1/admin/notification-templates${search ? `?${search}` : ""}`,
+      { token }
+    );
+  },
+  adminNotificationTemplate(token, type) {
+    return request(`/v1/admin/notification-templates/${encodeURIComponent(type)}`, {
+      token,
+    });
+  },
+  previewNotificationTemplate(token, type, payload = {}) {
+    return request(
+      `/v1/admin/notification-templates/${encodeURIComponent(type)}/preview`,
+      { method: "POST", body: payload, token }
+    );
+  },
+  updateNotificationTemplate(token, type, channel, payload) {
+    return request(
+      `/v1/admin/notification-templates/${encodeURIComponent(type)}/${encodeURIComponent(channel)}`,
+      { method: "PATCH", body: payload, token }
+    );
+  },
+  resetNotificationTemplate(token, type, channel) {
+    return request(
+      `/v1/admin/notification-templates/${encodeURIComponent(type)}/${encodeURIComponent(channel)}/reset`,
+      { method: "POST", token }
+    );
+  },
   adminPayment(token, id) {
     return request(`/v1/admin/payments/${id}`, { token });
   },

@@ -41,47 +41,64 @@ function getErrorMessage(error) {
   return "Beklenmeyen bir hata oluştu";
 }
 
+function sortByOrder(items) {
+  return [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+}
+
 export function ConsultantCertificatesManager({ consultant }) {
   const inputRef = useRef(null);
   const [deleting, setDeleting] = useState(null);
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [reordering, setReordering] = useState(false);
 
   const addCertificate = useAddConsultantCertificate(consultant.id);
   const updateCertificate = useUpdateConsultantCertificate();
   const deleteCertificate = useDeleteConsultantCertificate();
 
-  const certificates = consultant.certificates ?? [];
+  const certificates = sortByOrder(consultant.certificates ?? []);
+  const busy =
+    reordering ||
+    addCertificate.isPending ||
+    updateCertificate.isPending ||
+    deleteCertificate.isPending ||
+    uploadingCount > 0;
 
-  const moveCertificate = (certificate, direction) => {
+  const moveCertificate = async (certificate, direction) => {
+    if (busy) return;
     const index = certificates.findIndex((item) => item.id === certificate.id);
     if (index < 0) return;
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= certificates.length) return;
 
-    const current = certificates[index];
-    const target = certificates[targetIndex];
+    const next = [...certificates];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
 
-    updateCertificate.mutate(
-      { id: current.id, payload: { sort_order: target.sort_order ?? 0 } },
-      {
-        onSuccess: () => {
-          updateCertificate.mutate({
-            id: target.id,
-            payload: { sort_order: current.sort_order ?? 0 },
-          });
-        },
-        onError: (error) => {
-          toast.add({
-            title: "Sıralama güncellenemedi",
-            description: getErrorMessage(error),
-            type: "error",
-          });
-        },
+    const updates = next
+      .map((item, position) => ({ item, position }))
+      .filter(({ item, position }) => (item.sort_order ?? 0) !== position)
+      .map(({ item, position }) => ({
+        id: item.id,
+        payload: { sort_order: position },
+      }));
+
+    setReordering(true);
+    try {
+      for (const update of updates) {
+        await updateCertificate.mutateAsync(update);
       }
-    );
+    } catch (error) {
+      toast.add({
+        title: "Sıralama güncellenemedi",
+        description: getErrorMessage(error),
+        type: "error",
+      });
+    } finally {
+      setReordering(false);
+    }
   };
 
-  const handleFilesChange = (event) => {
+  const handleFilesChange = async (event) => {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     if (files.length === 0) return;
@@ -102,43 +119,29 @@ export function ConsultantCertificatesManager({ consultant }) {
 
     setUploadingCount(files.length);
 
-    let pending = files.length;
-    const finish = () => {
-      pending -= 1;
-      if (pending <= 0) {
-        setUploadingCount(0);
-      }
-    };
-
-    files.forEach((file) => {
-      const formData = new FormData();
-      formData.append("image", file);
-      addCertificate.mutate(formData, {
-        onSuccess: () => {
+    await Promise.all(
+      files.map(async (file) => {
+        const formData = new FormData();
+        formData.append("image", file);
+        try {
+          await addCertificate.mutateAsync(formData);
           toast.add({
             title: "Sertifika yüklendi",
             description: file.name,
             type: "success",
           });
-          finish();
-        },
-        onError: (error) => {
+        } catch (error) {
           toast.add({
             title: "Sertifika yüklenemedi",
             description: getErrorMessage(error),
             type: "error",
           });
-          finish();
-        },
-      });
-    });
+        } finally {
+          setUploadingCount((count) => Math.max(0, count - 1));
+        }
+      })
+    );
   };
-
-  const busy =
-    addCertificate.isPending ||
-    updateCertificate.isPending ||
-    deleteCertificate.isPending ||
-    uploadingCount > 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -190,14 +193,14 @@ export function ConsultantCertificatesManager({ consultant }) {
               <div className="aspect-3/4 w-full bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  alt={`Sertifika #${(certificate.sort_order ?? 0) + 1}`}
+                  alt={`Sertifika #${index + 1}`}
                   className="h-full w-full object-cover"
                   src={certificate.src}
                 />
               </div>
               <div className="flex items-center justify-between gap-1 p-2">
                 <span className="text-xs text-muted-foreground">
-                  #{(certificate.sort_order ?? 0) + 1}
+                  #{index + 1}
                 </span>
                 <div className="flex items-center gap-0.5">
                   <Button
